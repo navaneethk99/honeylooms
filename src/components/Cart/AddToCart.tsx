@@ -94,6 +94,51 @@ export function AddToCart({ product }: Props) {
     return false
   }, [selectedVariant, cart?.items, product])
 
+  const isOutOfStock = useMemo<boolean>(() => {
+    if (product.enableVariants) {
+      if (selectedVariant) {
+        const existingItem = cart?.items?.find((item) => {
+          const productID = typeof item.product === 'object' ? item.product?.id : item.product
+          const variantID = item.variant
+            ? typeof item.variant === 'object'
+              ? item.variant?.id
+              : item.variant
+            : undefined
+
+          return productID === product.id && variantID === selectedVariant.id
+        })
+
+        if (existingItem && existingItem.quantity >= (selectedVariant.inventory || 0)) {
+          return true
+        }
+
+        return selectedVariant.inventory === 0 || !selectedVariant.inventory
+      }
+
+      const allVariants = product.variants?.docs || []
+      if (allVariants.length > 0) {
+        return allVariants.every((variant) => {
+          if (typeof variant === 'object' && variant !== null) {
+            return variant.inventory === 0 || !variant.inventory
+          }
+          return true
+        })
+      }
+      return true
+    }
+
+    const existingItem = cart?.items?.find((item) => {
+      const productID = typeof item.product === 'object' ? item.product?.id : item.product
+      return productID === product.id
+    })
+
+    if (existingItem && existingItem.quantity >= (product.inventory || 0)) {
+      return true
+    }
+
+    return product.inventory === 0 || !product.inventory
+  }, [selectedVariant, cart?.items, product])
+
   return (
     <button
       aria-label="Add to cart"
@@ -107,7 +152,13 @@ export function AddToCart({ product }: Props) {
       onClick={addToCart}
       type="submit"
     >
-      {isLoading ? 'Adding...' : 'Add to bag'}
+      {isLoading
+        ? 'Adding...'
+        : isOutOfStock
+        ? 'Out of Stock'
+        : product.enableVariants && !selectedVariant
+        ? 'Select size'
+        : 'Add to bag'}
     </button>
   )
 }

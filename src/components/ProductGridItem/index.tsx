@@ -87,11 +87,11 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
       <div className="flex flex-col gap-1 px-3 py-3.5 border-t border-neutral-100 dark:border-neutral-900 transition-colors duration-300 group-hover:border-neutral-200 dark:group-hover:border-neutral-800">
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col gap-0.5 min-w-0">
-            {categoryTitle && (
+            {/*{categoryTitle && (
               <span className="text-[9px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-mono">
                 {categoryTitle}
               </span>
-            )}
+            )}*/}
             <h3 className="font-sans text-sm font-medium text-neutral-800 dark:text-neutral-200 leading-snug tracking-tight truncate group-hover:text-neutral-950 dark:group-hover:text-neutral-50 transition-colors duration-300">
               {title}
             </h3>

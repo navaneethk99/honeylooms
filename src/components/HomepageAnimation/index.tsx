@@ -323,10 +323,13 @@ export function HomepageAnimation({ products }: Props) {
         </div>
 
         {/* Footer Swipe indicator */}
-        <div className="text-center z-10 pointer-events-none select-none mt-4">
-          <span className="text-[9px] uppercase tracking-[0.25em] text-zinc-700 font-mono">
-            Swipe to view &rarr;
-          </span>
+        <div className="text-center z-10  select-none mt-4">
+          <a
+            href="/shop"
+            className="bg-white/40 tracking-[0.2em] uppercase rounded-full px-4 py-1 border-2 hover:bg-white/50 hover:-translate-y-1 transition-all duration-300"
+          >
+            Explore Store
+          </a>
         </div>
       </div>
     )
@@ -370,18 +373,80 @@ export function HomepageAnimation({ products }: Props) {
             ref={scrollIndicatorRef}
             className="transition-opacity gap-5 duration-300 flex justify-center items-center flex-col pointer-events-auto"
           >
-            <div className="flex gap-3 justify-center items-center uppercase tracking-[0.3em]">
+            <div className="flex gap-4 justify-center items-center uppercase tracking-[0.25em] text-[10px] sm:text-xs font-mono font-semibold">
               <a
                 href="/shop"
-                className="bg-white/40 rounded-full px-2 py-1 border-2 hover:bg-white/50 transition-all duration-300"
+                className="group relative p-[1px] transition-transform duration-300 hover:scale-105"
+                style={{
+                  clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                }}
               >
-                Explore Store
+                {/* Border layer */}
+                <div
+                  className="absolute inset-0 bg-zinc-900/10 group-hover:bg-zinc-900/25 transition-colors duration-300"
+                  style={{
+                    clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                  }}
+                />
+                {/* Content layer */}
+                <div
+                  className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 text-zinc-900 transition-colors duration-300 flex items-center justify-center min-w-[160px] h-11"
+                  style={{
+                    clipPath: 'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
+                  }}
+                >
+                  <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em]">
+                    {"Explore Store".split("").map((char, index) => (
+                      <span
+                        key={index}
+                        className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-1/2"
+                        style={{ transitionDelay: `${index * 25}ms`, height: '2.4em' }}
+                      >
+                        <span className="h-[1.2em] flex items-center justify-center">{char === ' ' ? '\u00A0' : char}</span>
+                        <span className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold" aria-hidden="true">
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                      </span>
+                    ))}
+                  </span>
+                </div>
               </a>
               <a
                 href="/collections"
-                className="bg-white/40 rounded-full px-2 py-1 border-2 hover:bg-white/50 transition-all duration-300"
+                className="group relative p-[1px] transition-transform duration-300 hover:scale-105"
+                style={{
+                  clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                }}
               >
-                All Collections
+                {/* Border layer */}
+                <div
+                  className="absolute inset-0 bg-zinc-900/10 group-hover:bg-zinc-900/25 transition-colors duration-300"
+                  style={{
+                    clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                  }}
+                />
+                {/* Content layer */}
+                <div
+                  className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 text-zinc-900 transition-colors duration-300 flex items-center justify-center min-w-[160px] h-11"
+                  style={{
+                    clipPath: 'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
+                  }}
+                >
+                  <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em]">
+                    {"All Collections".split("").map((char, index) => (
+                      <span
+                        key={index}
+                        className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-1/2"
+                        style={{ transitionDelay: `${index * 25}ms`, height: '2.4em' }}
+                      >
+                        <span className="h-[1.2em] flex items-center justify-center">{char === ' ' ? '\u00A0' : char}</span>
+                        <span className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold" aria-hidden="true">
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                      </span>
+                    ))}
+                  </span>
+                </div>
               </a>
             </div>
             <span className="text-xl uppercase tracking-[0.3em] text-white font-mono text-center pl-[0.3em]">

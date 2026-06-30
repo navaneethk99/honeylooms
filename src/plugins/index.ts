@@ -18,7 +18,7 @@ import { applyCosmeticCurrencyAdminOverrides } from '@/utilities/adminCurrencyOv
 import { cashfreeAdapter } from '@/payments/cashfree/server'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Ecommerce Template` : 'Payload Ecommerce Template'
+  return doc?.title ? `${doc.title} | Honeylooms` : 'Honeylooms'
 }
 
 const generateURL: GenerateURL<Product | Page> = ({ doc }) => {

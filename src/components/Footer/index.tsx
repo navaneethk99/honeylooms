@@ -45,17 +45,13 @@ export async function Footer() {
       </div>
       <div className="border-t border-neutral-200 py-6 text-sm dark:border-neutral-700">
         <div className="container mx-auto flex w-full flex-col items-center gap-1 md:flex-row md:gap-0">
-          <p>
+          {/*<p>
             &copy; {copyrightDate} {copyrightName}
             {copyrightName.length && !copyrightName.endsWith('.') ? '.' : ''} All rights reserved.
-          </p>
-          <hr className="mx-4 hidden h-4 w-px border-l border-neutral-400 md:inline-block" />
-          <p>Designed in Michigan</p>
-          <p className="md:ml-auto">
-            <a className="text-black dark:text-white" href="https://payloadcms.com">
-              Crafted by Payload
-            </a>
-          </p>
+          </p>*/}
+          {/*<hr className="mx-4 hidden h-4 w-px border-l border-neutral-400 md:inline-block" />*/}
+          {/*<p>Designed in Michigan</p>*/}
+          <p className="md:ml-auto"></p>
         </div>
       </div>
     </footer>
