@@ -79,7 +79,19 @@ export const Pages: CollectionConfig = {
       type: 'tabs',
       tabs: [
         {
-          fields: [hero],
+          fields: [
+            hero,
+            {
+              name: 'featuredOutfits',
+              type: 'relationship',
+              relationTo: 'products',
+              hasMany: true,
+              admin: {
+                condition: (data) => data?.slug === 'home',
+                description: 'Select exactly 6 products to showcase in the homepage scroll animation.',
+              },
+            },
+          ],
           label: 'Hero',
         },
         {

@@ -20,7 +20,7 @@ import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
-import { Product } from '@/payload-types'
+import { Product, Variant } from '@/payload-types'
 
 export function CartModal() {
   const { cart } = useCart()
@@ -61,8 +61,8 @@ export function CartModal() {
             <div className="flex flex-col justify-between w-full">
               <ul className="grow overflow-auto py-4">
                 {cart?.items?.map((item, i) => {
-                  const product = item.product
-                  const variant = item.variant
+                  const product = item.product as Product
+                  const variant = item.variant as Variant
 
                   if (typeof product !== 'object' || !item || !product || !product.slug)
                     return <React.Fragment key={i} />

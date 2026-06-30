@@ -15,6 +15,7 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from '@/collections/Categories'
+import { Collections } from '@/collections/Collections'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
@@ -38,10 +39,13 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Pages, Categories, Media],
+  collections: [Users, Pages, Categories, Media, Collections],
   db: postgresAdapter({
     pool: {
       connectionString: getDatabaseURL(process.env.DATABASE_URL),
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
     },
   }),
   editor: lexicalEditor({

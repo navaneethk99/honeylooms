@@ -76,6 +76,7 @@ export interface Config {
     pages: Page;
     categories: Category;
     media: Media;
+    collections: Collection;
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
@@ -109,6 +110,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    collections: CollectionsSelect<false> | CollectionsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
@@ -309,6 +311,7 @@ export interface Product {
     description?: string | null;
   };
   categories?: (number | Category)[] | null;
+  collections?: (number | Collection)[] | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -476,6 +479,10 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
+  /**
+   * Select exactly 6 products to showcase in the homepage scroll animation.
+   */
+  featuredOutfits?: (number | Product)[] | null;
   layout: (
     | CallToActionBlock
     | ContentBlock
@@ -896,6 +903,24 @@ export interface Variant {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections".
+ */
+export interface Collection {
+  id: number;
+  title: string;
+  showOnHomePage?: boolean | null;
+  poster: number | Media;
+  banner: number | Media;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "transactions".
  */
 export interface Transaction {
@@ -1080,6 +1105,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'collections';
+        value: number | Collection;
+      } | null)
+    | ({
         relationTo: 'forms';
         value: number | Form;
       } | null)
@@ -1217,6 +1246,7 @@ export interface PagesSelect<T extends boolean = true> {
             };
         media?: T;
       };
+  featuredOutfits?: T;
   layout?:
     | T
     | {
@@ -1389,6 +1419,20 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_select".
+ */
+export interface CollectionsSelect<T extends boolean = true> {
+  title?: T;
+  showOnHomePage?: T;
+  poster?: T;
+  banner?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1636,6 +1680,7 @@ export interface ProductsSelect<T extends boolean = true> {
         description?: T;
       };
   categories?: T;
+  collections?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;

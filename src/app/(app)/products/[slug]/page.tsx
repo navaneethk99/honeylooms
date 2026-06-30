@@ -13,6 +13,7 @@ import React, { Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChevronLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
+import { unstable_cache } from 'next/cache'
 
 type Args = {
   params: Promise<{
@@ -184,17 +185,15 @@ function RelatedProducts({ products }: { products: Product[] }) {
   )
 }
 
-const queryProductBySlug = async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
-
+const getProductBySlug = async (slug: string) => {
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
     collection: 'products',
     depth: 3,
-    draft,
+    draft: false,
     limit: 1,
-    overrideAccess: draft,
+    overrideAccess: false,
     pagination: false,
     where: {
       and: [
@@ -203,7 +202,11 @@ const queryProductBySlug = async ({ slug }: { slug: string }) => {
             equals: slug,
           },
         },
-        ...(draft ? [] : [{ _status: { equals: 'published' } }]),
+        {
+          _status: {
+            equals: 'published',
+          },
+        },
       ],
     },
     populate: {
@@ -217,4 +220,50 @@ const queryProductBySlug = async ({ slug }: { slug: string }) => {
   })
 
   return result.docs?.[0] || null
+}
+
+const getCachedProductBySlug = unstable_cache(
+  async (slug: string) => getProductBySlug(slug),
+  ['products'],
+  {
+    tags: ['products'],
+  }
+)
+
+const queryProductBySlug = async ({ slug }: { slug: string }) => {
+  const { isEnabled: draft } = await draftMode()
+
+  if (draft) {
+    const payload = await getPayload({ config: configPromise })
+
+    const result = await payload.find({
+      collection: 'products',
+      depth: 3,
+      draft,
+      limit: 1,
+      overrideAccess: draft,
+      pagination: false,
+      where: {
+        and: [
+          {
+            slug: {
+              equals: slug,
+            },
+          },
+        ],
+      },
+      populate: {
+        variants: {
+          title: true,
+          priceInUSD: true,
+          inventory: true,
+          options: true,
+        },
+      },
+    })
+
+    return result.docs?.[0] || null
+  }
+
+  return getCachedProductBySlug(slug)
 }

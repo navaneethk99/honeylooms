@@ -91,6 +91,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                 },
                 {
                   name: 'variantOption',
+                  dbName: 'varOpt',
                   type: 'relationship',
                   relationTo: 'variantOptions',
                   admin: {
@@ -129,7 +130,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                       },
                     }
                   },
-                },
+                } as any,
               ],
             },
 
@@ -208,6 +209,45 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       hasMany: true,
       relationTo: 'categories',
     },
+    {
+      name: 'collections',
+      type: 'relationship',
+      admin: {
+        position: 'sidebar',
+        sortOptions: 'title',
+      },
+      hasMany: true,
+      relationTo: 'collections',
+    },
     slugField(),
   ]),
+  hooks: {
+    ...defaultCollection?.hooks,
+    afterChange: [
+      ...(defaultCollection?.hooks?.afterChange || []),
+      ({ doc, req: { payload } }) => {
+        const { revalidateTag, revalidatePath } = require('next/cache')
+        payload.logger.info(`Revalidating product cache: ${doc.slug}`)
+        revalidateTag('products', 'max')
+        if (doc.slug) {
+          revalidatePath(`/products/${doc.slug}`)
+          revalidatePath('/shop')
+        }
+        return doc
+      },
+    ],
+    afterDelete: [
+      ...(defaultCollection?.hooks?.afterDelete || []),
+      ({ doc, req: { payload } }) => {
+        const { revalidateTag, revalidatePath } = require('next/cache')
+        payload.logger.info(`Revalidating deleted product cache: ${doc?.slug}`)
+        revalidateTag('products', 'max')
+        if (doc?.slug) {
+          revalidatePath(`/products/${doc.slug}`)
+          revalidatePath('/shop')
+        }
+        return doc
+      },
+    ],
+  },
 })

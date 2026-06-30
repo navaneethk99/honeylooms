@@ -11,6 +11,7 @@ import React from 'react'
 
 import type { Page } from '@/payload-types'
 import { notFound } from 'next/navigation'
+import { getCachedDocument } from '@/utilities/getDocument'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -76,31 +77,34 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     slug,
   })
 
-  return generateMeta({ doc: page })
+  return generateMeta({ doc: page as Page })
 }
 
-const queryPageBySlug = async ({ slug }: { slug: string }) => {
+const queryPageBySlug = async ({ slug }: { slug: string }): Promise<Page | null> => {
   const { isEnabled: draft } = await draftMode()
 
-  const payload = await getPayload({ config: configPromise })
+  if (draft) {
+    const payload = await getPayload({ config: configPromise })
 
-  const result = await payload.find({
-    collection: 'pages',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    pagination: false,
-    where: {
-      and: [
-        {
-          slug: {
-            equals: slug,
+    const result = await payload.find({
+      collection: 'pages',
+      draft,
+      limit: 1,
+      overrideAccess: draft,
+      pagination: false,
+      where: {
+        and: [
+          {
+            slug: {
+              equals: slug,
+            },
           },
-        },
-        ...(draft ? [] : [{ _status: { equals: 'published' } }]),
-      ],
-    },
-  })
+        ],
+      },
+    })
 
-  return result.docs?.[0] || null
+    return (result.docs?.[0] as Page) || null
+  }
+
+  return (await getCachedDocument('pages', slug)()) as Page || null
 }
