@@ -52,10 +52,13 @@ export function ProductDescription({ product }: { product: Product }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="text-2xl font-medium">{product.title}</h1>
-        <div className="uppercase font-mono">
+    <div className="flex flex-col gap-8">
+      {/* Title & Price stacked vertically */}
+      <div className="flex flex-col gap-3">
+        <h1 className="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+          {product.title}
+        </h1>
+        <div className="font-mono text-xl font-bold text-neutral-800 dark:text-neutral-200">
           {hasVariants ? (
             <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
           ) : (
@@ -63,26 +66,33 @@ export function ProductDescription({ product }: { product: Product }) {
           )}
         </div>
       </div>
+
+      {/* Description block */}
       {product.description ? (
-        <RichText className="" data={product.description} enableGutter={false} />
+        <div className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-sm">
+          <RichText data={product.description} enableGutter={false} />
+        </div>
       ) : null}
-      <hr />
+
+      {/* Divider */}
+      <div className="border-t border-neutral-100 dark:border-neutral-900" />
+
+      {/* Variant Selector */}
       {hasVariants && (
-        <>
+        <div className="flex flex-col gap-6">
           <Suspense fallback={null}>
             <VariantSelector product={product} />
           </Suspense>
-
-          <hr />
-        </>
+          <div className="border-t border-neutral-100 dark:border-neutral-900" />
+        </div>
       )}
-      <div className="flex items-center justify-between">
+
+      {/* Stock & Purchase section */}
+      <div className="flex flex-col gap-6">
         <Suspense fallback={null}>
           <StockIndicator product={product} />
         </Suspense>
-      </div>
 
-      <div className="flex items-center justify-between">
         <Suspense fallback={null}>
           <AddToCart product={product} />
         </Suspense>

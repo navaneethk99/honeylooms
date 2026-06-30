@@ -1,5 +1,6 @@
 'use client'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
+import { formatCosmeticPrice, getCosmeticCurrency } from '@/utilities/cosmeticCurrency'
 import React, { useMemo } from 'react'
 
 type BaseProps = {
@@ -32,7 +33,7 @@ export const Price = ({
   currencyCode: currencyCodeFromProps,
   as = 'p',
 }: Props & React.ComponentProps<'p'>) => {
-  const { formatCurrency, supportedCurrencies } = useCurrency()
+  const { currency, supportedCurrencies } = useCurrency()
 
   const Element = as
 
@@ -40,13 +41,24 @@ export const Price = ({
     if (currencyCodeFromProps) {
       return supportedCurrencies.find((currency) => currency.code === currencyCodeFromProps)
     }
-    return undefined
-  }, [currencyCodeFromProps, supportedCurrencies])
+    return currency
+  }, [currency, currencyCodeFromProps, supportedCurrencies])
+
+  const formatValue = (value: number) => {
+    if (!currencyToUse) {
+      return value.toString()
+    }
+
+    return formatCosmeticPrice({
+      baseValue: value,
+      currency: getCosmeticCurrency(currencyToUse),
+    })
+  }
 
   if (typeof amount === 'number') {
     return (
       <Element className={className} suppressHydrationWarning>
-        {formatCurrency(amount, { currency: currencyToUse })}
+        {formatValue(amount)}
       </Element>
     )
   }
@@ -54,7 +66,7 @@ export const Price = ({
   if (highestAmount && highestAmount !== lowestAmount) {
     return (
       <Element className={className} suppressHydrationWarning>
-        {`${formatCurrency(lowestAmount, { currency: currencyToUse })} - ${formatCurrency(highestAmount, { currency: currencyToUse })}`}
+        {`${formatValue(lowestAmount)} - ${formatValue(highestAmount)}`}
       </Element>
     )
   }
@@ -62,7 +74,7 @@ export const Price = ({
   if (lowestAmount) {
     return (
       <Element className={className} suppressHydrationWarning>
-        {`${formatCurrency(lowestAmount, { currency: currencyToUse })}`}
+        {formatValue(lowestAmount)}
       </Element>
     )
   }

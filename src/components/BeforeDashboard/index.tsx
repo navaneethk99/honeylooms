@@ -24,21 +24,21 @@ export const BeforeDashboard: React.FC = () => {
         <li>
           {'Head over to '}
           <a
-            href="https://dashboard.stripe.com/test/apikeys"
+            href="https://www.cashfree.com/docs/payments/online/web/redirect"
             rel="noopener noreferrer"
             target="_blank"
           >
-            Stripe to obtain your API Keys
+            Cashfree to review the payment setup
           </a>
           {
-            '. Create a new account if needed, then copy them into your environment variables and restart your server. See the '
+            '. Create an account if needed, then copy your Cashfree environment variables and restart your server. See the '
           }
           <a
-            href="https://github.com/payloadcms/payload/blob/3.x/templates/ecommerce/README.md#stripe"
+            href="https://www.cashfree.com/docs/api-reference/payments/latest/orders/create"
             rel="noopener noreferrer"
             target="_blank"
           >
-            README
+            Cashfree docs
           </a>
           {' for more details.'}
         </li>

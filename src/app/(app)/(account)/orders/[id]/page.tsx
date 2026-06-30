@@ -113,53 +113,64 @@ export default async function Order({ params, searchParams }: PageProps) {
   }
 
   return (
-    <div className="">
-      <div className="flex gap-8 justify-between items-center mb-6">
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-neutral-100 dark:border-neutral-900">
         {user ? (
-          <div className="flex gap-4">
-            <Button asChild variant="ghost">
-              <Link href="/orders">
-                <ChevronLeftIcon />
-                All orders
-              </Link>
-            </Button>
-          </div>
+          <Link
+            href="/orders"
+            className="group flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-neutral-500 hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors duration-300"
+          >
+            <ChevronLeftIcon className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
+            <span>Back to orders</span>
+          </Link>
         ) : (
           <div></div>
         )}
 
-        <h1 className="text-sm uppercase font-mono px-2 bg-primary/10 rounded tracking-[0.07em]">
-          <span className="">{`Order #${order.id}`}</span>
-        </h1>
+        <span className="text-xs uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500">
+          {`Order #${order.id}`}
+        </span>
       </div>
 
-      <div className="bg-card border rounded-lg px-6 py-4 flex flex-col gap-12">
-        <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
-          <div className="">
-            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Order Date</p>
-            <p className="text-lg">
+      <div className="flex flex-col gap-12">
+        {/* Info Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 border-b border-neutral-100 dark:border-neutral-900">
+          <div>
+            <p className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">
+              Order Date
+            </p>
+            <p className="text-base font-semibold text-neutral-900 dark:text-neutral-50">
               <time dateTime={order.createdAt}>
                 {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
               </time>
             </p>
           </div>
 
-          <div className="">
-            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Total</p>
-            {order.amount && <Price className="text-lg" amount={order.amount} />}
+          <div>
+            <p className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">
+              Total
+            </p>
+            {order.amount && (
+              <Price className="text-base font-semibold font-mono" amount={order.amount} />
+            )}
           </div>
 
           {order.status && (
-            <div className="grow max-w-1/3">
-              <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Status</p>
-              <OrderStatus className="text-sm" status={order.status} />
+            <div>
+              <p className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">
+                Status
+              </p>
+              <OrderStatus status={order.status} />
             </div>
           )}
         </div>
 
+        {/* Order Items */}
         {order.items && (
-          <div>
-            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Items</h2>
+          <div className="pb-8 border-b border-neutral-100 dark:border-neutral-900">
+            <h2 className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-6">
+              Items
+            </h2>
             <ul className="flex flex-col gap-6">
               {order.items?.map((item, index) => {
                 if (typeof item.product === 'string') {
@@ -167,14 +178,21 @@ export default async function Order({ params, searchParams }: PageProps) {
                 }
 
                 if (!item.product || typeof item.product !== 'object') {
-                  return <div key={index}>This item is no longer available.</div>
+                  return (
+                    <div key={index} className="text-sm text-neutral-500">
+                      This item is no longer available.
+                    </div>
+                  )
                 }
 
                 const variant =
                   item.variant && typeof item.variant === 'object' ? item.variant : undefined
 
                 return (
-                  <li key={item.id}>
+                  <li
+                    key={item.id}
+                    className="pb-6 border-b border-neutral-50 dark:border-neutral-950 last:pb-0 last:border-0"
+                  >
                     <ProductItem
                       product={item.product}
                       quantity={item.quantity}
@@ -187,12 +205,16 @@ export default async function Order({ params, searchParams }: PageProps) {
           </div>
         )}
 
+        {/* Shipping Address */}
         {order.shippingAddress && (
           <div>
-            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Shipping Address</h2>
-
-            {/* @ts-expect-error - some kind of type hell */}
-            <AddressItem address={order.shippingAddress} hideActions />
+            <h2 className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-4">
+              Shipping Address
+            </h2>
+            <div className="text-sm text-neutral-700 dark:text-neutral-300">
+              {/* @ts-expect-error - some kind of type hell */}
+              <AddressItem address={order.shippingAddress} hideActions />
+            </div>
           </div>
         )}
       </div>

@@ -3,9 +3,9 @@
 import type { Media as MediaType, Product } from '@/payload-types'
 
 import { Media } from '@/components/Media'
-import { GridTileImage } from '@/components/Grid/tile'
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
+import clsx from 'clsx'
 
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { DefaultDocumentIDType } from 'payload'
@@ -49,26 +49,41 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
 
   return (
     <div>
-      <div className="relative w-full overflow-hidden mb-8">
+      <div className="relative w-full aspect-[2/3] overflow-hidden bg-neutral-50 dark:bg-neutral-900 mb-4">
         <Media
           resource={gallery[current].image}
-          className="w-full"
-          imgClassName="w-full rounded-lg"
+          fill
+          className="absolute inset-0"
+          imgClassName="w-full h-full object-cover rounded-none"
         />
       </div>
 
       <Carousel setApi={setApi} className="w-full" opts={{ align: 'start', loop: false }}>
-        <CarouselContent>
+        <CarouselContent className="-ml-2">
           {gallery.map((item, i) => {
             if (typeof item.image !== 'object') return null
 
             return (
               <CarouselItem
-                className="basis-1/5"
+                className="basis-1/5 pl-2 cursor-pointer"
                 key={`${item.image.id}-${i}`}
                 onClick={() => setCurrent(i)}
               >
-                <GridTileImage active={i === current} media={item.image} />
+                <div
+                  className={clsx(
+                    'relative aspect-[2/3] w-full overflow-hidden border transition-all duration-200',
+                    i === current
+                      ? 'border-neutral-950 dark:border-neutral-50'
+                      : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600',
+                  )}
+                >
+                  <Media
+                    fill
+                    className="absolute inset-0"
+                    imgClassName="w-full h-full object-cover rounded-none"
+                    resource={item.image}
+                  />
+                </div>
               </CarouselItem>
             )
           })}

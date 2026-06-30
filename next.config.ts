@@ -8,6 +8,16 @@ const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
 
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+const imageRemoteURLs = [NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL].filter(Boolean) as string[]
+const imageRemotePatterns = imageRemoteURLs.map((item) => {
+  const url = new URL(item)
+
+  return {
+    hostname: url.hostname,
+    pathname: '/**',
+    protocol: url.protocol.replace(':', '') as 'http' | 'https',
+  }
+})
 
 const nextConfig: NextConfig = {
   // Temporarily required on Windows until Next.js fixes Turbopack Sass resolution.
@@ -23,14 +33,12 @@ const nextConfig: NextConfig = {
     ],
     qualities: [90, 100],
     remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
-        const url = new URL(item)
-
-        return {
-          hostname: url.hostname,
-          protocol: url.protocol.replace(':', '') as 'http' | 'https',
-        }
-      }),
+      ...imageRemotePatterns,
+      {
+        hostname: '**.r2.dev',
+        pathname: '/**',
+        protocol: 'https',
+      },
     ],
   },
   reactStrictMode: true,

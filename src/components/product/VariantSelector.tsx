@@ -32,9 +32,11 @@ export function VariantSelector({ product }: { product: Product }) {
     }
 
     return (
-      <dl className="" key={type.id}>
-        <dt className="mb-4 text-sm">{type.label}</dt>
-        <dd className="flex flex-wrap gap-3">
+      <dl className="flex flex-col gap-3" key={type.id}>
+        <dt className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-mono font-bold">
+          Select {type.label}
+        </dt>
+        <dd className="flex flex-wrap gap-2">
           <React.Fragment>
             {options?.map((option) => {
               if (!option || typeof option !== 'object') {
@@ -95,23 +97,29 @@ export function VariantSelector({ product }: { product: Product }) {
                 searchParams.get(optionKeyLowerCase) === String(optionID)
 
               return (
-                <Button
-                  variant={'ghost'}
+                <button
                   aria-disabled={!isAvailableForSale}
-                  className={clsx('px-2', {
-                    'bg-primary/5 text-primary': isActive,
-                  })}
+                  className={clsx(
+                    'px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200 border rounded-none min-w-[3.5rem] h-10 flex items-center justify-center',
+                    isActive
+                      ? 'bg-neutral-950 border-neutral-950 text-neutral-50 dark:bg-neutral-50 dark:border-neutral-50 dark:text-neutral-950'
+                      : isAvailableForSale
+                      ? 'bg-transparent border-neutral-200 hover:border-neutral-950 text-neutral-800 dark:border-neutral-800 dark:hover:border-neutral-50 dark:text-neutral-200 cursor-pointer'
+                      : 'bg-transparent border-neutral-100 text-neutral-300 dark:border-neutral-900 dark:text-neutral-700 cursor-not-allowed line-through',
+                  )}
                   disabled={!isAvailableForSale}
                   key={option.id}
                   onClick={() => {
-                    router.replace(`${optionUrl}`, {
-                      scroll: false,
-                    })
+                    if (isAvailableForSale) {
+                      router.replace(`${optionUrl}`, {
+                        scroll: false,
+                      })
+                    }
                   }}
                   title={`${option.label} ${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
                 >
                   {option.label}
-                </Button>
+                </button>
               )
             })}
           </React.Fragment>

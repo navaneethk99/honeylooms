@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import React from 'react'
 
 type Props = {
   className?: string
@@ -12,59 +12,47 @@ type Props = {
 export const AccountNav: React.FC<Props> = ({ className }) => {
   const pathname = usePathname()
 
+  const links = [
+    { href: '/account', label: 'Account settings' },
+    { href: '/account/addresses', label: 'Addresses' },
+    { href: '/orders', label: 'Orders' },
+  ]
+
   return (
     <div className={clsx(className)}>
-      <ul className="flex flex-col gap-2">
-        <li>
-          <Button asChild variant="link">
+      <nav>
+        <h3 className="text-xs mb-3 text-neutral-500 dark:text-neutral-400">Account</h3>
+        <ul className="flex flex-col gap-2">
+          {links.map((link) => {
+            const active =
+              pathname === link.href || (link.href !== '/account' && pathname.startsWith(link.href))
+            const DynamicTag = active ? 'p' : Link
+            return (
+              <li key={link.href} className="flex text-sm text-black dark:text-white">
+                <DynamicTag
+                  href={link.href}
+                  className={clsx(
+                    'w-full hover:underline hover:underline-offset-4 transition-all duration-200',
+                    {
+                      'underline underline-offset-4 font-medium': active,
+                    },
+                  )}
+                >
+                  {link.label}
+                </DynamicTag>
+              </li>
+            )
+          })}
+          <li className="mt-4 border-t border-neutral-100 dark:border-neutral-900 pt-4 flex text-sm text-neutral-500 dark:text-neutral-400">
             <Link
-              href="/account"
-              className={clsx('text-primary/50 hover:text-primary hover:no-underline', {
-                'text-primary': pathname === '/account',
-              })}
+              href="/logout"
+              className="w-full hover:underline hover:underline-offset-4 transition-all duration-200"
             >
-              Account settings
+              Log out
             </Link>
-          </Button>
-        </li>
-
-        <li>
-          <Button asChild variant="link">
-            <Link
-              href="/account/addresses"
-              className={clsx('text-primary/50 hover:text-primary hover:no-underline', {
-                'text-primary': pathname === '/account/addresses',
-              })}
-            >
-              Addresses
-            </Link>
-          </Button>
-        </li>
-
-        <li>
-          <Button
-            asChild
-            variant="link"
-            className={clsx('text-primary/50 hover:text-primary hover:no-underline', {
-              'text-primary': pathname === '/orders' || pathname.includes('/orders'),
-            })}
-          >
-            <Link href="/orders">Orders</Link>
-          </Button>
-        </li>
-      </ul>
-
-      <hr className="w-full border-white/5" />
-
-      <Button
-        asChild
-        variant="link"
-        className={clsx('text-primary/50 hover:text-primary hover:no-underline', {
-          'text-primary': pathname === '/logout',
-        })}
-      >
-        <Link href="/logout">Log out</Link>
-      </Button>
+          </li>
+        </ul>
+      </nav>
     </div>
   )
 }

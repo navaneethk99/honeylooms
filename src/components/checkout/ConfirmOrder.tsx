@@ -19,16 +19,16 @@ export const ConfirmOrder: React.FC = () => {
       return
     }
 
-    const paymentIntentID = searchParams.get('payment_intent')
+    const orderID = searchParams.get('order_id')
     const email = searchParams.get('email')
 
-    if (paymentIntentID) {
+    if (orderID) {
       if (!isConfirming.current) {
         isConfirming.current = true
 
-        confirmOrder('stripe', {
+        confirmOrder('cashfree', {
           additionalData: {
-            paymentIntentID,
+            orderID,
           },
         }).then((result) => {
           if (result && typeof result === 'object' && 'orderID' in result && result.orderID) {
@@ -48,7 +48,7 @@ export const ConfirmOrder: React.FC = () => {
         })
       }
     } else {
-      // If no payment intent ID is found, redirect to the home
+      // If no order ID is found, redirect to the home
       router.push('/')
     }
   }, [cart, confirmOrder, router, searchParams])

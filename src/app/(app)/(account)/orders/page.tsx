@@ -38,24 +38,23 @@ export default async function Orders() {
   } catch (error) {}
 
   return (
-    <>
-      <div className="border p-8 rounded-lg bg-primary-foreground w-full">
-        <h1 className="text-3xl font-medium mb-8">Orders</h1>
-        {(!orders || !Array.isArray(orders) || orders?.length === 0) && (
-          <p className="">You have no orders.</p>
-        )}
+    <div className="w-full">
+      <h1 className="text-2xl font-semibold mb-8 pb-4 border-b border-neutral-100 dark:border-neutral-900">Orders</h1>
+      
+      {(!orders || !Array.isArray(orders) || orders?.length === 0) && (
+        <p className="text-sm text-neutral-500 py-6">You have no orders.</p>
+      )}
 
-        {orders && orders.length > 0 && (
-          <ul className="flex flex-col gap-6">
-            {orders?.map((order, index) => (
-              <li key={order.id}>
-                <OrderItem order={order} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </>
+      {orders && orders.length > 0 && (
+        <ul className="flex flex-col gap-4">
+          {orders?.map((order) => (
+            <li key={order.id}>
+              <OrderItem order={order} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }
 

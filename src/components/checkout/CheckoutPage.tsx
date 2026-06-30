@@ -7,14 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/providers/Auth'
-import { useTheme } from '@/providers/Theme'
-import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 
-import { cssVariables } from '@/cssVariables'
 import { CheckoutForm } from '@/components/forms/CheckoutForm'
 import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
@@ -26,15 +22,11 @@ import { FormItem } from '@/components/forms/FormItem'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 
-const apiKey = `${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}`
-const stripe = loadStripe(apiKey)
-
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
   const router = useRouter()
   const { cart } = useCart()
   const [error, setError] = useState<null | string>(null)
-  const { theme } = useTheme()
   /**
    * State to manage the email input for guest checkout.
    */
@@ -47,6 +39,9 @@ export const CheckoutPage: React.FC = () => {
   const [billingAddress, setBillingAddress] = useState<Partial<Address>>()
   const [billingAddressSameAsShipping, setBillingAddressSameAsShipping] = useState(true)
   const [isProcessingPayment, setProcessingPayment] = useState(false)
+
+  const billingPhone = billingAddress?.phone?.trim()
+  const shippingPhone = shippingAddress?.phone?.trim()
 
   const cartIsEmpty = !cart || !cart.items || !cart.items.length
 
@@ -78,12 +73,30 @@ export const CheckoutPage: React.FC = () => {
 
   const initiatePaymentIntent = useCallback(
     async (paymentID: string) => {
+      const selectedShippingAddress = billingAddressSameAsShipping ? billingAddress : shippingAddress
+
+      if (!billingAddress?.phone?.trim()) {
+        const errorMessage = 'A phone number is required on the billing address for UPI payments.'
+
+        setError(errorMessage)
+        toast.error(errorMessage)
+        return
+      }
+
+      if (!selectedShippingAddress?.phone?.trim()) {
+        const errorMessage = 'A phone number is required on the shipping address for UPI payments.'
+
+        setError(errorMessage)
+        toast.error(errorMessage)
+        return
+      }
+
       try {
         const paymentData = (await initiatePayment(paymentID, {
           additionalData: {
             ...(email ? { customerEmail: email } : {}),
             billingAddress,
-            shippingAddress: billingAddressSameAsShipping ? billingAddress : shippingAddress,
+            shippingAddress: selectedShippingAddress,
           },
         })) as Record<string, unknown>
 
@@ -91,8 +104,16 @@ export const CheckoutPage: React.FC = () => {
           setPaymentData(paymentData)
         }
       } catch (error) {
-        const errorData = error instanceof Error ? JSON.parse(error.message) : {}
+        let errorData: Record<string, any> = {}
         let errorMessage = 'An error occurred while initiating payment.'
+
+        if (error instanceof Error) {
+          try {
+            errorData = JSON.parse(error.message) as Record<string, any>
+          } catch {
+            errorMessage = error.message
+          }
+        }
 
         if (errorData?.cause?.code === 'OutOfStock') {
           errorMessage = 'One or more items in your cart are out of stock.'
@@ -102,10 +123,8 @@ export const CheckoutPage: React.FC = () => {
         toast.error(errorMessage)
       }
     },
-    [billingAddress, billingAddressSameAsShipping, shippingAddress],
+    [billingAddress, billingAddressSameAsShipping, email, initiatePayment, shippingAddress],
   )
-
-  if (!stripe) return null
 
   if (cartIsEmpty && isProcessingPayment) {
     return (
@@ -206,6 +225,11 @@ export const CheckoutPage: React.FC = () => {
               }
               address={billingAddress}
             />
+            {!billingPhone && (
+              <p className="mt-3 text-sm text-destructive">
+                Add a phone number to this address to use UPI checkout.
+              </p>
+            )}
           </div>
         ) : user ? (
           <CheckoutAddresses heading="Billing address" setAddress={setBillingAddress} />
@@ -250,6 +274,11 @@ export const CheckoutPage: React.FC = () => {
                   }
                   address={shippingAddress}
                 />
+                {!shippingPhone && (
+                  <p className="mt-3 text-sm text-destructive">
+                    Add a phone number to this address to use UPI checkout.
+                  </p>
+                )}
               </div>
             ) : user ? (
               <CheckoutAddresses
@@ -275,14 +304,14 @@ export const CheckoutPage: React.FC = () => {
             disabled={!canGoToPayment}
             onClick={(e) => {
               e.preventDefault()
-              void initiatePaymentIntent('stripe')
+              void initiatePaymentIntent('cashfree')
             }}
           >
             Go to payment
           </Button>
         )}
 
-        {!paymentData?.['clientSecret'] && error && (
+        {!paymentData?.['paymentSessionID'] && error && (
           <div className="my-8">
             <Message error={error} />
 
@@ -299,42 +328,18 @@ export const CheckoutPage: React.FC = () => {
         )}
 
         <Suspense fallback={<React.Fragment />}>
-          {/* @ts-ignore */}
-          {paymentData && paymentData?.['clientSecret'] && (
-            <div className="pb-16">
-              <h2 className="font-medium text-3xl">Payment</h2>
-              {error && <p>{`Error: ${error}`}</p>}
-              <Elements
-                options={{
-                  appearance: {
-                    theme: 'stripe',
-                    variables: {
-                      borderRadius: '6px',
-                      colorPrimary: '#858585',
-                      gridColumnSpacing: '20px',
-                      gridRowSpacing: '20px',
-                      colorBackground: theme === 'dark' ? '#0a0a0a' : cssVariables.colors.base0,
-                      colorDanger: cssVariables.colors.error500,
-                      colorDangerText: cssVariables.colors.error500,
-                      colorIcon:
-                        theme === 'dark' ? cssVariables.colors.base0 : cssVariables.colors.base1000,
-                      colorText: theme === 'dark' ? '#858585' : cssVariables.colors.base1000,
-                      colorTextPlaceholder: '#858585',
-                      fontFamily: 'Geist, sans-serif',
-                      fontSizeBase: '16px',
-                      fontWeightBold: '600',
-                      fontWeightNormal: '500',
-                      spacingUnit: '4px',
-                    },
-                  },
-                  clientSecret: paymentData['clientSecret'] as string,
-                }}
-                stripe={stripe}
-              >
+          {paymentData &&
+            Boolean(paymentData['paymentSessionID']) &&
+            Boolean(paymentData['orderID']) && (
+              <div className="pb-16">
+                <h2 className="font-medium text-3xl">Payment</h2>
+                {error && <p>{`Error: ${error}`}</p>}
                 <div className="flex flex-col gap-8">
                   <CheckoutForm
-                    customerEmail={email}
                     billingAddress={billingAddress}
+                    customerEmail={email}
+                    orderID={paymentData['orderID'] as string}
+                    paymentSessionID={paymentData['paymentSessionID'] as string}
                     setProcessingPayment={setProcessingPayment}
                   />
                   <Button
@@ -345,9 +350,8 @@ export const CheckoutPage: React.FC = () => {
                     Cancel payment
                   </Button>
                 </div>
-              </Elements>
-            </div>
-          )}
+              </div>
+            )}
         </Suspense>
       </div>
 
@@ -373,14 +377,14 @@ export const CheckoutPage: React.FC = () => {
               if (isVariant) {
                 price = variant?.priceInUSD
 
-                const imageVariant = product.gallery?.find((item) => {
+                const imageVariant = product.gallery?.find((item: any) => {
                   if (!item.variantOption) return false
                   const variantOptionID =
                     typeof item.variantOption === 'object'
                       ? item.variantOption.id
                       : item.variantOption
 
-                  const hasMatch = variant?.options?.some((option) => {
+                  const hasMatch = variant?.options?.some((option: any) => {
                     if (typeof option === 'object') return option.id === variantOptionID
                     else return option === variantOptionID
                   })
@@ -408,7 +412,7 @@ export const CheckoutPage: React.FC = () => {
                       {variant && typeof variant === 'object' && (
                         <p className="text-sm font-mono text-primary/50 tracking-widest">
                           {variant.options
-                            ?.map((option) => {
+                            ?.map((option: any) => {
                               if (typeof option === 'object') return option.label
                               return null
                             })

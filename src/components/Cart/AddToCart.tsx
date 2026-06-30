@@ -95,17 +95,19 @@ export function AddToCart({ product }: Props) {
   }, [selectedVariant, cart?.items, product])
 
   return (
-    <Button
+    <button
       aria-label="Add to cart"
-      variant={'outline'}
-      className={clsx({
-        'hover:opacity-90': true,
-      })}
+      className={clsx(
+        'w-full max-w-[320px] mx-auto py-4 text-xs font-semibold uppercase tracking-widest transition-all duration-300 rounded-none flex items-center justify-center border h-12',
+        disabled || isLoading
+          ? 'bg-neutral-100 border-neutral-100 text-neutral-400 cursor-not-allowed dark:bg-neutral-900 dark:border-neutral-900 dark:text-neutral-700'
+          : 'bg-neutral-950 border-neutral-950 text-neutral-50 hover:bg-neutral-900 dark:bg-neutral-50 dark:border-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200 cursor-pointer',
+      )}
       disabled={disabled || isLoading}
       onClick={addToCart}
       type="submit"
     >
-      Add To Cart
-    </Button>
+      {isLoading ? 'Adding...' : 'Add to bag'}
+    </button>
   )
 }

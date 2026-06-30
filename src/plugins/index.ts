@@ -1,11 +1,10 @@
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { seoPlugin } from '@payloadcms/plugin-seo'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { Plugin } from 'payload'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
-
-import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
 
 import { Page, Product } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -15,6 +14,8 @@ import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
 import { customerOnlyFieldAccess } from '@/access/customerOnlyFieldAccess'
 import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
+import { applyCosmeticCurrencyAdminOverrides } from '@/utilities/adminCurrencyOverrides'
+import { cashfreeAdapter } from '@/payments/cashfree/server'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Ecommerce Template` : 'Payload Ecommerce Template'
@@ -26,7 +27,39 @@ const generateURL: GenerateURL<Product | Page> = ({ doc }) => {
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
 
+const r2PublicURL = process.env.R2_PUBLIC_URL?.replace(/\/$/, '')
+const r2Endpoint = process.env.R2_ENDPOINT ? new URL(process.env.R2_ENDPOINT).origin : undefined
+
 export const plugins: Plugin[] = [
+  s3Storage({
+    enabled: Boolean(
+      process.env.R2_BUCKET &&
+      process.env.R2_ACCESS_KEY_ID &&
+      process.env.R2_SECRET_ACCESS_KEY &&
+      r2Endpoint &&
+      r2PublicURL,
+    ),
+    collections: {
+      media: {
+        disablePayloadAccessControl: true,
+        generateFileURL: ({ filename, prefix }) => {
+          const key = prefix ? `${prefix}/${filename}` : filename
+
+          return `${r2PublicURL}/${key}`
+        },
+      },
+    },
+    bucket: process.env.R2_BUCKET || '',
+    config: {
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+      },
+      endpoint: r2Endpoint,
+      forcePathStyle: true,
+      region: 'auto',
+    },
+  }),
   seoPlugin({
     generateTitle,
     generateURL,
@@ -90,7 +123,7 @@ export const plugins: Plugin[] = [
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
-        fields: [
+        fields: applyCosmeticCurrencyAdminOverrides([
           ...defaultCollection.fields,
           {
             name: 'accessToken',
@@ -103,7 +136,7 @@ export const plugins: Plugin[] = [
             },
             hooks: {
               beforeValidate: [
-                ({ value, operation }) => {
+                ({ value, operation }: any) => {
                   if (operation === 'create' || !value) {
                     return crypto.randomUUID()
                   }
@@ -112,20 +145,41 @@ export const plugins: Plugin[] = [
               ],
             },
           },
-        ],
+        ]),
       }),
     },
     payments: {
       paymentMethods: [
-        stripeAdapter({
-          secretKey: process.env.STRIPE_SECRET_KEY!,
-          publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-          webhookSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET!,
+        cashfreeAdapter({
+          apiVersion: process.env.CASHFREE_API_VERSION,
+          appID: process.env.CASHFREE_APP_ID!,
+          environment: process.env.CASHFREE_ENV === 'production' ? 'production' : 'sandbox',
+          label: 'UPI',
+          paymentMethods: 'upi',
+          secretKey: process.env.CASHFREE_SECRET_KEY!,
         }),
       ],
     },
     products: {
+      variants: {
+        variantsCollectionOverride: ({ defaultCollection }) => ({
+          ...defaultCollection,
+          fields: applyCosmeticCurrencyAdminOverrides(defaultCollection.fields),
+        }),
+      },
       productsCollectionOverride: ProductsCollection,
+    },
+    carts: {
+      cartsCollectionOverride: ({ defaultCollection }) => ({
+        ...defaultCollection,
+        fields: applyCosmeticCurrencyAdminOverrides(defaultCollection.fields),
+      }),
+    },
+    transactions: {
+      transactionsCollectionOverride: ({ defaultCollection }) => ({
+        ...defaultCollection,
+        fields: applyCosmeticCurrencyAdminOverrides(defaultCollection.fields),
+      }),
     },
   }),
 ]

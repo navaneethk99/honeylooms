@@ -11,9 +11,7 @@ export default async function ConfirmOrderPage({
 }: {
   searchParams: SearchParams
 }) {
-  const searchParams = await searchParamsPromise
-
-  const paymentIntent = searchParams.paymentId
+  await searchParamsPromise
 
   return (
     <div className="container min-h-[90vh] flex py-12">

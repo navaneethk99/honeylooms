@@ -19,6 +19,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 import { DefaultDocumentIDType, Where } from 'payload'
+import { applyCosmeticCurrencyAdminOverrides } from '@/utilities/adminCurrencyOverrides'
 
 export const ProductsCollection: CollectionOverride = ({ defaultCollection }) => ({
   ...defaultCollection,
@@ -53,7 +54,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     inventory: true,
     meta: true,
   },
-  fields: [
+  fields: applyCosmeticCurrencyAdminOverrides([
     { name: 'title', type: 'text', required: true },
     {
       type: 'tabs',
@@ -93,11 +94,11 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                   type: 'relationship',
                   relationTo: 'variantOptions',
                   admin: {
-                    condition: (data) => {
+                    condition: (data: any) => {
                       return data?.enableVariants === true && data?.variantTypes?.length > 0
                     },
                   },
-                  filterOptions: ({ data }) => {
+                  filterOptions: ({ data }: { data?: any }) => {
                     if (data?.enableVariants && data?.variantTypes?.length) {
                       const variantTypeIDs = data.variantTypes.map((item: any) => {
                         if (typeof item === 'object' && item?.id) {
@@ -146,7 +147,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
             {
               name: 'relatedProducts',
               type: 'relationship',
-              filterOptions: ({ id }) => {
+              filterOptions: ({ id }: { id?: string | number }) => {
                 if (id) {
                   return {
                     id: {
@@ -208,5 +209,5 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       relationTo: 'categories',
     },
     slugField(),
-  ],
+  ]),
 })

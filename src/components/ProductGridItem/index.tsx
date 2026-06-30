@@ -29,34 +29,84 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
     }
   }
 
-  const image =
-    gallery?.[0]?.image && typeof gallery[0]?.image !== 'string' ? gallery[0]?.image : false
+  // Filter out any invalid gallery images
+  const images =
+    gallery?.filter(
+      (item): item is NonNullable<NonNullable<Product['gallery']>[number]> & {
+        image: Exclude<NonNullable<Product['gallery']>[number]['image'], string | number>
+      } => Boolean(item?.image && typeof item.image !== 'string'),
+    ) ?? []
+
+  const primaryImage = images[0]?.image
+  const hoverImage = images[1]?.image
+
+  // Get first category title if populated
+  const firstCategory = product.categories?.[0]
+  const categoryTitle =
+    firstCategory && typeof firstCategory === 'object' && 'title' in firstCategory
+      ? firstCategory.title
+      : null
 
   return (
-    <Link className="relative inline-block h-full w-full group" href={`/products/${product.slug}`}>
-      {image ? (
-        <Media
-          className={clsx(
-            'relative aspect-square object-cover border rounded-2xl p-8 bg-primary-foreground',
-          )}
-          height={80}
-          imgClassName={clsx('h-full w-full object-cover rounded-2xl', {
-            'transition duration-300 ease-in-out group-hover:scale-102': true,
-          })}
-          resource={image}
-          width={80}
-        />
-      ) : null}
-
-      <div className="font-mono text-primary/50 group-hover:text-primary flex justify-between items-center mt-4">
-        <div>{title}</div>
-
-        {typeof price === 'number' && (
-          <div className="">
-            <Price amount={price} />
+    <Link
+      className="group relative flex h-full w-full flex-col overflow-hidden rounded-none border border-neutral-100 hover:border-neutral-300 dark:border-neutral-900 dark:hover:border-neutral-800 bg-background"
+      href={`/products/${product.slug}`}
+    >
+      {/* Image container: sharp 2:3 aspect ratio */}
+      <div className="relative aspect-[2/3] w-full overflow-hidden bg-neutral-50 dark:bg-neutral-950">
+        {primaryImage ? (
+          <>
+            <Media
+              fill
+              className="absolute inset-0"
+              imgClassName={clsx(
+                'object-cover p-0 transition-opacity duration-300 ease-in-out',
+                hoverImage ? 'group-hover:opacity-0' : '',
+              )}
+              resource={primaryImage}
+              size="(max-width: 768px) 100vw, 33vw"
+            />
+            {hoverImage ? (
+              <Media
+                fill
+                className="absolute inset-0"
+                imgClassName="object-cover p-0 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100"
+                resource={hoverImage}
+                size="(max-width: 768px) 100vw, 33vw"
+              />
+            ) : null}
+          </>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
+            No Image
           </div>
         )}
+      </div>
+
+      {/* Details container: minimal, sharp layout with price display */}
+      <div className="flex flex-col gap-1 px-3 py-3.5 border-t border-neutral-100 dark:border-neutral-900 transition-colors duration-300 group-hover:border-neutral-200 dark:group-hover:border-neutral-800">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-0.5 min-w-0">
+            {categoryTitle && (
+              <span className="text-[9px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-mono">
+                {categoryTitle}
+              </span>
+            )}
+            <h3 className="font-sans text-sm font-medium text-neutral-800 dark:text-neutral-200 leading-snug tracking-tight truncate group-hover:text-neutral-950 dark:group-hover:text-neutral-50 transition-colors duration-300">
+              {title}
+            </h3>
+          </div>
+
+          {/* Price / Cost of the item */}
+          {typeof price === 'number' && (
+            <Price
+              amount={price}
+              className="shrink-0 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight"
+            />
+          )}
+        </div>
       </div>
     </Link>
   )
 }
+

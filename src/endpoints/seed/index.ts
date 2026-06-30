@@ -358,10 +358,11 @@ export const seed = async ({
     data: {
       currency: 'USD',
       customer: customer.id,
-      paymentMethod: 'stripe',
-      stripe: {
-        customerID: 'cus_123',
-        paymentIntentID: 'pi_123',
+      paymentMethod: 'cashfree',
+      cashfree: {
+        cfOrderID: 'cf_order_123',
+        orderID: 'order_123',
+        paymentSessionID: 'session_123',
       },
       status: 'pending',
       billingAddress: baseAddressUSData,
@@ -373,10 +374,11 @@ export const seed = async ({
     data: {
       currency: 'USD',
       customer: customer.id,
-      paymentMethod: 'stripe',
-      stripe: {
-        customerID: 'cus_123',
-        paymentIntentID: 'pi_123',
+      paymentMethod: 'cashfree',
+      cashfree: {
+        cfOrderID: 'cf_order_123',
+        orderID: 'order_123',
+        paymentSessionID: 'session_123',
       },
       status: 'succeeded',
       billingAddress: baseAddressUSData,

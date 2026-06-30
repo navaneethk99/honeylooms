@@ -2,28 +2,79 @@
 
 import { Message } from '@/components/Message'
 import { Button } from '@/components/ui/button'
-import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
-import React, { useCallback, FormEvent } from 'react'
+import React, { FormEvent, useCallback, useState } from 'react'
 import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { Address } from '@/payload-types'
 
 type Props = {
   customerEmail?: string
   billingAddress?: Partial<Address>
-  shippingAddress?: Partial<Address>
+  orderID: string
+  paymentSessionID: string
   setProcessingPayment: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+type CashfreeInstance = {
+  checkout: (options: {
+    paymentSessionId: string
+    redirectTarget?: '_blank' | '_modal' | '_self' | '_top'
+  }) => Promise<unknown>
+}
+
+declare global {
+  interface Window {
+    Cashfree?: (options: { mode: 'production' | 'sandbox' }) => CashfreeInstance
+  }
+}
+
+let cashfreeScriptPromise: Promise<void> | null = null
+
+const loadCashfreeScript = async () => {
+  if (typeof window === 'undefined') return
+
+  if (window.Cashfree) return
+
+  if (!cashfreeScriptPromise) {
+    cashfreeScriptPromise = new Promise((resolve, reject) => {
+      const existingScript = document.querySelector<HTMLScriptElement>(
+        'script[src="https://sdk.cashfree.com/js/v3/cashfree.js"]',
+      )
+
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(), { once: true })
+        existingScript.addEventListener(
+          'error',
+          () => reject(new Error('Failed to load Cashfree SDK.')),
+          {
+            once: true,
+          },
+        )
+        return
+      }
+
+      const script = document.createElement('script')
+
+      script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js'
+      script.async = true
+      script.onload = () => resolve()
+      script.onerror = () => reject(new Error('Failed to load Cashfree SDK.'))
+
+      document.body.appendChild(script)
+    })
+  }
+
+  await cashfreeScriptPromise
 }
 
 export const CheckoutForm: React.FC<Props> = ({
   customerEmail,
-  billingAddress,
+  orderID,
+  paymentSessionID,
   setProcessingPayment,
 }) => {
-  const stripe = useStripe()
-  const elements = useElements()
-  const [error, setError] = React.useState<null | string>(null)
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [error, setError] = useState<null | string>(null)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { clearCart } = useCart()
   const { confirmOrder } = usePayments()
@@ -31,113 +82,80 @@ export const CheckoutForm: React.FC<Props> = ({
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault()
+      setError(null)
       setIsLoading(true)
       setProcessingPayment(true)
 
-      if (stripe && elements) {
-        try {
-          const returnUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/checkout/confirm-order${customerEmail ? `?email=${customerEmail}` : ''}`
+      try {
+        await loadCashfreeScript()
 
-          const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
-            confirmParams: {
-              return_url: returnUrl,
-              payment_method_data: {
-                billing_details: {
-                  email: customerEmail,
-                  phone: billingAddress?.phone,
-                  address: {
-                    line1: billingAddress?.addressLine1,
-                    line2: billingAddress?.addressLine2,
-                    city: billingAddress?.city,
-                    state: billingAddress?.state,
-                    postal_code: billingAddress?.postalCode,
-                    country: billingAddress?.country,
-                  },
-                },
-              },
-            },
-            elements,
-            redirect: 'if_required',
-          })
-
-          if (paymentIntent && paymentIntent.status === 'succeeded') {
-            try {
-              const confirmResult = await confirmOrder('stripe', {
-                additionalData: {
-                  paymentIntentID: paymentIntent.id,
-                  ...(customerEmail ? { customerEmail } : {}),
-                },
-              })
-
-              if (
-                confirmResult &&
-                typeof confirmResult === 'object' &&
-                'orderID' in confirmResult &&
-                confirmResult.orderID
-              ) {
-                const accessToken =
-                  'accessToken' in confirmResult ? (confirmResult.accessToken as string) : ''
-                const queryParams = new URLSearchParams()
-
-                if (customerEmail) {
-                  queryParams.set('email', customerEmail)
-                }
-                if (accessToken) {
-                  queryParams.set('accessToken', accessToken)
-                }
-
-                const queryString = queryParams.toString()
-                const redirectUrl = `/orders/${confirmResult.orderID}${queryString ? `?${queryString}` : ''}`
-
-                // Clear the cart after successful payment
-                clearCart()
-
-                // Redirect to order confirmation page
-                router.push(redirectUrl)
-              }
-            } catch (err) {
-              console.log({ err })
-              const msg = err instanceof Error ? err.message : 'Something went wrong.'
-              setError(`Error while confirming order: ${msg}`)
-              setIsLoading(false)
-            }
-          }
-          if (stripeError?.message) {
-            setError(stripeError.message)
-            setIsLoading(false)
-          }
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Something went wrong.'
-          setError(`Error while submitting payment: ${msg}`)
-          setIsLoading(false)
-          setProcessingPayment(false)
+        if (!window.Cashfree) {
+          throw new Error('Cashfree SDK is unavailable.')
         }
+
+        const cashfree = window.Cashfree({
+          mode: process.env.NEXT_PUBLIC_CASHFREE_ENV === 'production' ? 'production' : 'sandbox',
+        })
+
+        await cashfree.checkout({
+          paymentSessionId: paymentSessionID,
+          redirectTarget: '_modal',
+        })
+
+        const confirmResult = await confirmOrder('cashfree', {
+          additionalData: {
+            ...(customerEmail ? { customerEmail } : {}),
+            orderID,
+          },
+        })
+
+        if (confirmResult && typeof confirmResult === 'object' && 'orderID' in confirmResult) {
+          const accessToken =
+            'accessToken' in confirmResult ? (confirmResult.accessToken as string) : ''
+          const queryParams = new URLSearchParams()
+
+          if (customerEmail) {
+            queryParams.set('email', customerEmail)
+          }
+
+          if (accessToken) {
+            queryParams.set('accessToken', accessToken)
+          }
+
+          clearCart()
+
+          const queryString = queryParams.toString()
+          router.push(`/orders/${confirmResult.orderID}${queryString ? `?${queryString}` : ''}`)
+          return
+        }
+
+        throw new Error('Order confirmation did not return an order ID.')
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Something went wrong.'
+        setError(`Error while submitting payment: ${msg}`)
+        setIsLoading(false)
+        setProcessingPayment(false)
       }
     },
     [
-      setProcessingPayment,
-      stripe,
-      elements,
-      customerEmail,
-      billingAddress?.phone,
-      billingAddress?.addressLine1,
-      billingAddress?.addressLine2,
-      billingAddress?.city,
-      billingAddress?.state,
-      billingAddress?.postalCode,
-      billingAddress?.country,
-      confirmOrder,
       clearCart,
+      confirmOrder,
+      customerEmail,
+      orderID,
+      paymentSessionID,
       router,
+      setProcessingPayment,
     ],
   )
 
   return (
     <form onSubmit={handleSubmit}>
       {error && <Message error={error} />}
-      <PaymentElement />
+      <div className="rounded-lg border bg-primary/5 p-4 text-sm text-muted-foreground">
+        Cashfree will open a secure UPI payment window and charge the order in Indian rupees.
+      </div>
       <div className="mt-8 flex gap-4">
-        <Button disabled={!stripe || isLoading} type="submit" variant="default">
+        <Button disabled={isLoading} type="submit" variant="default">
           {isLoading ? 'Loading...' : 'Pay now'}
         </Button>
       </div>

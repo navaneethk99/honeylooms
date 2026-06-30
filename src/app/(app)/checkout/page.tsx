@@ -8,24 +8,24 @@ import { CheckoutPage } from '@/components/checkout/CheckoutPage'
 export default function Checkout() {
   return (
     <div className="container min-h-[90vh] flex">
-      {!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+      {(!process.env.CASHFREE_APP_ID || !process.env.CASHFREE_SECRET_KEY) && (
         <div>
           <Fragment>
             {'To enable checkout, you must '}
             <a
-              href="https://dashboard.stripe.com/test/apikeys"
+              href="https://www.cashfree.com/docs/payments/online/web/redirect"
               rel="noopener noreferrer"
               target="_blank"
             >
-              obtain your Stripe API Keys
+              configure your Cashfree credentials
             </a>
             {' then set them as environment variables. See the '}
             <a
-              href="https://github.com/payloadcms/payload/blob/3.x/templates/ecommerce/README.md#stripe"
+              href="https://www.cashfree.com/docs/api-reference/payments/latest/orders/create"
               rel="noopener noreferrer"
               target="_blank"
             >
-              README
+              Cashfree docs
             </a>
             {' for more details.'}
           </Fragment>

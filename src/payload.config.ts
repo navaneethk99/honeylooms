@@ -20,6 +20,7 @@ import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
+import { getDatabaseURL } from '@/utilities/getDatabaseURL'
 import { plugins } from './plugins'
 
 const filename = fileURLToPath(import.meta.url)
@@ -40,7 +41,7 @@ export default buildConfig({
   collections: [Users, Pages, Categories, Media],
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: getDatabaseURL(process.env.DATABASE_URL),
     },
   }),
   editor: lexicalEditor({
