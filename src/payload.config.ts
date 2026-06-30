@@ -21,6 +21,7 @@ import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
+import { FeaturedOutfits } from '@/globals/FeaturedOutfits'
 import { getDatabaseURL } from '@/utilities/getDatabaseURL'
 import { plugins } from './plugins'
 
@@ -85,7 +86,7 @@ export default buildConfig({
   }),
   //email: nodemailerAdapter(),
   endpoints: [],
-  globals: [Header, Footer],
+  globals: [Header, Footer, FeaturedOutfits],
   plugins,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

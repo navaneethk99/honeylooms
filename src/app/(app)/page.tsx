@@ -7,6 +7,7 @@ import Link from 'next/link'
 
 import type { Page as PageType, Product } from '@/payload-types'
 import { getCachedDocument } from '@/utilities/getDocument'
+import { getCachedGlobal } from '@/utilities/getGlobals'
 import { HomepageAnimation } from '@/components/HomepageAnimation'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { generateMeta } from '@/utilities/generateMeta'
@@ -52,9 +53,21 @@ export default async function HomePage() {
     page = homeStaticData() as PageType
   }
 
-  // 2. Determine outfits for the GSAP animation
+  // 2. Determine outfits from the global configuration
   let outfits: Product[] = []
-  if (page.featuredOutfits && page.featuredOutfits.length > 0) {
+  try {
+    const featuredOutfitsGlobal = await getCachedGlobal('featured-outfits', 2)()
+    if (featuredOutfitsGlobal && featuredOutfitsGlobal.outfits && featuredOutfitsGlobal.outfits.length > 0) {
+      outfits = featuredOutfitsGlobal.outfits.filter(
+        (item): item is Product => typeof item === 'object' && item !== null && 'slug' in item,
+      )
+    }
+  } catch (error) {
+    console.error('Error loading featured outfits global:', error)
+  }
+
+  // Fallback to page-specific featured outfits if global outfits are empty
+  if (outfits.length === 0 && page.featuredOutfits && page.featuredOutfits.length > 0) {
     outfits = page.featuredOutfits.filter(
       (item): item is Product => typeof item === 'object' && item !== null && 'slug' in item,
     )
