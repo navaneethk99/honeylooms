@@ -2,8 +2,6 @@ import { replaceCurrencyText } from '@/utilities/cosmeticCurrency'
 import type { Field } from 'payload'
 
 const adminPriceCellPath = '@/components/admin/currency/CosmeticPriceCell#CosmeticPriceCell'
-const adminPriceFieldPath = '@/components/admin/currency/CosmeticPriceInput#CosmeticPriceInput'
-
 const overridePriceComponents = (field: Record<string, any>) => {
   const admin = field.admin ?? {}
   const components = admin.components ?? {}
@@ -20,12 +18,6 @@ const overridePriceComponents = (field: Record<string, any>) => {
               path: adminPriceCellPath,
             }
           : components.Cell,
-        Field: components.Field
-          ? {
-              ...components.Field,
-              path: adminPriceFieldPath,
-            }
-          : components.Field,
       },
     },
   }

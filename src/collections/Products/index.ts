@@ -225,27 +225,31 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     ...defaultCollection?.hooks,
     afterChange: [
       ...(defaultCollection?.hooks?.afterChange || []),
-      ({ doc, req: { payload } }) => {
+      ({ doc, req: { context, payload } }) => {
+        if (context.disableRevalidate || !doc.slug) {
+          return doc
+        }
+
         const { revalidateTag, revalidatePath } = require('next/cache')
         payload.logger.info(`Revalidating product cache: ${doc.slug}`)
         revalidateTag('products', 'max')
-        if (doc.slug) {
-          revalidatePath(`/products/${doc.slug}`)
-          revalidatePath('/shop')
-        }
+        revalidatePath(`/products/${doc.slug}`)
+        revalidatePath('/shop')
         return doc
       },
     ],
     afterDelete: [
       ...(defaultCollection?.hooks?.afterDelete || []),
-      ({ doc, req: { payload } }) => {
+      ({ doc, req: { context, payload } }) => {
+        if (context.disableRevalidate || !doc?.slug) {
+          return doc
+        }
+
         const { revalidateTag, revalidatePath } = require('next/cache')
         payload.logger.info(`Revalidating deleted product cache: ${doc?.slug}`)
         revalidateTag('products', 'max')
-        if (doc?.slug) {
-          revalidatePath(`/products/${doc.slug}`)
-          revalidatePath('/shop')
-        }
+        revalidatePath(`/products/${doc.slug}`)
+        revalidatePath('/shop')
         return doc
       },
     ],

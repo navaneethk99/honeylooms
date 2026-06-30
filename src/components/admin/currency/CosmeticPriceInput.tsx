@@ -45,7 +45,12 @@ export const CosmeticPriceInput = (args: any) => {
   const debounceTimer = useRef<null | ReturnType<typeof setTimeout>>(null)
   const parentPath = path.split('.').slice(0, -1).join('.')
   const currencyPath = parentPath ? `${parentPath}.currency` : 'currency'
-  const currencyFromSelectField = useFormFields(([fields]) => fields[currencyPath])
+  const currencyFromSelectField = useFormFields((state) => {
+    if (state && Array.isArray(state) && state[0]) {
+      return state[0][currencyPath]
+    }
+    return undefined
+  })
   const currencyCode = currencyFromProps?.code ?? currencyFromSelectField?.value
 
   const supportedCurrencies = useMemo(
