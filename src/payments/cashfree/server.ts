@@ -172,6 +172,22 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
     group: groupField,
     initiatePayment: async ({ data, req }) => {
       const payload = req.payload
+
+      console.log('=== Cashfree API Auth Debug ===')
+      console.log('appID:', appID ? `${appID.substring(0, 6)}...${appID.substring(appID.length - 6)}` : 'undefined')
+      console.log('secretKey:', secretKey ? `${secretKey.substring(0, 10)}...${secretKey.substring(secretKey.length - 10)}` : 'undefined')
+      console.log('apiVersion:', apiVersion)
+      console.log('environment:', environment)
+      console.log('===============================')
+
+      if (!appID || !secretKey) {
+        payload.logger.error({
+          msg: 'Cashfree credentials (CASHFREE_APP_ID or CASHFREE_SECRET_KEY) are missing or empty.',
+          appIDExists: Boolean(appID),
+          secretKeyExists: Boolean(secretKey),
+        })
+        throw new Error('Cashfree authentication configuration is missing or empty. Please check your environment variables and restart your server.')
+      }
       const amount = data.cart?.subtotal
       const billingAddress = data.billingAddress as CashfreeAddress | undefined
       const cart = data.cart
@@ -297,6 +313,16 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
     },
     confirmOrder: async ({ data, req }) => {
       const payload = req.payload
+
+      if (!appID || !secretKey) {
+        payload.logger.error({
+          msg: 'Cashfree credentials (CASHFREE_APP_ID or CASHFREE_SECRET_KEY) are missing or empty.',
+          appIDExists: Boolean(appID),
+          secretKeyExists: Boolean(secretKey),
+        })
+        throw new Error('Cashfree authentication configuration is missing or empty. Please check your environment variables and restart your server.')
+      }
+
       const customerEmail = data.customerEmail
       const orderID = data.orderID
 
