@@ -355,7 +355,7 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         .font('Helvetica')
         .fontSize(7.5)
         .text('Thank you for shopping with Honeylooms!', 40, y, { align: 'center', width: contentWidth })
-        .text('For queries, contact us at contact@honeylooms.com. This is a system-generated document.', 40, y + 10, { align: 'center', width: contentWidth })
+        .text('For queries, contact us at contact@honeylooms.in. This is a system-generated document.', 40, y + 10, { align: 'center', width: contentWidth })
 
       doc.end()
     } catch (err) {

@@ -408,7 +408,7 @@ export const sendOrderStatusEmail: CollectionAfterChangeHook = async ({
           </div>
           <div class="footer">
             &copy; ${new Date().getFullYear()} Honeylooms. All rights reserved.<br/>
-            If you have any questions or concerns, please contact us at <a href="mailto:contact@honeylooms.com">contact@honeylooms.com</a>.
+            If you have any questions or concerns, please contact us at <a href="mailto:contact@honeylooms.in">contact@honeylooms.in</a>.
           </div>
         </div>
       </div>

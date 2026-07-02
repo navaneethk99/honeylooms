@@ -55,9 +55,17 @@ export const AddressForm: React.FC<Props> = ({
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<AddressFormValues>({
     defaultValues: initialData,
   })
+
+  const countryValue = watch('country')
+  const isNotIndia = Boolean(
+    countryValue &&
+      countryValue.toLowerCase() !== 'in' &&
+      countryValue.toLowerCase() !== 'india',
+  )
 
   const { createAddress, updateAddress } = useAddresses()
 
@@ -224,10 +232,11 @@ export const AddressForm: React.FC<Props> = ({
             </SelectContent>
           </Select>
           {errors.country && <FormError message={errors.country.message} />}
+          {isNotIndia && <FormError message="Sorry! We do not ship outside India yet" />}
         </FormItem>
       </div>
 
-      <Button type="submit">Submit</Button>
+      <Button type="submit" disabled={isNotIndia}>Submit</Button>
     </form>
   )
 }
