@@ -19,6 +19,7 @@ import { cashfreeAdapter } from '@/payments/cashfree/server'
 import { codAdapter } from '@/payments/cod/server'
 import { reduceInventory } from '@/hooks/reduceInventory'
 import { sendInvoiceEmail } from '@/hooks/sendInvoiceEmail'
+import { sendOrderStatusEmail } from '@/hooks/sendOrderStatusEmail'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Honeylooms` : 'Honeylooms'
@@ -136,6 +137,7 @@ export const plugins: Plugin[] = [
             ...(defaultCollection?.hooks?.afterChange || []),
             reduceInventory,
             sendInvoiceEmail,
+            sendOrderStatusEmail,
           ],
         },
         fields: applyCosmeticCurrencyAdminOverrides([

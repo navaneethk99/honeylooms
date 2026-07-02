@@ -2,11 +2,7 @@ import type { CollectionAfterChangeHook } from 'payload'
 import { getServerSideURL } from '@/utilities/getURL'
 import { generateInvoicePDF } from '@/utilities/generateInvoicePDF'
 
-export const sendInvoiceEmail: CollectionAfterChangeHook = async ({
-  doc,
-  req,
-  operation,
-}) => {
+export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, operation }) => {
   if (operation === 'create') {
     const payload = req.payload
 
@@ -310,9 +306,8 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({
           <div class="container">
             <div class="header">
               <div class="logo-container">
-                <div class="logo-text">Honeylooms</div>
+                <img src="${serverURL}/logo.svg" alt="Honeylooms" style="max-width: 240px; height: auto; display: block; margin: 0 auto;" />
               </div>
-              <div class="logo-sub">Premium Quality</div>
             </div>
             <div class="content">
               <h1>Thank you for your order, ${customerName || 'Customer'}!</h1>
@@ -369,7 +364,7 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({
               </div>
 
               <div class="attachment-notice">
-                <strong>Note:</strong> We have generated a formal PDF invoice for your records and attached it directly to this email.
+                <strong>Note:</strong> We have attached a PDF invoice for your records.
               </div>
 
               <div class="btn-container">
@@ -422,7 +417,9 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({
         ],
       })
 
-      payload.logger.info(`Invoice email sent successfully to ${toEmail} for order #${doc.id} with PDF attachment`)
+      payload.logger.info(
+        `Invoice email sent successfully to ${toEmail} for order #${doc.id} with PDF attachment`,
+      )
     } catch (error) {
       payload.logger.error(`Error sending invoice email for order #${doc.id}: ${error}`)
     }
