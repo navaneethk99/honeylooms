@@ -16,6 +16,7 @@ import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { applyCosmeticCurrencyAdminOverrides } from '@/utilities/adminCurrencyOverrides'
 import { cashfreeAdapter } from '@/payments/cashfree/server'
+import { reduceInventory } from '@/hooks/reduceInventory'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Honeylooms` : 'Honeylooms'
@@ -123,6 +124,13 @@ export const plugins: Plugin[] = [
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
+        hooks: {
+          ...defaultCollection?.hooks,
+          afterChange: [
+            ...(defaultCollection?.hooks?.afterChange || []),
+            reduceInventory,
+          ],
+        },
         fields: applyCosmeticCurrencyAdminOverrides([
           ...defaultCollection.fields,
           {
@@ -145,6 +153,16 @@ export const plugins: Plugin[] = [
               ],
             },
           },
+          {
+            name: 'cashfreeOrderID',
+            type: 'text',
+            unique: true,
+            index: true,
+            admin: {
+              position: 'sidebar',
+              readOnly: true,
+            },
+          },
         ]),
       }),
     },
@@ -164,6 +182,61 @@ export const plugins: Plugin[] = [
       variants: {
         variantsCollectionOverride: ({ defaultCollection }) => ({
           ...defaultCollection,
+          hooks: {
+            ...defaultCollection?.hooks,
+            afterChange: [
+              ...(defaultCollection?.hooks?.afterChange || []),
+              async ({ doc, req: { context, payload } }) => {
+                if (context.disableRevalidate || !doc.product) {
+                  return doc
+                }
+                try {
+                  const productID = typeof doc.product === 'object' ? doc.product.id : doc.product
+                  const product = await payload.findByID({
+                    collection: 'products',
+                    id: productID,
+                    depth: 0,
+                  })
+                  if (product && product.slug) {
+                    const { revalidateTag, revalidatePath } = require('next/cache')
+                    payload.logger.info(`Revalidating product cache from variant: ${product.slug}`)
+                    revalidateTag('products', 'max')
+                    revalidatePath(`/products/${product.slug}`)
+                    revalidatePath('/shop')
+                  }
+                } catch (err) {
+                  payload.logger.error(`Error revalidating product cache from variant: ${err}`)
+                }
+                return doc
+              },
+            ],
+            afterDelete: [
+              ...(defaultCollection?.hooks?.afterDelete || []),
+              async ({ doc, req: { context, payload } }) => {
+                if (context.disableRevalidate || !doc.product) {
+                  return doc
+                }
+                try {
+                  const productID = typeof doc.product === 'object' ? doc.product.id : doc.product
+                  const product = await payload.findByID({
+                    collection: 'products',
+                    id: productID,
+                    depth: 0,
+                  })
+                  if (product && product.slug) {
+                    const { revalidateTag, revalidatePath } = require('next/cache')
+                    payload.logger.info(`Revalidating product cache from deleted variant: ${product.slug}`)
+                    revalidateTag('products', 'max')
+                    revalidatePath(`/products/${product.slug}`)
+                    revalidatePath('/shop')
+                  }
+                } catch (err) {
+                  payload.logger.error(`Error revalidating product cache from deleted variant: ${err}`)
+                }
+                return doc
+              },
+            ],
+          },
           fields: applyCosmeticCurrencyAdminOverrides(defaultCollection.fields),
         }),
       },

@@ -74,30 +74,43 @@ export function HomepageAnimation({ products }: Props) {
     return list
   }, [])
 
-  const desktopStyles = [
-    { left: '6%', top: '8%', bottom: 'auto', right: 'auto' },
-    { left: '26%', top: '38%', bottom: 'auto', right: 'auto' },
-    { left: '6%', top: 'auto', right: 'auto', bottom: '8%' },
-    { left: 'auto', top: '8%', right: '6%', bottom: 'auto' },
-    { left: 'auto', top: '38%', right: '26%', bottom: 'auto' },
-    { left: 'auto', top: 'auto', right: '6%', bottom: '8%' },
-  ]
+  const isMobile = windowWidth > 0 && windowWidth < 768
 
   useEffect(() => {
-    if (!containerRef.current || !stickyRef.current || outfits.length === 0 || windowWidth === 0)
+    if (!containerRef.current || !stickyRef.current || outfits.length === 0 || isMobile)
       return
 
-    // Do not initialize ScrollTrigger / GSAP pinning on mobile (width < 768px)
-    if (windowWidth < 768) return
+    const mm = gsap.matchMedia(containerRef)
 
-    const ctx = gsap.context(() => {
+    mm.add({
+      isDesktop: "(min-width: 1280px)",
+      isTablet: "(min-width: 768px) and (max-width: 1279px)",
+    }, (context) => {
+      const { isDesktop } = context.conditions as { isDesktop: boolean }
+
+      const styles = isDesktop ? [
+        { left: '4vw', top: '8vh', bottom: 'auto', right: 'auto' },
+        { left: '18vw', top: '36vh', bottom: 'auto', right: 'auto' },
+        { left: '4vw', top: 'auto', right: 'auto', bottom: '8vh' },
+        { left: 'auto', top: '8vh', right: '4vw', bottom: 'auto' },
+        { left: 'auto', top: '36vh', right: '18vw', bottom: 'auto' },
+        { left: 'auto', top: 'auto', right: '4vw', bottom: '8vh' },
+      ] : [
+        { left: '4vw', top: '8vh', bottom: 'auto', right: 'auto' },
+        { left: '20vw', top: '36vh', bottom: 'auto', right: 'auto' }, // hidden by CSS
+        { left: '4vw', top: 'auto', right: 'auto', bottom: '8vh' },
+        { left: 'auto', top: '8vh', right: '4vw', bottom: 'auto' },
+        { left: 'auto', top: '36vh', right: '20vw', bottom: 'auto' }, // hidden by CSS
+        { left: 'auto', top: 'auto', right: '4vw', bottom: '8vh' },
+      ]
+
       // Initialize card positions off-screen
       cardsRef.current.forEach((card, index) => {
         if (!card) return
         const isLeft = index < 3
-        const startX = isLeft ? -1200 : 1200
+        const startX = isLeft ? '-100vw' : '100vw'
         const startY = isLeft ? (index % 3) * 150 - 150 : ((index - 3) % 3) * 150 - 150
-        const pos = desktopStyles[index]
+        const pos = styles[index]
         gsap.set(card, {
           x: startX,
           y: startY,
@@ -168,7 +181,7 @@ export function HomepageAnimation({ products }: Props) {
         {
           opacity: 1,
           scale: 1.1,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.14em',
           duration: 2.0,
           ease: 'power1.inOut',
         },
@@ -178,7 +191,7 @@ export function HomepageAnimation({ products }: Props) {
       // 3. Stagger-in the clothing products into view
       cardsRef.current.forEach((card, index) => {
         if (!card) return
-        const pos = desktopStyles[index]
+        const pos = styles[index]
         if (!pos) return
 
         tl.to(
@@ -224,12 +237,10 @@ export function HomepageAnimation({ products }: Props) {
         },
         '<',
       )
-    }, containerRef)
+    })
 
-    return () => ctx.revert()
-  }, [outfits, windowWidth])
-
-  const isMobile = windowWidth > 0 && windowWidth < 768
+    return () => mm.revert()
+  }, [outfits, isMobile])
 
   if (isMobile) {
     return (
@@ -490,7 +501,7 @@ export function HomepageAnimation({ products }: Props) {
         <div className="text-center z-10 pointer-events-none select-none">
           <h1
             ref={titleRef}
-            className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-white tracking-widest uppercase font-sans drop-shadow-[0_2px_15px_rgba(0,0,0,0.15)]"
+            className="text-[clamp(2.5rem,5.5vw,5.5rem)] font-bold text-white tracking-widest uppercase font-sans drop-shadow-[0_2px_15px_rgba(0,0,0,0.15)]"
           >
             honeylooms
           </h1>
@@ -522,8 +533,8 @@ export function HomepageAnimation({ products }: Props) {
               ref={(el) => {
                 cardsRef.current[index] = el
               }}
-              className={`absolute aspect-[2/3] w-[28vw] md:w-[15vw] overflow-hidden bg-neutral-900 border border-white/5 rounded-md shadow-2xl transition-transform duration-300 hover:scale-[1.03] group z-20 pointer-events-auto card-item
-                ${index >= 4 ? 'hidden md:block' : ''}
+              className={`absolute aspect-[2/3] w-[min(16vw,22vh)] xl:w-[min(13vw,20vh)] overflow-hidden bg-neutral-900 border border-white/5 rounded-md shadow-2xl transition-transform duration-300 hover:scale-[1.03] group z-20 pointer-events-auto card-item
+                ${(index === 1 || index === 4) ? 'hidden xl:block' : ''}
               `}
             >
               {/* Image with zoom effect on hover */}

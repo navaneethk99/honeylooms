@@ -358,19 +358,38 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
 
         const shippingAddress = parseAddress(transaction.cashfree?.shippingAddressJSON)
 
-        const order = (await payload.create({
-          collection: 'orders',
-          data: {
-            ...(req.user ? { customer: req.user.id } : { customerEmail }),
-            amount: transaction.amount,
-            currency: transaction.currency,
-            items: transaction.items,
-            shippingAddress,
-            status: 'processing',
-            transactions: [transaction.id],
-          },
-          req,
-        })) as Order
+        let order: Order
+        try {
+          order = (await payload.create({
+            collection: 'orders',
+            data: {
+              ...(req.user ? { customer: req.user.id } : { customerEmail }),
+              amount: transaction.amount,
+              currency: transaction.currency,
+              items: transaction.items,
+              shippingAddress,
+              status: 'processing',
+              transactions: [transaction.id],
+              cashfreeOrderID: orderID,
+            },
+            req,
+          })) as Order
+        } catch (error) {
+          const existingOrders = await payload.find({
+            collection: 'orders',
+            req,
+            where: {
+              cashfreeOrderID: {
+                equals: orderID,
+              },
+            },
+          })
+          if (existingOrders.docs.length > 0) {
+            order = existingOrders.docs[0] as Order
+          } else {
+            throw error
+          }
+        }
 
         if (transaction.cart) {
           const cartID =

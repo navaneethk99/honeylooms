@@ -2,6 +2,7 @@
 
 import { Message } from '@/components/Message'
 import { Button } from '@/components/ui/button'
+import { LottieLoader } from '@/components/LottieLoader'
 import { useRouter } from 'next/navigation'
 import React, { FormEvent, useCallback, useState } from 'react'
 import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
@@ -149,16 +150,19 @@ export const CheckoutForm: React.FC<Props> = ({
   )
 
   return (
-    <form onSubmit={handleSubmit}>
-      {error && <Message error={error} />}
-      <div className="rounded-lg border bg-primary/5 p-4 text-sm text-muted-foreground">
-        Cashfree will open a secure UPI payment window and charge the order in Indian rupees.
-      </div>
-      <div className="mt-8 flex gap-4">
-        <Button disabled={isLoading} type="submit" variant="default">
-          {isLoading ? 'Loading...' : 'Pay now'}
-        </Button>
-      </div>
-    </form>
+    <>
+      {isLoading && <LottieLoader size="full" />}
+      <form onSubmit={handleSubmit}>
+        {error && <Message error={error} />}
+        <div className="rounded-lg border bg-primary/5 p-4 text-sm text-muted-foreground">
+          Cashfree will open a secure UPI payment window and charge the order in Indian rupees.
+        </div>
+        <div className="mt-8 flex gap-4">
+          <Button disabled={isLoading} type="submit" variant="default">
+            {isLoading ? 'Loading...' : 'Pay now'}
+          </Button>
+        </div>
+      </form>
+    </>
   )
 }

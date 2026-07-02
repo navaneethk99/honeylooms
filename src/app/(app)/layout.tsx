@@ -50,6 +50,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <link rel="preload" href="/Cat.lottie" as="fetch" crossOrigin="anonymous" />
       </head>
       <body>
         <Providers>

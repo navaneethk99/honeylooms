@@ -228,3 +228,35 @@ input,
 button {
   @apply focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-neutral-600 dark:focus-visible:ring-offset-neutral-900;
 }
+
+/* Lanyard Component Animations */
+@keyframes sway-strap {
+  0% { transform: translateX(-50%) rotate(-1.5deg); }
+  50% { transform: translateX(-50%) rotate(1.5deg); }
+  100% { transform: translateX(-50%) rotate(-1.5deg); }
+}
+
+@keyframes sway-clip {
+  0% { transform: translateX(-50%) rotate(-1.5deg); }
+  50% { transform: translateX(-50%) rotate(1.5deg); }
+  100% { transform: translateX(-50%) rotate(-1.5deg); }
+}
+
+@keyframes sway-card {
+  0% { transform: rotate(-1.2deg) translateY(-2px); }
+  50% { transform: rotate(1.2deg) translateY(2px); }
+  100% { transform: rotate(-1.2deg) translateY(-2px); }
+}
+
+.animate-sway-strap {
+  animation: sway-strap 6s ease-in-out infinite alternate;
+}
+
+.animate-sway-clip {
+  animation: sway-clip 6s ease-in-out infinite alternate;
+}
+
+.animate-sway-card {
+  animation: sway-card 6s ease-in-out infinite alternate;
+}
+

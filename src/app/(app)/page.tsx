@@ -12,6 +12,7 @@ import { HomepageAnimation } from '@/components/HomepageAnimation'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { generateMeta } from '@/utilities/generateMeta'
 import type { Metadata } from 'next'
+import { DomeGalleryWrapper as DomeGallery } from '@/components/DomeGallery/DomeGalleryWrapper'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getHomepageData()
@@ -46,6 +47,46 @@ const getHomepageData = async (): Promise<PageType | null> => {
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
 
+  // Fetch all published products to extract their images for the Dome Gallery
+  let domeImages: string[] = []
+  try {
+    const allProductsResult = await payload.find({
+      collection: 'products',
+      draft: false,
+      limit: 100,
+      where: {
+        _status: {
+          equals: 'published',
+        },
+      },
+    })
+
+    domeImages = allProductsResult.docs
+      .flatMap((product) => {
+        const urls: string[] = []
+        if (product.gallery && product.gallery.length > 0) {
+          product.gallery.forEach((item) => {
+            if (item.image && typeof item.image === 'object' && 'url' in item.image && item.image.url) {
+              urls.push(item.image.url)
+            }
+          })
+        }
+        if (
+          product.meta &&
+          product.meta.image &&
+          typeof product.meta.image === 'object' &&
+          'url' in product.meta.image &&
+          product.meta.image.url
+        ) {
+          urls.push(product.meta.image.url)
+        }
+        return urls
+      })
+      .filter(Boolean)
+  } catch (error) {
+    console.error('Error fetching products for dome gallery:', error)
+  }
+
   // 1. Fetch the homepage page document
   let page = await getHomepageData()
 
@@ -57,7 +98,11 @@ export default async function HomePage() {
   let outfits: Product[] = []
   try {
     const featuredOutfitsGlobal = await getCachedGlobal('featured-outfits', 2)()
-    if (featuredOutfitsGlobal && featuredOutfitsGlobal.outfits && featuredOutfitsGlobal.outfits.length > 0) {
+    if (
+      featuredOutfitsGlobal &&
+      featuredOutfitsGlobal.outfits &&
+      featuredOutfitsGlobal.outfits.length > 0
+    ) {
       outfits = featuredOutfitsGlobal.outfits.filter(
         (item): item is Product => typeof item === 'object' && item !== null && 'slug' in item,
       )
@@ -151,7 +196,7 @@ export default async function HomePage() {
                   href={`/collections/${collection.slug}`}
                   className="text-xs uppercase tracking-widest font-mono text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors mt-4 md:mt-0"
                 >
-                  Explore Collection &rarr;
+                  Explore Full Collection &rarr;
                 </Link>
               </div>
 
@@ -166,6 +211,30 @@ export default async function HomePage() {
             </section>
           )
         })}
+
+        {/* Dome Gallery Section */}
+        {domeImages.length > 0 && (
+          <section className="w-full h-[600px] relative overflow-hidden bg-white dark:bg-neutral-950 border-t border-neutral-100 dark:border-neutral-900 [--bg-gallery:#ffffff] dark:[--bg-gallery:#0a0a0a]">
+            <div className="absolute inset-x-0 top-12 z-10 flex flex-col items-center justify-start pointer-events-none">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-neutral-900 dark:text-white uppercase text-center mb-1">
+                Product Gallery
+              </h2>
+              <p className="text-[10px] tracking-widest text-neutral-500 dark:text-neutral-400 uppercase font-mono text-center">
+                Drag to orbit • Click to enlarge
+              </p>
+            </div>
+            <div className="w-full h-full">
+              <DomeGallery
+                images={domeImages}
+                grayscale={false}
+                overlayBlurColor="var(--bg-gallery)"
+                fit={0.9}
+                fitBasis="width"
+                minRadius={700}
+              />
+            </div>
+          </section>
+        )}
       </div>
     </article>
   )

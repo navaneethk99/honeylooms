@@ -260,6 +260,7 @@ export interface Order {
   amount?: number | null;
   currency?: 'USD' | null;
   accessToken?: string | null;
+  cashfreeOrderID?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1747,6 +1748,7 @@ export interface OrdersSelect<T extends boolean = true> {
   amount?: T;
   currency?: T;
   accessToken?: T;
+  cashfreeOrderID?: T;
   updatedAt?: T;
   createdAt?: T;
 }

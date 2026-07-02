@@ -21,6 +21,7 @@ import { AddressItem } from '@/components/addresses/AddressItem'
 import { FormItem } from '@/components/forms/FormItem'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { LottieLoader } from '@/components/LottieLoader'
 
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
@@ -39,6 +40,7 @@ export const CheckoutPage: React.FC = () => {
   const [billingAddress, setBillingAddress] = useState<Partial<Address>>()
   const [billingAddressSameAsShipping, setBillingAddressSameAsShipping] = useState(true)
   const [isProcessingPayment, setProcessingPayment] = useState(false)
+  const [isInitiatingPayment, setIsInitiatingPayment] = useState(false)
 
   const billingPhone = billingAddress?.phone?.trim()
   const shippingPhone = shippingAddress?.phone?.trim()
@@ -91,6 +93,7 @@ export const CheckoutPage: React.FC = () => {
         return
       }
 
+      setIsInitiatingPayment(true)
       try {
         const paymentData = (await initiatePayment(paymentID, {
           additionalData: {
@@ -121,6 +124,8 @@ export const CheckoutPage: React.FC = () => {
 
         setError(errorMessage)
         toast.error(errorMessage)
+      } finally {
+        setIsInitiatingPayment(false)
       }
     },
     [billingAddress, billingAddressSameAsShipping, email, initiatePayment, shippingAddress],
@@ -300,14 +305,18 @@ export const CheckoutPage: React.FC = () => {
 
         {!paymentData && (
           <Button
-            className="self-start"
-            disabled={!canGoToPayment}
+            className="self-start min-w-[150px]"
+            disabled={!canGoToPayment || isInitiatingPayment}
             onClick={(e) => {
               e.preventDefault()
               void initiatePaymentIntent('cashfree')
             }}
           >
-            Go to payment
+            {isInitiatingPayment ? (
+              'Processing...'
+            ) : (
+              'Go to payment'
+            )}
           </Button>
         )}
 

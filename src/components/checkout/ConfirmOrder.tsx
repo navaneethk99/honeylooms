@@ -1,6 +1,6 @@
 'use client'
 
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { LottieLoader } from '@/components/LottieLoader'
 import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef } from 'react'
@@ -53,11 +53,5 @@ export const ConfirmOrder: React.FC = () => {
     }
   }, [cart, confirmOrder, router, searchParams])
 
-  return (
-    <div className="text-center w-full flex flex-col items-center justify-start gap-4">
-      <h1 className="text-2xl">Confirming Order</h1>
-
-      <LoadingSpinner className="w-12 h-6" />
-    </div>
-  )
+  return <LottieLoader size="full" />
 }
