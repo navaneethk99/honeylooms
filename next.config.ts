@@ -20,6 +20,7 @@ const imageRemotePatterns = imageRemoteURLs.map((item) => {
 })
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['pdfkit'],
   // Temporarily required on Windows until Next.js fixes Turbopack Sass resolution.
   // See: https://github.com/vercel/next.js/issues/86431
   sassOptions: {

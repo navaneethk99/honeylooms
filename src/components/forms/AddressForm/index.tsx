@@ -135,7 +135,6 @@ export const AddressForm: React.FC<Props> = ({
             type="tel"
             id="phone"
             autoComplete="mobile tel"
-            placeholder="Required for UPI payments"
             {...register('phone', {
               required: 'Phone is required for UPI payments.',
             })}

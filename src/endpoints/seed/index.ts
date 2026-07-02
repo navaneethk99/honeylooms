@@ -463,6 +463,7 @@ export const seed = async ({
       amount: 7499,
       currency: 'USD',
       customer: customer.id,
+      paymentMethod: 'cashfree',
       shippingAddress: baseAddressUSData,
       items: [
         {
@@ -487,6 +488,7 @@ export const seed = async ({
       amount: 7499,
       currency: 'USD',
       customer: customer.id,
+      paymentMethod: 'cashfree',
       shippingAddress: baseAddressUSData,
       items: [
         {

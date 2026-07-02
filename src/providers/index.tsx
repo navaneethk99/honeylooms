@@ -6,6 +6,7 @@ import { HeaderThemeProvider } from './HeaderTheme'
 import { ThemeProvider } from './Theme'
 import { SonnerProvider } from '@/providers/Sonner'
 import { cashfreeAdapterClient } from '@/payments/cashfree/client'
+import { codAdapterClient } from '@/payments/cod/client'
 
 export const Providers: React.FC<{
   children: React.ReactNode
@@ -34,7 +35,7 @@ export const Providers: React.FC<{
                 },
               },
             }}
-            paymentMethods={[cashfreeAdapterClient()]}
+            paymentMethods={[cashfreeAdapterClient(), codAdapterClient()]}
           >
             {children}
           </EcommerceProvider>

@@ -367,6 +367,7 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
               amount: transaction.amount,
               currency: transaction.currency,
               items: transaction.items,
+              paymentMethod: 'cashfree',
               shippingAddress,
               status: 'processing',
               transactions: [transaction.id],

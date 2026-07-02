@@ -16,7 +16,9 @@ import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { applyCosmeticCurrencyAdminOverrides } from '@/utilities/adminCurrencyOverrides'
 import { cashfreeAdapter } from '@/payments/cashfree/server'
+import { codAdapter } from '@/payments/cod/server'
 import { reduceInventory } from '@/hooks/reduceInventory'
+import { sendInvoiceEmail } from '@/hooks/sendInvoiceEmail'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Honeylooms` : 'Honeylooms'
@@ -124,15 +126,56 @@ export const plugins: Plugin[] = [
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
+        admin: {
+          ...defaultCollection.admin,
+          defaultColumns: ['id', 'createdAt', 'paymentMethod', 'amount', 'status'],
+        },
         hooks: {
           ...defaultCollection?.hooks,
           afterChange: [
             ...(defaultCollection?.hooks?.afterChange || []),
             reduceInventory,
+            sendInvoiceEmail,
           ],
         },
         fields: applyCosmeticCurrencyAdminOverrides([
-          ...defaultCollection.fields,
+          ...defaultCollection.fields.map((field) => {
+            if ('name' in field && field.name === 'status' && field.type === 'select') {
+              return {
+                ...field,
+                options: [
+                  { label: 'Processing', value: 'processing' },
+                  { label: 'Confirmed', value: 'confirmed' },
+                  { label: 'Shipped', value: 'shipped' },
+                  { label: 'Completed', value: 'completed' },
+                  { label: 'Cancelled', value: 'cancelled' },
+                  { label: 'Refunded', value: 'refunded' },
+                ],
+              }
+            }
+            return field
+          }),
+          {
+            name: 'paymentMethod',
+            type: 'select',
+            options: [
+              { label: 'UPI', value: 'cashfree' },
+              { label: 'Cash on Delivery', value: 'cod' },
+            ],
+            defaultValue: 'cashfree',
+            admin: {
+              position: 'sidebar',
+            },
+          },
+          {
+            name: 'shippingLink',
+            type: 'text',
+            label: 'Shipping Tracking Link',
+            admin: {
+              position: 'sidebar',
+              condition: (data) => data?.status === 'shipped',
+            },
+          },
           {
             name: 'accessToken',
             type: 'text',
@@ -176,6 +219,7 @@ export const plugins: Plugin[] = [
           paymentMethods: 'upi',
           secretKey: process.env.CASHFREE_SECRET_KEY!,
         }),
+        codAdapter({}),
       ],
     },
     products: {

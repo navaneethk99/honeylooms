@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import {
   BoldFeature,
   EXPERIMENTAL_TableFeature,
@@ -84,7 +85,26 @@ export default buildConfig({
       ]
     },
   }),
-  //email: nodemailerAdapter(),
+  ...(process.env.SMTP_HOST
+    ? (() => {
+        const port = Number(process.env.SMTP_PORT) || 587
+        return {
+          email: nodemailerAdapter({
+            defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'contact@honeylooms.in',
+            defaultFromName: process.env.SMTP_FROM_NAME || 'Honeylooms',
+            transportOptions: {
+              host: process.env.SMTP_HOST,
+              port,
+              secure: port === 465,
+              auth: {
+                user: process.env.SMTP_USER || '',
+                pass: process.env.SMTP_PASS || '',
+              },
+            },
+          }),
+        }
+      })()
+    : {}),
   endpoints: [],
   globals: [Header, Footer, FeaturedOutfits],
   plugins,

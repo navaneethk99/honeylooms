@@ -83,6 +83,7 @@ export default async function Order({ params, searchParams }: PageProps) {
         createdAt: true,
         updatedAt: true,
         shippingAddress: true,
+        shippingLink: true,
       },
     })
 
@@ -160,7 +161,19 @@ export default async function Order({ params, searchParams }: PageProps) {
               <p className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">
                 Status
               </p>
-              <OrderStatus status={order.status} />
+              <div className="flex flex-col gap-2">
+                <OrderStatus status={order.status} />
+                {order.status === 'shipped' && order.shippingLink && (
+                  <a
+                    href={order.shippingLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#D9A321] hover:underline font-mono"
+                  >
+                    Track Shipment →
+                  </a>
+                )}
+              </div>
             </div>
           )}
         </div>

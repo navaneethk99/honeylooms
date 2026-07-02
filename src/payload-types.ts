@@ -10,7 +10,7 @@
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "OrderStatus".
  */
-export type OrderStatus = ('processing' | 'completed' | 'cancelled' | 'refunded') | null;
+export type OrderStatus = ('processing' | 'confirmed' | 'shipped' | 'completed' | 'cancelled' | 'refunded') | null;
 /**
  * Supported timezones in IANA format.
  *
@@ -259,6 +259,8 @@ export interface Order {
   status?: OrderStatus;
   amount?: number | null;
   currency?: 'USD' | null;
+  paymentMethod?: ('cashfree' | 'cod') | null;
+  shippingLink?: string | null;
   accessToken?: string | null;
   cashfreeOrderID?: string | null;
   updatedAt: string;
@@ -936,12 +938,15 @@ export interface Transaction {
         id?: string | null;
       }[]
     | null;
-  paymentMethod?: 'cashfree' | null;
+  paymentMethod?: ('cashfree' | 'cod') | null;
   cashfree?: {
     cfOrderID?: string | null;
     orderID?: string | null;
     paymentSessionID?: string | null;
     shippingAddressJSON?: string | null;
+  };
+  cod?: {
+    codFee?: number | null;
   };
   billingAddress?: {
     title?: string | null;
@@ -1747,6 +1752,8 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   amount?: T;
   currency?: T;
+  paymentMethod?: T;
+  shippingLink?: T;
   accessToken?: T;
   cashfreeOrderID?: T;
   updatedAt?: T;
@@ -1773,6 +1780,11 @@ export interface TransactionsSelect<T extends boolean = true> {
         orderID?: T;
         paymentSessionID?: T;
         shippingAddressJSON?: T;
+      };
+  cod?:
+    | T
+    | {
+        codFee?: T;
       };
   billingAddress?:
     | T
