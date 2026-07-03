@@ -25,46 +25,58 @@ export interface InvoiceData {
     country?: string | null
     phone?: string | null
   }
+  billingName?: string | null
+  billingAddress?: {
+    addressLine1?: string | null
+    addressLine2?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    phone?: string | null
+  } | null
   items: InvoiceItem[]
   subtotal: number
   codFee: number
   totalAmount: number
 }
 
-export function drawLogo(doc: InstanceType<typeof PDFDocument>, x: number, y: number, width: number) {
+export function drawLogo(
+  doc: InstanceType<typeof PDFDocument>,
+  x: number,
+  y: number,
+  width: number,
+) {
   try {
     const svgPath = path.join(process.cwd(), 'public/logo.svg')
     if (!fs.existsSync(svgPath)) {
       // Fallback to text if file doesn't exist
-      doc.fillColor('#D9A321')
-        .font('Helvetica-Bold')
-        .fontSize(20)
-        .text('HONEYLOOMS', x, y)
+      doc.fillColor('#D9A321').font('Helvetica-Bold').fontSize(20).text('HONEYLOOMS', x, y)
       return
     }
 
     const svgContent = fs.readFileSync(svgPath, 'utf8')
     const paths = svgContent.match(/<path\s+[^>]+?>/gs) || []
-    
+
     // ViewBox is 0 0 3535 612
     const originalWidth = 3535
     const scale = width / originalWidth
-    
+
     doc.save()
     doc.translate(x, y)
     doc.scale(scale)
-    
+
     for (const p of paths) {
       const dMatch = p.match(/d="([^"]+)"/)
       if (!dMatch) continue
       const d = dMatch[1]
-      
+
       const fillMatch = p.match(/fill="([^"]+)"/)
       const strokeMatch = p.match(/stroke="([^"]+)"/)
-      
+
       const fillColor = fillMatch ? fillMatch[1] : '#D9A321'
       const strokeColor = strokeMatch ? strokeMatch[1] : undefined
-      
+
       doc.path(d)
       if (strokeColor && strokeColor !== 'none') {
         doc.strokeColor(strokeColor).lineWidth(15)
@@ -77,14 +89,11 @@ export function drawLogo(doc: InstanceType<typeof PDFDocument>, x: number, y: nu
         doc.fillColor(fillColor).fill()
       }
     }
-    
+
     doc.restore()
   } catch (error) {
     console.error('Error rendering SVG logo in PDF:', error)
-    doc.fillColor('#D9A321')
-      .font('Helvetica-Bold')
-      .fontSize(20)
-      .text('HONEYLOOMS', x, y)
+    doc.fillColor('#D9A321').font('Helvetica-Bold').fontSize(20).text('HONEYLOOMS', x, y)
   }
 }
 
@@ -93,7 +102,7 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     try {
       const doc = new PDFDocument({
         size: 'A4',
-        margins: { top: 40, bottom: 40, left: 40, right: 40 },
+        margins: { top: 40, bottom: 30, left: 40, right: 40 },
         bufferPages: true,
       })
 
@@ -105,257 +114,334 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       // Margins are 40, so printable width is 595 - 80 = 515
       const contentWidth = 515
 
-      // Header section
-      let y = 40
-      
-      // Draw Logo
-      drawLogo(doc, 40, y, 160)
-      
-      // Invoice Title
-      doc.fillColor('#141414')
-        .font('Helvetica-Bold')
-        .fontSize(24)
-        .text('INVOICE', 40, y, { align: 'right', width: contentWidth })
-      
-      y += 50
+      // Header section: large bold Title "Invoice" on the left, Order # and Date on the right
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(24).text('Invoice', 40, 40)
 
-      // Divider Line
-      doc.strokeColor('#e5e5e5')
-        .lineWidth(1)
-        .moveTo(40, y)
-        .lineTo(555, y)
+      doc
+        .fillColor('#000000')
+        .font('Helvetica-Bold')
+        .fontSize(10)
+        .text(`Order #${data.orderId}`, 40, 40, { align: 'right', width: contentWidth })
+        .font('Helvetica')
+        .text(data.date, 40, 54, { align: 'right', width: contentWidth })
+
+      let y = 90
+      const columnsStartY = y
+
+      // Column 1: From
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(10).text('From', 40, y)
+
+      y += 14
+
+      const companyName = process.env.COMPANY_NAME || 'Honeylooms'
+      const companyGst = process.env.COMPANY_GST || '[GST NO]'
+      const companyAddress = process.env.COMPANY_ADDRESS || '[ADDRESS]'
+
+      doc
+        .font('Helvetica')
+        .fontSize(9)
+        .fillColor('#000000')
+        .text(companyName, 40, y, { width: 160 })
+
+      y += 13
+
+      doc.text(`GST NO: ${companyGst}`, 40, y, { width: 160 })
+      y += 13
+
+      const companyAddressHeight = doc.heightOfString(companyAddress, { width: 160 })
+      doc.text(companyAddress, 40, y, { width: 160 })
+      const fromEndY = y + companyAddressHeight
+
+      // Column 2: Bill to
+      y = columnsStartY
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(10).text('Bill to', 215, y)
+
+      y += 14
+
+      const billAddr = data.billingAddress || data.shippingAddress || {}
+      const billName = data.billingName || data.customerName || 'Customer'
+
+      doc.font('Helvetica').fontSize(9).fillColor('#000000').text(billName, 215, y, { width: 160 })
+
+      y += 13
+
+      let billAddressText = ''
+      if (billAddr.addressLine1) billAddressText += billAddr.addressLine1 + '\n'
+      if (billAddr.addressLine2) billAddressText += billAddr.addressLine2 + '\n'
+      const billCityStateZip = [billAddr.city, billAddr.state, billAddr.postalCode]
+        .filter(Boolean)
+        .join(', ')
+      if (billCityStateZip) billAddressText += billCityStateZip + '\n'
+      if (billAddr.country) billAddressText += billAddr.country + '\n'
+      if (data.customerEmail) billAddressText += data.customerEmail
+
+      const billAddressHeight = doc.heightOfString(billAddressText.trim(), { width: 160 })
+      doc.text(billAddressText.trim(), 215, y, { width: 160 })
+      const billEndY = y + billAddressHeight
+
+      // Column 3: Ship to
+      y = columnsStartY
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(10).text('Ship to', 390, y)
+
+      y += 14
+
+      const shipAddr = data.shippingAddress || {}
+      const shipName = data.customerName || 'Customer'
+
+      doc.font('Helvetica').fontSize(9).fillColor('#000000').text(shipName, 390, y, { width: 165 })
+
+      y += 13
+
+      let shipAddressText = ''
+      if (shipAddr.addressLine1) shipAddressText += shipAddr.addressLine1 + '\n'
+      if (shipAddr.addressLine2) shipAddressText += shipAddr.addressLine2 + '\n'
+      const shipCityStateZip = [shipAddr.city, shipAddr.state, shipAddr.postalCode]
+        .filter(Boolean)
+        .join(', ')
+      if (shipCityStateZip) shipAddressText += shipCityStateZip + '\n'
+      if (shipAddr.country) shipAddressText += shipAddr.country + '\n'
+
+      const shippingPhone = shipAddr.phone || billAddr.phone
+      if (shippingPhone) shipAddressText += shippingPhone
+
+      const shipAddressHeight = doc.heightOfString(shipAddressText.trim(), { width: 165 })
+      doc.text(shipAddressText.trim(), 390, y, { width: 165 })
+      const shipEndY = y + shipAddressHeight
+
+      y = Math.max(fromEndY, billEndY, shipEndY) + 20
+
+      // Solid thick line separator
+      doc.strokeColor('#000000').lineWidth(1.5).moveTo(40, y).lineTo(555, y).stroke()
+
+      y += 15
+
+      // Section Header: Order Details
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(11).text('Order Details', 40, y)
+
+      y += 20
+
+      // Table Header: Qty, Item, Price
+      doc.strokeColor('#e5e5e5').lineWidth(0.5).moveTo(40, y).lineTo(555, y).stroke()
+
+      doc
+        .fillColor('#000000')
+        .font('Helvetica-Bold')
+        .fontSize(9)
+        .text('Qty', 45, y + 5, { width: 40, align: 'left' })
+        .text('Item', 90, y + 5, { width: 340, align: 'left' })
+        .text('Price', 440, y + 5, { width: 110, align: 'right' })
+
+      doc
+        .strokeColor('#e5e5e5')
+        .lineWidth(0.5)
+        .moveTo(40, y + 20)
+        .lineTo(555, y + 20)
         .stroke()
 
       y += 20
 
-      // Billing & Invoice details metadata columns
-      const billingStartY = y
-      
-      // Left Column: Billed To
-      doc.fillColor('#888888')
-        .font('Helvetica-Bold')
-        .fontSize(8)
-        .text('BILLED TO', 40, y)
-      
-      y += 12
-      
-      doc.fillColor('#141414')
-        .font('Helvetica-Bold')
-        .fontSize(10)
-        .text(data.customerName || 'Customer', 40, y)
-      
-      y += 14
-      
-      doc.font('Helvetica')
-        .fontSize(9)
-        .fillColor('#444444')
-      
-      const addr = data.shippingAddress
-      if (addr.addressLine1) {
-        doc.text(addr.addressLine1, 40, y)
-        y += 13
-      }
-      if (addr.addressLine2) {
-        doc.text(addr.addressLine2, 40, y)
-        y += 13
-      }
-      
-      const cityStateZip = [addr.city, addr.state, addr.postalCode].filter(Boolean).join(', ')
-      if (cityStateZip) {
-        doc.text(cityStateZip, 40, y)
-        y += 13
-      }
-      if (addr.country) {
-        doc.text(addr.country, 40, y)
-        y += 13
-      }
-      if (addr.phone) {
-        doc.text(`Phone: ${addr.phone}`, 40, y)
-        y += 13
-      }
-      if (data.customerEmail) {
-        doc.text(`Email: ${data.customerEmail}`, 40, y)
-        y += 13
-      }
-
-      const billingEndY = y
-
-      // Reset to top of column for right side
-      y = billingStartY
-
-      // Right Column: Invoice metadata
-      doc.fillColor('#888888')
-        .font('Helvetica-Bold')
-        .fontSize(8)
-        .text('INVOICE DETAILS', 340, y)
-      
-      y += 12
-      
-      doc.fillColor('#141414')
-        .font('Helvetica-Bold')
-        .fontSize(9)
-        .text('Invoice Number:', 340, y)
-      doc.font('Helvetica')
-        .text(`#${data.orderId}`, 440, y)
-      y += 14
-
-      doc.font('Helvetica-Bold')
-        .text('Invoice Date:', 340, y)
-      doc.font('Helvetica')
-        .text(data.date, 440, y)
-      y += 14
-
-      doc.font('Helvetica-Bold')
-        .text('Payment Method:', 340, y)
-      doc.font('Helvetica')
-        .text(data.paymentMethodLabel, 440, y)
-      y += 14
-
-      // Use the lower end point to prevent overlaps
-      y = Math.max(billingEndY, y) + 20
-
-      // Table Header
-      // Background bar for header
-      doc.rect(40, y, contentWidth, 20)
-        .fillColor('#141414')
-        .fill()
-
-      // Header text
-      doc.fillColor('#ffffff')
-        .font('Helvetica-Bold')
-        .fontSize(8)
-        .text('ITEM DESCRIPTION', 45, y + 6, { width: 260, align: 'left' })
-        .text('QTY', 305, y + 6, { width: 45, align: 'center' })
-        .text('PRICE', 355, y + 6, { width: 80, align: 'right' })
-        .text('TOTAL', 440, y + 6, { width: 110, align: 'right' })
-
-      y += 20
-
       // Items rows
-      doc.fontSize(9).fillColor('#141414')
-      
+      doc.font('Helvetica').fontSize(9).fillColor('#000000')
+
       for (const item of data.items) {
         // Page break safety
         if (y > 700) {
           doc.addPage()
           y = 45
-          
-          // Re-draw table header on new page
-          doc.rect(40, y, contentWidth, 20)
-            .fillColor('#141414')
-            .fill()
 
-          doc.fillColor('#ffffff')
+          doc.strokeColor('#e5e5e5').lineWidth(0.5).moveTo(40, y).lineTo(555, y).stroke()
+
+          doc
+            .fillColor('#000000')
             .font('Helvetica-Bold')
-            .fontSize(8)
-            .text('ITEM DESCRIPTION', 45, y + 6, { width: 260, align: 'left' })
-            .text('QTY', 305, y + 6, { width: 45, align: 'center' })
-            .text('PRICE', 355, y + 6, { width: 80, align: 'right' })
-            .text('TOTAL', 440, y + 6, { width: 110, align: 'right' })
+            .fontSize(9)
+            .text('Qty', 45, y + 5, { width: 40, align: 'left' })
+            .text('Item', 90, y + 5, { width: 340, align: 'left' })
+            .text('Price', 440, y + 5, { width: 110, align: 'right' })
+
+          doc
+            .strokeColor('#e5e5e5')
+            .lineWidth(0.5)
+            .moveTo(40, y + 20)
+            .lineTo(555, y + 20)
+            .stroke()
 
           y += 20
-          doc.fontSize(9).fillColor('#141414')
+          doc.font('Helvetica').fontSize(9).fillColor('#000000')
         }
 
-        // Measure description & variant height
-        const titleHeight = doc.heightOfString(item.title, { width: 260 })
+        const titleHeight = doc.heightOfString(item.title, { width: 340 })
         const variantHeight = item.variantOptionsText
-          ? doc.heightOfString(`Variant: ${item.variantOptionsText}`, { width: 260 }) + 3
+          ? doc.heightOfString(`Variant: ${item.variantOptionsText}`, { width: 340 }) + 3
           : 0
         const rowHeight = Math.max(26, titleHeight + variantHeight + 10)
 
-        // Draw Row Border
-        doc.strokeColor('#f0f0f0')
-          .lineWidth(1)
+        const textY = y + 6
+
+        doc
+          .font('Helvetica')
+          .text(item.quantity.toString(), 45, textY, { width: 40, align: 'left' })
+
+        doc.text(item.title, 90, textY, { width: 340, align: 'left' })
+
+        if (item.variantOptionsText) {
+          doc
+            .font('Helvetica')
+            .fillColor('#555555')
+            .fontSize(7.5)
+            .text(`Variant: ${item.variantOptionsText}`, 90, textY + titleHeight + 2, {
+              width: 340,
+              align: 'left',
+            })
+        }
+
+        doc
+          .font('Helvetica')
+          .fillColor('#000000')
+          .fontSize(9)
+          .text(`Rs. ${(item.price / 100).toFixed(2)}`, 440, textY, { width: 110, align: 'right' })
+
+        doc
+          .strokeColor('#f0f0f0')
+          .lineWidth(0.5)
           .moveTo(40, y + rowHeight)
           .lineTo(555, y + rowHeight)
           .stroke()
-
-        // Text Y offset for vertical alignment
-        const textY = y + 6
-        
-        doc.font('Helvetica-Bold')
-          .text(item.title, 45, textY, { width: 260, align: 'left' })
-        
-        if (item.variantOptionsText) {
-          doc.font('Helvetica')
-            .fillColor('#777777')
-            .fontSize(7.5)
-            .text(`Variant: ${item.variantOptionsText}`, 45, textY + titleHeight + 2, { width: 260, align: 'left' })
-        }
-
-        doc.font('Helvetica')
-          .fillColor('#141414')
-          .fontSize(9)
-          .text(item.quantity.toString(), 305, textY, { width: 45, align: 'center' })
-          .text(`INR ${(item.price / 100).toFixed(2)}`, 355, textY, { width: 80, align: 'right' })
-          .text(`INR ${(item.total / 100).toFixed(2)}`, 440, textY, { width: 110, align: 'right' })
 
         y += rowHeight
       }
 
       y += 15
 
-      // Summary Section
-      // Subtotal
-      doc.font('Helvetica')
-        .fillColor('#666666')
-        .text('Subtotal:', 340, y, { width: 95, align: 'right' })
-      doc.fillColor('#141414')
-        .text(`INR ${(data.subtotal / 100).toFixed(2)}`, 440, y, { width: 110, align: 'right' })
-      y += 14
+      // Summary Box (aligned right)
+      const summaryBoxX = 340
+      const summaryBoxWidth = 215
+      const summaryRowHeight = 20
+      const summaryBoxStartY = y
 
-      // COD handling if any
-      if (data.codFee > 0) {
-        doc.fillColor('#666666')
-          .text('COD Fee:', 340, y, { width: 95, align: 'right' })
-        doc.fillColor('#141414')
-          .text(`INR ${(data.codFee / 100).toFixed(2)}`, 440, y, { width: 110, align: 'right' })
-        y += 14
+      const summaryRows = [
+        { label: 'Subtotal', value: `Rs. ${(data.subtotal / 100).toFixed(2)}` },
+        {
+          label: 'Tax',
+          subLabel: 'IGST (5%)',
+          value: `Rs. ${((data.subtotal * 0.05) / 100).toFixed(2)}`,
+        },
+        { label: 'Shipping (COD)', value: `Rs. ${(data.codFee / 100).toFixed(2)}` },
+        { label: 'Total', value: `Rs. ${(data.totalAmount / 100).toFixed(2)}`, isBold: true },
+      ]
+
+      let currentY = summaryBoxStartY
+      for (const row of summaryRows) {
+        doc
+          .strokeColor('#e5e5e5')
+          .lineWidth(0.5)
+          .moveTo(summaryBoxX, currentY)
+          .lineTo(summaryBoxX + summaryBoxWidth, currentY)
+          .stroke()
+
+        doc
+          .fillColor('#000000')
+          .font(row.isBold ? 'Helvetica-Bold' : 'Helvetica')
+          .fontSize(9)
+
+        if (row.subLabel) {
+          doc
+            .text(row.label, summaryBoxX + 5, currentY + 5, { width: 45, align: 'left' })
+            .fontSize(7.5)
+            .fillColor('#555555')
+            .text(row.subLabel, summaryBoxX + 45, currentY + 6, { width: 50, align: 'right' })
+        } else {
+          doc.text(row.label, summaryBoxX + 5, currentY + 5, { width: 90, align: 'left' })
+        }
+
+        doc
+          .fontSize(9)
+          .fillColor('#000000')
+          .font(row.isBold ? 'Helvetica-Bold' : 'Helvetica')
+          .text(row.value, summaryBoxX + 100, currentY + 5, { width: 110, align: 'right' })
+
+        currentY += summaryRowHeight
       }
 
-      // Divider for total
-      doc.strokeColor('#D9A321')
-        .lineWidth(1)
-        .moveTo(340, y)
-        .lineTo(555, y)
+      // Bottom border line for summary box
+      doc
+        .strokeColor('#e5e5e5')
+        .lineWidth(0.5)
+        .moveTo(summaryBoxX, currentY)
+        .lineTo(summaryBoxX + summaryBoxWidth, currentY)
         .stroke()
-      
-      y += 6
 
-      // Grand Total
-      doc.font('Helvetica-Bold')
-        .fontSize(10)
-        .fillColor('#141414')
-        .text('Total Amount:', 340, y, { width: 95, align: 'right' })
-      doc.fontSize(11)
-        .text(`INR ${(data.totalAmount / 100).toFixed(2)}`, 440, y, { width: 110, align: 'right' })
+      // Left border line
+      doc
+        .strokeColor('#e5e5e5')
+        .lineWidth(0.5)
+        .moveTo(summaryBoxX, summaryBoxStartY)
+        .lineTo(summaryBoxX, currentY)
+        .stroke()
+        // Right border line
+        .moveTo(summaryBoxX + summaryBoxWidth, summaryBoxStartY)
+        .lineTo(summaryBoxX + summaryBoxWidth, currentY)
+        .stroke()
+        // Column separator vertical divider
+        .moveTo(summaryBoxX + 100, summaryBoxStartY)
+        .lineTo(summaryBoxX + 100, currentY)
+        .stroke()
 
+      y = currentY
+
+      // Signatory Section
       y += 40
 
-      // Footer
-      // Ensure footer isn't cut off
-      if (y > 740) {
+      if (y > 700) {
         doc.addPage()
         y = 50
-      } else {
-        y = 730
       }
 
-      // Draw footer decorative line
-      doc.strokeColor('#e5e5e5')
-        .lineWidth(0.5)
-        .moveTo(40, y)
-        .lineTo(555, y)
-        .stroke()
+      const signaturePath = process.env.SIGNATURE_IMAGE_PATH
+      let sigDrawn = false
+      if (signaturePath && fs.existsSync(signaturePath)) {
+        try {
+          doc.image(signaturePath, 390, y, { width: 140, height: 50 })
+          y += 55
+          sigDrawn = true
+        } catch (err) {
+          console.error('Error drawing signature image in PDF:', err)
+        }
+      }
 
-      y += 10
+      if (!sigDrawn) {
+        doc
+          .strokeColor('#cccccc')
+          .lineWidth(0.5)
+          .moveTo(390, y + 45)
+          .lineTo(555, y + 45)
+          .stroke()
+        y += 50
+      }
 
-      doc.fillColor('#999999')
+      doc
+        .fillColor('#000000')
         .font('Helvetica')
-        .fontSize(7.5)
-        .text('Thank you for shopping with Honeylooms!', 40, y, { align: 'center', width: contentWidth })
-        .text('For queries, contact us at contact@honeylooms.in. This is a system-generated document.', 40, y + 10, { align: 'center', width: contentWidth })
+        .fontSize(9)
+        .text('Authorised Signatory', 390, y, { width: 165, align: 'center' })
+
+      // Footer Contact Info
+      const pageHeight = doc.page.height
+      const footerY = pageHeight - 65
+
+      doc.strokeColor('#e5e5e5').lineWidth(0.5).moveTo(40, footerY).lineTo(555, footerY).stroke()
+
+      const contactEmail = process.env.SMTP_FROM_ADDRESS || 'contact@honeylooms.in'
+      doc
+        .fillColor('#555555')
+        .font('Helvetica')
+        .fontSize(8.5)
+        .text(
+          `If you have any questions, please send an email to ${contactEmail}`,
+          40,
+          footerY + 10,
+          { align: 'left', width: contentWidth },
+        )
 
       doc.end()
     } catch (err) {

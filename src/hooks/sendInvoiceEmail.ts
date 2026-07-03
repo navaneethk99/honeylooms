@@ -381,6 +381,30 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, op
       </html>
       `
 
+      // Get billing address from transaction if possible
+      let billingAddress = doc.shippingAddress || {}
+      let billingName = customerName
+
+      if (doc.transactions && doc.transactions.length > 0) {
+        const firstTx = doc.transactions[0]
+        const txID = typeof firstTx === 'object' ? firstTx.id : firstTx
+        try {
+          const transaction = await payload.findByID({
+            collection: 'transactions',
+            id: txID,
+            req,
+          })
+          if (transaction && transaction.billingAddress) {
+            billingAddress = transaction.billingAddress
+            if (billingAddress.firstName || billingAddress.lastName) {
+              billingName = [billingAddress.firstName, billingAddress.lastName].filter(Boolean).join(' ')
+            }
+          }
+        } catch (error) {
+          payload.logger.error(`Error fetching transaction for billing address: ${error}`)
+        }
+      }
+
       // 9. Generate Invoice PDF Buffer
       const pdfBuffer = await generateInvoicePDF({
         orderId: doc.id,
@@ -396,6 +420,16 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, op
           postalCode: addr.postalCode || '',
           country: addr.country || '',
           phone: addr.phone || '',
+        },
+        billingName,
+        billingAddress: {
+          addressLine1: billingAddress.addressLine1 || '',
+          addressLine2: billingAddress.addressLine2 || '',
+          city: billingAddress.city || '',
+          state: billingAddress.state || '',
+          postalCode: billingAddress.postalCode || '',
+          country: billingAddress.country || '',
+          phone: billingAddress.phone || '',
         },
         items: resolvedItems,
         subtotal,

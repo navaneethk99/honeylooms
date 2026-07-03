@@ -20,6 +20,7 @@ import { codAdapter } from '@/payments/cod/server'
 import { reduceInventory } from '@/hooks/reduceInventory'
 import { sendInvoiceEmail } from '@/hooks/sendInvoiceEmail'
 import { sendOrderStatusEmail } from '@/hooks/sendOrderStatusEmail'
+import { sendAdminNotificationEmail } from '@/hooks/sendAdminNotificationEmail'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Honeylooms` : 'Honeylooms'
@@ -138,6 +139,7 @@ export const plugins: Plugin[] = [
             reduceInventory,
             sendInvoiceEmail,
             sendOrderStatusEmail,
+            sendAdminNotificationEmail,
           ],
         },
         fields: applyCosmeticCurrencyAdminOverrides([
