@@ -1,7 +1,7 @@
 import type { Media, Product } from '@/payload-types'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { GridTileImage } from '@/components/Grid/tile'
+import { ProductGridItem } from '@/components/ProductGridItem'
 import { Gallery } from '@/components/product/Gallery'
 import { ProductDescription } from '@/components/product/ProductDescription'
 import configPromise from '@payload-config'
@@ -166,18 +166,10 @@ function RelatedProducts({ products }: { products: Product[] }) {
       <ul className="flex w-full gap-4 overflow-x-auto pt-1">
         {products.map((product) => (
           <li
-            className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
+            className="w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
             key={product.id}
           >
-            <Link className="relative h-full w-full" href={`/products/${product.slug}`}>
-              <GridTileImage
-                label={{
-                  amount: product.priceInUSD!,
-                  title: product.title,
-                }}
-                media={product.meta?.image as Media}
-              />
-            </Link>
+            <ProductGridItem product={product} />
           </li>
         ))}
       </ul>

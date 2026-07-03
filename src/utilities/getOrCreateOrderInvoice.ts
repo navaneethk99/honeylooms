@@ -69,7 +69,7 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
         })
         if (product) {
           title = product.title
-          price = product.priceInUSD || 0
+          price = (product.onSale && product.salePrice) ? product.salePrice : (product.priceInUSD || 0)
         }
 
         if (variantID && product?.variants?.docs) {

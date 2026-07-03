@@ -61,6 +61,16 @@ export function ProductDescription({ product }: { product: Product }) {
         <div className="font-mono text-xl font-bold text-neutral-800 dark:text-neutral-200">
           {hasVariants ? (
             <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
+          ) : product.onSale && product.salePrice ? (
+            <div className="flex items-center gap-3">
+              <Price amount={product.salePrice} className="text-red-600 dark:text-red-400 font-bold" />
+              <Price amount={amount} className="text-neutral-400 dark:text-neutral-500 line-through text-sm font-normal" />
+              {product.discountPercentage ? (
+                <span className="bg-red-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded tracking-wider">
+                  -{product.discountPercentage}% OFF
+                </span>
+              ) : null}
+            </div>
           ) : (
             <Price amount={amount} />
           )}

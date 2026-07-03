@@ -22,6 +22,8 @@ import { VariantOptionsSelector as VariantOptionsSelector_b91672ccd6e8b071c11142
 import { CosmeticPriceCell as CosmeticPriceCell_ea1552f0180acf1672c5941e96f21db0 } from '@/components/admin/currency/CosmeticPriceCell'
 import { PriceInput as PriceInput_b91672ccd6e8b071c11142ab941fedfb } from '@payloadcms/plugin-ecommerce/rsc'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { CosmeticPriceInput as CosmeticPriceInput_ab96640bde486b18a35dadd51717a829 } from '@/components/admin/currency/CosmeticPriceInput'
+import { DiscountPreviewField as DiscountPreviewField_09a67080614904cb9e60c6dac10d9fa7 } from '@/components/admin/DiscountPreviewField'
 import { PriceCell as PriceCell_e27bf7b8cc50640dcdd584767b8eac3c } from '@payloadcms/plugin-ecommerce/client'
 import { PrintInvoiceButton as PrintInvoiceButton_5b0d4b730d4593912a64603f6d3a8185 } from '@/components/admin/PrintInvoiceButton'
 import { BeforeDashboard as BeforeDashboard_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
@@ -55,6 +57,8 @@ export const importMap = {
   "@/components/admin/currency/CosmeticPriceCell#CosmeticPriceCell": CosmeticPriceCell_ea1552f0180acf1672c5941e96f21db0,
   "@payloadcms/plugin-ecommerce/rsc#PriceInput": PriceInput_b91672ccd6e8b071c11142ab941fedfb,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/components/admin/currency/CosmeticPriceInput#CosmeticPriceInput": CosmeticPriceInput_ab96640bde486b18a35dadd51717a829,
+  "@/components/admin/DiscountPreviewField#DiscountPreviewField": DiscountPreviewField_09a67080614904cb9e60c6dac10d9fa7,
   "@payloadcms/plugin-ecommerce/client#PriceCell": PriceCell_e27bf7b8cc50640dcdd584767b8eac3c,
   "@/components/admin/PrintInvoiceButton#PrintInvoiceButton": PrintInvoiceButton_5b0d4b730d4593912a64603f6d3a8185,
   "@/components/BeforeDashboard#BeforeDashboard": BeforeDashboard_1a7510af427896d367a49dbf838d2de6,

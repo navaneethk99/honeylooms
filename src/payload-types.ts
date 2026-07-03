@@ -308,6 +308,9 @@ export interface Product {
   };
   priceInUSDEnabled?: boolean | null;
   priceInUSD?: number | null;
+  onSale?: boolean | null;
+  salePrice?: number | null;
+  discountPercentage?: number | null;
   relatedProducts?: (number | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -1712,6 +1715,9 @@ export interface ProductsSelect<T extends boolean = true> {
   variants?: T;
   priceInUSDEnabled?: T;
   priceInUSD?: T;
+  onSale?: T;
+  salePrice?: T;
+  discountPercentage?: T;
   relatedProducts?: T;
   meta?:
     | T

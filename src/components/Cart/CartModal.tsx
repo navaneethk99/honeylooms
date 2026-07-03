@@ -78,7 +78,7 @@ export function CartModal() {
                       : undefined
 
                   let image = firstGalleryImage || metaImage
-                  let price = product.priceInUSD
+                  let price = (product.onSale && product.salePrice) ? product.salePrice : product.priceInUSD
 
                   const isVariant = Boolean(variant) && typeof variant === 'object'
 

@@ -53,6 +53,9 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     priceInUSD: true,
     inventory: true,
     meta: true,
+    onSale: true,
+    salePrice: true,
+    discountPercentage: true,
   },
   fields: applyCosmeticCurrencyAdminOverrides([
     { name: 'title', type: 'text', required: true },
@@ -146,6 +149,39 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
           fields: [
             ...defaultCollection.fields,
             {
+              name: 'onSale',
+              type: 'checkbox',
+              label: 'On Sale',
+              defaultValue: false,
+            },
+            {
+              name: 'salePrice',
+              type: 'number',
+              label: 'Sale Price',
+              admin: {
+                condition: (data) => Boolean(data?.onSale),
+              },
+            },
+            {
+              name: 'discountPercentage',
+              type: 'number',
+              label: 'Discount Percentage (%)',
+              admin: {
+                hidden: true,
+              },
+            },
+            {
+              name: 'discountPreview',
+              type: 'ui',
+              admin: {
+                condition: (data) => Boolean(data?.onSale),
+                components: {
+                  Field:
+                    '@/components/admin/DiscountPreviewField#DiscountPreviewField',
+                },
+              },
+            },
+            {
               name: 'relatedProducts',
               type: 'relationship',
               filterOptions: ({ id }: { id?: string | number }) => {
@@ -223,6 +259,31 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
   ]),
   hooks: {
     ...defaultCollection?.hooks,
+    beforeChange: [
+      ...(defaultCollection?.hooks?.beforeChange || []),
+      ({ data, originalDoc, req }) => {
+        const priceInUSD = data.priceInUSD !== undefined ? data.priceInUSD : originalDoc?.priceInUSD
+        const salePrice = data.salePrice !== undefined ? data.salePrice : originalDoc?.salePrice
+        const onSale = data.onSale !== undefined ? data.onSale : originalDoc?.onSale
+
+        req.payload.logger.info(`sale check: onSale=${onSale}, priceInUSD=${priceInUSD} (${typeof priceInUSD}), salePrice=${salePrice} (${typeof salePrice})`)
+
+        if (onSale && priceInUSD && salePrice) {
+          const original = Number(priceInUSD)
+          const sale = Number(salePrice)
+          req.payload.logger.info(`sale math: original=${original}, sale=${sale}`)
+          if (original > sale && original > 0) {
+            data.discountPercentage = Math.round(((original - sale) / original) * 100)
+            req.payload.logger.info(`sale percentage calculated: ${data.discountPercentage}`)
+          } else {
+            data.discountPercentage = 0
+          }
+        } else {
+          data.discountPercentage = 0
+        }
+        return data
+      },
+    ],
     afterChange: [
       ...(defaultCollection?.hooks?.afterChange || []),
       ({ doc, req: { context, payload } }) => {

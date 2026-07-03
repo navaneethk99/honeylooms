@@ -485,7 +485,7 @@ export const CheckoutPage: React.FC = () => {
               if (!quantity) return null
 
               let image = gallery?.[0]?.image || meta?.image
-              let price = product?.priceInUSD
+              let price = (product && 'onSale' in product && product.onSale && 'salePrice' in product && product.salePrice) ? product.salePrice : product?.priceInUSD
 
               const isVariant = Boolean(variant) && typeof variant === 'object'
 

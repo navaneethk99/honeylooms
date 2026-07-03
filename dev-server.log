@@ -1,0 +1,847 @@
+npm warn Unknown project config "enable-pre-post-scripts". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> honeylooms@1.0.0 dev
+> cross-env NODE_OPTIONS=--no-deprecation next dev
+
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.29.208:3000
+- Environments: .env
+✓ Ready in 123ms
+- Experiments (use with caution):
+  ⨯ turbopackServerFastRefresh
+
+[⣷] Pulling schema from database...
+[2K[1G[⣯] Pulling schema from database...
+[2K[1G[⣟] Pulling schema from database...
+[2K[1G[⡿] Pulling schema from database...
+[2K[1G[⢿] Pulling schema from database...
+[2K[1G[⣻] Pulling schema from database...
+[2K[1G[⣽] Pulling schema from database...
+[2K[1G[⣷] Pulling schema from database...
+[2K[1G[⣯] Pulling schema from database...
+[2K[1G[⣟] Pulling schema from database...
+[2K[1G[⡿] Pulling schema from database...
+[2K[1G[⢿] Pulling schema from database...
+[2K[1G[⣻] Pulling schema from database...
+[2K[1G[⣽] Pulling schema from database...
+[2K[1G[⣷] Pulling schema from database...
+[2K[1G[⣯] Pulling schema from database...
+[2K[1G[⣟] Pulling schema from database...
+[2K[1G[⡿] Pulling schema from database...
+[2K[1G[⢿] Pulling schema from database...
+[2K[1G[⣻] Pulling schema from database...
+[2K[1G[⣽] Pulling schema from database...
+[2K[1G[⣷] Pulling schema from database...
+[2K[1G[⣯] Pulling schema from database...
+[2K[1G[⣟] Pulling schema from database...
+[2K[1G[⡿] Pulling schema from database...
+[2K[1G[⢿] Pulling schema from database...
+[2K[1G[⣻] Pulling schema from database...
+[2K[1G[⣽] Pulling schema from database...
+[2K[1G[⣷] Pulling schema from database...
+[2K[1G[⣯] Pulling schema from database...
+[2K[1G[⣟] Pulling schema from database...
+[2K[1G[⡿] Pulling schema from database...
+[2K[1G[⢿] Pulling schema from database...
+[2K[1G[⣻] Pulling schema from database...
+[2K[1G[⣽] Pulling schema from database...
+[2K[1G[⣷] Pulling schema from database...
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[2K[1G[⣯] Pulling schema from database...
+[2K[1G[⣟] Pulling schema from database...
+[2K[1G[⡿] Pulling schema from database...
+[2K[1G[⢿] Pulling schema from database...
+[2K[1G[⣻] Pulling schema from database...
+[2K[1G[⣽] Pulling schema from database...
+[2K[1G[⣷] Pulling schema from database...
+[2K[1G[⣯] Pulling schema from database...
+[2K[1G[⣟] Pulling schema from database...
+[2K[1G[⡿] Pulling schema from database...
+[2K[1G[⢿] Pulling schema from database...
+[2K[1G[⣻] Pulling schema from database...
+[2K[1G[⣽] Pulling schema from database...
+[2K[1G[⣷] Pulling schema from database...
+[2K[1G[⣯] Pulling schema from database...
+[2K[1G[⣟] Pulling schema from database...
+[2K[1G[⡿] Pulling schema from database...
+[2K[1G[⢿] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 8.6s (next.js: 964ms, application-code: 7.6s)
+ GET /api/users/me 200 in 8.6s (next.js: 965ms, application-code: 7.6s)
+ GET /api/users/me 200 in 4ms (next.js: 1964µs, application-code: 1649µs)
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 9.4s (next.js: 861ms, application-code: 8.6s)
+ GET /api/users/me 200 in 9.8s (next.js: 863ms, application-code: 8.9s)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 9.9s (next.js: 862ms, application-code: 9.1s)
+ GET /shop 200 in 10.2s (next.js: 3ms, application-code: 10.2s)
+ GET /shop 200 in 11.6s (next.js: 217ms, application-code: 11.3s)
+ GET /shop 200 in 10.4s (next.js: 6ms, application-code: 10.3s)
+ GET /shop 200 in 10.3s (next.js: 86ms, application-code: 10.2s)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design.PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 3 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 4 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 335ms (next.js: 1471µs, application-code: 333ms)
+[04:58:01] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=49900 (number)[39m
+ POST /admin/collections/products/55 200 in 1132ms (next.js: 5ms, application-code: 1127ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 1119ms src/app/(payload)/layout.tsx
+ PATCH /api/products/55?depth=0 200 in 1142ms (next.js: 9ms, application-code: 1133ms)
+ GET /admin/collections/products/55 200 in 12.7s (next.js: 1005ms, application-code: 11.6s)
+ GET /api/users/me 200 in 922ms (next.js: 1223µs, application-code: 921ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 1117ms (next.js: 1259µs, application-code: 1115ms)
+ POST /api/media 200 in 407ms (next.js: 2ms, application-code: 405ms)
+ GET /api/payload-preferences/collection-products-55 200 in 407ms (next.js: 17ms, application-code: 390ms)
+ POST /api/media 200 in 413ms (next.js: 14ms, application-code: 398ms)
+ POST /api/media 200 in 414ms (next.js: 11ms, application-code: 402ms)
+ GET /api/users/me 200 in 480ms (next.js: 979µs, application-code: 479ms)
+ GET /api/payload-preferences/nav 200 in 392ms (next.js: 778µs, application-code: 391ms)
+ POST /api/collections 200 in 385ms (next.js: 605µs, application-code: 384ms)
+ POST /api/categories 200 in 395ms (next.js: 789µs, application-code: 394ms)
+ POST /api/variantTypes 200 in 392ms (next.js: 629µs, application-code: 391ms)
+[04:58:03] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ GET /admin/collections/products/55 200 in 1212ms (next.js: 2ms, application-code: 1210ms)
+ POST /admin/collections/products/55 200 in 562ms (next.js: 2ms, application-code: 559ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 551ms src/app/(payload)/layout.tsx
+ POST /api/media 200 in 404ms (next.js: 8ms, application-code: 396ms)
+ POST /api/media 200 in 408ms (next.js: 3ms, application-code: 405ms)
+ GET /api/payload-preferences/collection-products-55 200 in 409ms (next.js: 10ms, application-code: 399ms)
+ POST /api/media 200 in 410ms (next.js: 6ms, application-code: 404ms)
+ GET /api/users/me 200 in 473ms (next.js: 766µs, application-code: 472ms)
+ POST /admin/collections/products/55 200 in 599ms (next.js: 1361µs, application-code: 598ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 589ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 403ms (next.js: 6ms, application-code: 397ms)
+ POST /api/collections 200 in 410ms (next.js: 4ms, application-code: 406ms)
+ POST /api/categories 200 in 411ms (next.js: 1141µs, application-code: 410ms)
+ GET /api/payload-preferences/nav 200 in 423ms (next.js: 5ms, application-code: 418ms)
+ POST /api/variantTypes 200 in 399ms (next.js: 740µs, application-code: 398ms)
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 397ms (next.js: 1005µs, application-code: 396ms)
+ POST /admin/collections/products/55 200 in 570ms (next.js: 3ms, application-code: 567ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 560ms src/app/(payload)/layout.tsx
+ POST /admin/collections/products/55 200 in 579ms (next.js: 1440µs, application-code: 577ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 562ms src/app/(payload)/layout.tsx
+ POST /admin/collections/products/55 200 in 495ms (next.js: 9ms, application-code: 486ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 480ms src/app/(payload)/layout.tsx
+[04:58:12] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=49900 (number)[39m
+[04:58:13] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?depth=0 200 in 2.1s (next.js: 3ms, application-code: 2.1s)
+ POST /api/products/access/55 200 in 240ms (next.js: 3ms, application-code: 237ms)
+ POST /api/products/access/55 200 in 249ms (next.js: 1546µs, application-code: 247ms)
+ POST /admin/collections/products/55 200 in 247ms (next.js: 2ms, application-code: 245ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 242ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 420ms (next.js: 6ms, application-code: 414ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 6 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 2 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 396ms (next.js: 7ms, application-code: 389ms)
+ GET /api/users/me 200 in 579ms (next.js: 3ms, application-code: 576ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 738ms (next.js: 5ms, application-code: 733ms)
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 337ms (next.js: 928µs, application-code: 336ms)
+ GET /shop 200 in 989ms (next.js: 5ms, application-code: 984ms)
+ GET /shop 200 in 913ms (next.js: 1574µs, application-code: 912ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 6 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 2 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me 200 in 495ms (next.js: 743µs, application-code: 494ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 653ms (next.js: 1289µs, application-code: 652ms)
+ GET /api/users/me 200 in 3ms (next.js: 1908µs, application-code: 1440µs)
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 2ms (next.js: 661µs, application-code: 1349µs)
+ GET /api/users/me 200 in 1631µs (next.js: 625µs, application-code: 1006µs)
+ GET / 200 in 2.4s (next.js: 24ms, application-code: 2.4s)
+ GET / 200 in 2.4s (next.js: 890µs, application-code: 2.4s)
+ POST /admin/collections/products/55 200 in 812ms (next.js: 5ms, application-code: 807ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 801ms src/app/(payload)/layout.tsx
+[04:58:58] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=49900 (number)[39m
+[04:59:00] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?depth=0 200 in 2.1s (next.js: 2ms, application-code: 2.1s)
+ POST /api/products/access/55 200 in 243ms (next.js: 3ms, application-code: 240ms)
+ POST /api/products/access/55 200 in 239ms (next.js: 3ms, application-code: 237ms)
+ POST /admin/collections/products/55 200 in 248ms (next.js: 2ms, application-code: 245ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 241ms src/app/(payload)/layout.tsx
+ GET /admin/collections/products 200 in 954ms (next.js: 7ms, application-code: 947ms)
+ GET /admin/collections/products/5 200 in 1505ms (next.js: 7ms, application-code: 1498ms)
+ POST /api/media 200 in 393ms (next.js: 6ms, application-code: 387ms)
+ POST /api/media 200 in 395ms (next.js: 2ms, application-code: 393ms)
+ POST /api/media 200 in 415ms (next.js: 6ms, application-code: 409ms)
+ POST /api/media 200 in 392ms (next.js: 771µs, application-code: 392ms)
+ GET /api/payload-preferences/collection-products 200 in 392ms (next.js: 643µs, application-code: 392ms)
+ POST /api/categories 200 in 398ms (next.js: 720µs, application-code: 398ms)
+ GET /api/payload-preferences/collection-products-5 200 in 863ms (next.js: 6ms, application-code: 857ms)
+ POST /api/media 200 in 874ms (next.js: 4ms, application-code: 870ms)
+ POST /api/media 200 in 892ms (next.js: 3ms, application-code: 889ms)
+ POST /api/collections 200 in 388ms (next.js: 913µs, application-code: 388ms)
+ POST /api/variantTypes 200 in 411ms (next.js: 10ms, application-code: 401ms)
+ POST /admin/collections/products/5 200 in 581ms (next.js: 15ms, application-code: 566ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 557ms src/app/(payload)/layout.tsx
+ POST /api/payload-preferences/collection-products-5 200 in 630ms (next.js: 4ms, application-code: 626ms)
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 392ms (next.js: 1376µs, application-code: 391ms)
+ POST /admin/collections/products/5 200 in 577ms (next.js: 1594µs, application-code: 575ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 560ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 408ms (next.js: 6ms, application-code: 403ms)
+ GET /products/gulabo 200 in 684ms (next.js: 661ms, application-code: 23ms)
+ GET /shop 200 in 983ms (next.js: 4ms, application-code: 979ms)
+ GET /products/indigo-ivory 200 in 690ms (next.js: 6ms, application-code: 684ms)
+ GET /shop 200 in 960ms (next.js: 1975µs, application-code: 958ms)
+ GET /products/kesari-kudi 200 in 40ms (next.js: 6ms, application-code: 33ms)
+ GET /admin/collections/products 200 in 952ms (next.js: 9ms, application-code: 943ms)
+ GET /admin/collections/products/6 200 in 1083ms (next.js: 8ms, application-code: 1075ms)
+ POST /api/media 200 in 402ms (next.js: 2ms, application-code: 400ms)
+ GET /api/payload-preferences/collection-products-6 200 in 402ms (next.js: 5ms, application-code: 397ms)
+ POST /api/media 200 in 418ms (next.js: 5ms, application-code: 413ms)
+ POST /api/media 200 in 411ms (next.js: 5ms, application-code: 406ms)
+ POST /api/media 200 in 408ms (next.js: 2ms, application-code: 406ms)
+ POST /api/media 200 in 415ms (next.js: 3ms, application-code: 412ms)
+ POST /api/media 200 in 408ms (next.js: 740µs, application-code: 407ms)
+ POST /api/categories 200 in 406ms (next.js: 734µs, application-code: 405ms)
+ POST /api/collections 200 in 406ms (next.js: 586µs, application-code: 405ms)
+ POST /api/variantTypes 200 in 422ms (next.js: 1038µs, application-code: 421ms)
+ POST /admin/collections/products/6 200 in 594ms (next.js: 5ms, application-code: 589ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 581ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 418ms (next.js: 1914µs, application-code: 416ms)
+ POST /admin/collections/products/6 200 in 585ms (next.js: 1330µs, application-code: 584ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 578ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 408ms (next.js: 1037µs, application-code: 407ms)
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 399ms (next.js: 8ms, application-code: 391ms)
+ GET /api/users/me 200 in 583ms (next.js: 4ms, application-code: 579ms)
+ GET /api/users/me 200 in 585ms (next.js: 2ms, application-code: 583ms)
+ GET /products/kesari-kudi 200 in 843ms (next.js: 3ms, application-code: 840ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 744ms (next.js: 6ms, application-code: 737ms)
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 337ms (next.js: 1088µs, application-code: 336ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 693ms (next.js: 1148µs, application-code: 692ms)
+ GET /products/kesari-kudi 200 in 1189ms (next.js: 10ms, application-code: 1179ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 2 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /shop 200 in 1072ms (next.js: 1581µs, application-code: 1071ms)
+ GET /products/moo-mood 200 in 42ms (next.js: 7ms, application-code: 36ms)
+ GET /admin/collections/products 200 in 944ms (next.js: 8ms, application-code: 936ms)
+ GET /admin/collections/products/2 200 in 1087ms (next.js: 7ms, application-code: 1080ms)
+ POST /api/media 200 in 411ms (next.js: 5ms, application-code: 406ms)
+ POST /api/media 200 in 408ms (next.js: 6ms, application-code: 402ms)
+ GET /api/payload-preferences/collection-products-2 200 in 405ms (next.js: 4ms, application-code: 401ms)
+ POST /api/media 200 in 415ms (next.js: 2ms, application-code: 413ms)
+ POST /api/media 200 in 404ms (next.js: 2ms, application-code: 402ms)
+ POST /api/media 200 in 410ms (next.js: 3ms, application-code: 408ms)
+ POST /api/categories 200 in 396ms (next.js: 1365µs, application-code: 394ms)
+ POST /api/collections 200 in 395ms (next.js: 691µs, application-code: 394ms)
+ POST /api/media 200 in 410ms (next.js: 729µs, application-code: 409ms)
+ POST /api/variantTypes 200 in 420ms (next.js: 12ms, application-code: 408ms)
+ POST /admin/collections/products/2 200 in 589ms (next.js: 19ms, application-code: 570ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 561ms src/app/(payload)/layout.tsx
+ POST /api/payload-preferences/collection-products-2 200 in 669ms (next.js: 7ms, application-code: 662ms)
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 408ms (next.js: 1178µs, application-code: 407ms)
+ POST /admin/collections/products/2 200 in 571ms (next.js: 1227µs, application-code: 570ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 557ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 406ms (next.js: 3ms, application-code: 404ms)
+ POST /admin/collections/products/2 200 in 1336ms (next.js: 3ms, application-code: 1333ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","docID":4,"drawerSlug":"doc-drawer_variants_1_4__r_76_","...":"6 items not stringified"},"name":"render-document"}) in 963ms src/app/(payload)/layout.tsx
+ GET /api/payload-preferences/collection-variants 200 in 423ms (next.js: 5ms, application-code: 418ms)
+ POST /api/products 200 in 411ms (next.js: 1250µs, application-code: 410ms)
+ GET /api/payload-preferences/collection-variants-4 200 in 343ms (next.js: 6ms, application-code: 336ms)
+ POST /admin/collections/products/2 200 in 634ms (next.js: 3ms, application-code: 631ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"variants","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 627ms src/app/(payload)/layout.tsx
+ POST /admin/collections/products/2 200 in 492ms (next.js: 4ms, application-code: 488ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"variants","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 480ms src/app/(payload)/layout.tsx
+[05:00:15] [32mINFO[39m: [36mRevalidating product cache from variant: moo-mood[39m
+ PATCH /api/variants/4?depth=0 200 in 2.1s (next.js: 3ms, application-code: 2.1s)
+ POST /api/variants/access/4 200 in 249ms (next.js: 4ms, application-code: 245ms)
+ POST /api/variants/access/4 200 in 243ms (next.js: 2ms, application-code: 240ms)
+ POST /admin/collections/products/2 200 in 578ms (next.js: 3ms, application-code: 574ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","data":"[Object]","...":"6 items not stringified"},"name":"table-state"}) in 566ms src/app/(payload)/layout.tsx
+ POST /admin/collections/products/2 200 in 255ms (next.js: 1182µs, application-code: 254ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","data":"[Object]","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 250ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 404ms (next.js: 1202µs, application-code: 403ms)
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 393ms (next.js: 7ms, application-code: 385ms)
+ GET /api/users/me 200 in 553ms (next.js: 4ms, application-code: 549ms)
+ GET /api/users/me 200 in 562ms (next.js: 2ms, application-code: 559ms)
+ GET /products/moo-mood 200 in 805ms (next.js: 6ms, application-code: 799ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 5 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 743ms (next.js: 6ms, application-code: 737ms)
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 314ms (next.js: 954µs, application-code: 313ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 649ms (next.js: 797µs, application-code: 648ms)
+ GET /products/moo-mood 200 in 1187ms (next.js: 9ms, application-code: 1177ms)
+ GET /products/moo-mood?Sizes=1&variant=28 200 in 29ms (next.js: 7ms, application-code: 22ms)
+ GET /products/moo-mood?Sizes=2&variant=5 200 in 28ms (next.js: 6ms, application-code: 22ms)
+ GET /products/moo-mood?Sizes=3&variant=4 200 in 9ms (next.js: 984µs, application-code: 8ms)
+ GET /products/moo-mood?Sizes=4&variant=6 200 in 27ms (next.js: 7ms, application-code: 21ms)
+ GET /products/moo-mood?Sizes=5&variant=27 200 in 9ms (next.js: 1016µs, application-code: 8ms)
+ GET /shop 200 in 991ms (next.js: 4ms, application-code: 987ms)
+ GET /products/neel-noor 200 in 23ms (next.js: 3ms, application-code: 20ms)
+ GET /shop 200 in 1002ms (next.js: 1360µs, application-code: 1001ms)
+ GET /products/neel-paisley 200 in 19ms (next.js: 3ms, application-code: 16ms)
+ GET /shop 200 in 1058ms (next.js: 4ms, application-code: 1054ms)
+ GET /products/rangeen-rush 200 in 52ms (next.js: 7ms, application-code: 45ms)
+ GET /products/rangeen-rush?Sizes=1&variant=24 200 in 32ms (next.js: 7ms, application-code: 25ms)
+ GET /products/rangeen-rush?Sizes=2&variant=11 200 in 11ms (next.js: 2ms, application-code: 9ms)
+ GET /products/rangeen-rush?Sizes=3&variant=10 200 in 10ms (next.js: 996µs, application-code: 9ms)
+ GET /products/rangeen-rush?Sizes=4&variant=12 200 in 23ms (next.js: 5ms, application-code: 17ms)
+ GET /products/rangeen-rush?Sizes=5&variant=23 200 in 10ms (next.js: 1248µs, application-code: 9ms)
+ GET /shop 200 in 1057ms (next.js: 3ms, application-code: 1055ms)
+ GET /products/gulabo 200 in 32ms (next.js: 6ms, application-code: 26ms)
+ GET /products/gulabo?Sizes=1&variant=20 200 in 31ms (next.js: 8ms, application-code: 23ms)
+ GET /products/gulabo?Sizes=2&variant=13 200 in 8ms (next.js: 890µs, application-code: 7ms)
+ GET /products/gulabo?Sizes=3&variant=15 200 in 29ms (next.js: 5ms, application-code: 24ms)
+ GET /products/gulabo?Sizes=4&variant=16 200 in 8ms (next.js: 945µs, application-code: 7ms)
+ GET /products/gulabo?Sizes=5&variant=14 200 in 17ms (next.js: 3ms, application-code: 14ms)
+ GET /shop 200 in 1014ms (next.js: 2ms, application-code: 1012ms)
+ POST /api/products 200 in 411ms (next.js: 7ms, application-code: 405ms)
+ POST /admin/collections/products/55 200 in 647ms (next.js: 4ms, application-code: 643ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 638ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 398ms (next.js: 1723µs, application-code: 396ms)
+ POST /api/products 200 in 400ms (next.js: 1324µs, application-code: 399ms)
+[05:01:21] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+ POST /admin/collections/products/55 200 in 502ms (next.js: 2ms, application-code: 499ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 496ms src/app/(payload)/layout.tsx
+[05:01:21] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1454ms (next.js: 4ms, application-code: 1450ms)
+ POST /api/products 200 in 406ms (next.js: 1840µs, application-code: 404ms)
+ POST /admin/collections/products/55 200 in 240ms (next.js: 3ms, application-code: 237ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 233ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 408ms (next.js: 708µs, application-code: 407ms)
+ POST /admin/collections/products/55 200 in 649ms (next.js: 6ms, application-code: 643ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 636ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 409ms (next.js: 1836µs, application-code: 407ms)
+[05:01:26] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+[05:01:27] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1730ms (next.js: 4ms, application-code: 1725ms)
+ POST /admin/collections/products/55 200 in 262ms (next.js: 8ms, application-code: 254ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 247ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 394ms (next.js: 1712µs, application-code: 392ms)
+ POST /admin/collections/products/55 200 in 647ms (next.js: 1358µs, application-code: 645ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 642ms src/app/(payload)/layout.tsx
+ POST /admin/collections/products/55 200 in 579ms (next.js: 4ms, application-code: 576ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 572ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 401ms (next.js: 3ms, application-code: 398ms)
+[05:01:32] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+[05:01:33] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1688ms (next.js: 6ms, application-code: 1682ms)
+ POST /admin/collections/products/55 200 in 244ms (next.js: 3ms, application-code: 240ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 237ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 388ms (next.js: 1767µs, application-code: 387ms)
+[05:01:42] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+[05:01:43] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?depth=0 200 in 2.0s (next.js: 6ms, application-code: 2.0s)
+ POST /api/products/access/55 200 in 248ms (next.js: 3ms, application-code: 245ms)
+ POST /api/products/access/55 200 in 320ms (next.js: 1302µs, application-code: 319ms)
+ POST /admin/collections/products/55 200 in 341ms (next.js: 2ms, application-code: 338ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 335ms src/app/(payload)/layout.tsx
+ GET /products/indigo-ivory 200 in 1057ms (next.js: 6ms, application-code: 1051ms)
+ GET /products/indigo-ivory 200 in 41ms (next.js: 6ms, application-code: 34ms)
+Generating import map
+No new imports found, skipping writing import map
+ GET /products/indigo-ivory 200 in 719ms (next.js: 64ms, application-code: 654ms)
+ GET /admin/collections/products/55 200 in 1831ms (next.js: 4ms, application-code: 1827ms)
+ GET / 200 in 3.5s (next.js: 1190µs, application-code: 3.5s)
+ POST /api/products 200 in 412ms (next.js: 6ms, application-code: 406ms)
+ GET /admin/collections/products/2 200 in 1023ms (next.js: 7ms, application-code: 1016ms)
+ POST /admin/collections/products/55 200 in 615ms (next.js: 1396µs, application-code: 614ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 610ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 401ms (next.js: 3ms, application-code: 398ms)
+[05:04:07] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+[05:04:08] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1473ms (next.js: 5ms, application-code: 1468ms)
+ POST /admin/collections/products/55 200 in 260ms (next.js: 8ms, application-code: 252ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 246ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 400ms (next.js: 1756µs, application-code: 398ms)
+ POST /admin/collections/products/55 200 in 656ms (next.js: 4ms, application-code: 653ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 648ms src/app/(payload)/layout.tsx
+[05:04:13] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+[05:04:14] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?depth=0 200 in 2.2s (next.js: 2ms, application-code: 2.2s)
+ POST /api/products/access/55 200 in 249ms (next.js: 5ms, application-code: 244ms)
+ POST /api/products/access/55 200 in 245ms (next.js: 1478µs, application-code: 243ms)
+ POST /admin/collections/products/55 200 in 244ms (next.js: 2ms, application-code: 242ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 239ms src/app/(payload)/layout.tsx
+[05:04:18] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+[05:04:19] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1307ms (next.js: 6ms, application-code: 1301ms)
+ POST /admin/collections/products/55 200 in 260ms (next.js: 7ms, application-code: 253ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 247ms src/app/(payload)/layout.tsx
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me 200 in 490ms (next.js: 2ms, application-code: 488ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 638ms (next.js: 5ms, application-code: 633ms)
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 849ms (next.js: 6ms, application-code: 842ms)
+ GET /api/users/me 200 in 518ms (next.js: 761µs, application-code: 518ms)
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 321ms (next.js: 574µs, application-code: 321ms)
+ GET /products/indigo-ivory 200 in 1628ms (next.js: 5ms, application-code: 1622ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 680ms (next.js: 4ms, application-code: 676ms)
+ GET /products/indigo-ivory 200 in 1559ms (next.js: 9ms, application-code: 1550ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 6 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ POST /admin/collections/products/55 200 in 767ms (next.js: 7ms, application-code: 760ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 753ms src/app/(payload)/layout.tsx
+[05:04:32] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+[05:04:34] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?depth=0 200 in 2.2s (next.js: 2ms, application-code: 2.2s)
+ POST /api/products/access/55 200 in 284ms (next.js: 4ms, application-code: 280ms)
+ POST /api/products/access/55 200 in 248ms (next.js: 3ms, application-code: 246ms)
+ POST /admin/collections/products/55 200 in 246ms (next.js: 2ms, application-code: 244ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 241ms src/app/(payload)/layout.tsx
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[05:04:38] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 320ms (next.js: 6ms, application-code: 314ms)
+ GET /api/users/me 200 in 498ms (next.js: 1082µs, application-code: 497ms)
+[05:04:38] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 635ms (next.js: 3ms, application-code: 632ms)
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 325ms (next.js: 1936µs, application-code: 323ms)
+ PATCH /api/products/55?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1385ms (next.js: 4ms, application-code: 1381ms)
+ GET /products/indigo-ivory 200 in 980ms (next.js: 2ms, application-code: 977ms)
+ POST /admin/collections/products/55 200 in 243ms (next.js: 2ms, application-code: 241ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 238ms src/app/(payload)/layout.tsx
+ GET /api/users/me 200 in 486ms (next.js: 711µs, application-code: 485ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 6 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 626ms (next.js: 680µs, application-code: 625ms)
+ GET /products/indigo-ivory 200 in 1558ms (next.js: 9ms, application-code: 1549ms)
+ GET /admin/collections/products 200 in 1185ms (next.js: 4ms, application-code: 1182ms)
+ GET /admin/collections/products/6 200 in 1157ms (next.js: 6ms, application-code: 1150ms)
+ POST /api/media 200 in 406ms (next.js: 7ms, application-code: 399ms)
+ POST /api/media 200 in 386ms (next.js: 3ms, application-code: 383ms)
+ POST /api/media 200 in 401ms (next.js: 3ms, application-code: 399ms)
+ GET /api/payload-preferences/collection-products-6 200 in 412ms (next.js: 4ms, application-code: 408ms)
+ POST /api/media 200 in 414ms (next.js: 2ms, application-code: 411ms)
+ POST /api/media 200 in 425ms (next.js: 6ms, application-code: 419ms)
+ POST /api/media 200 in 378ms (next.js: 1025µs, application-code: 377ms)
+ GET /api/payload-preferences/collection-products 200 in 386ms (next.js: 553µs, application-code: 386ms)
+ POST /api/categories 200 in 393ms (next.js: 437µs, application-code: 393ms)
+ POST /api/collections 200 in 398ms (next.js: 687µs, application-code: 397ms)
+ POST /api/variantTypes 200 in 402ms (next.js: 666µs, application-code: 401ms)
+ POST /admin/collections/products/6 200 in 569ms (next.js: 5ms, application-code: 564ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 558ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 414ms (next.js: 2ms, application-code: 412ms)
+ POST /admin/collections/products/6 200 in 596ms (next.js: 1201µs, application-code: 594ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 588ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 416ms (next.js: 710µs, application-code: 415ms)
+ GET /admin/collections/products 200 in 994ms (next.js: 2ms, application-code: 992ms)
+ GET /admin/collections/products/55 200 in 1281ms (next.js: 8ms, application-code: 1273ms)
+ POST /api/media 200 in 401ms (next.js: 19ms, application-code: 382ms)
+ POST /api/media 200 in 403ms (next.js: 4ms, application-code: 399ms)
+ POST /api/media 200 in 415ms (next.js: 9ms, application-code: 406ms)
+ POST /api/media 200 in 415ms (next.js: 12ms, application-code: 403ms)
+ POST /api/media 200 in 416ms (next.js: 14ms, application-code: 401ms)
+ POST /api/media 200 in 416ms (next.js: 16ms, application-code: 400ms)
+ POST /api/collections 200 in 384ms (next.js: 3ms, application-code: 382ms)
+ POST /api/variantTypes 200 in 391ms (next.js: 674µs, application-code: 390ms)
+ POST /api/categories 200 in 405ms (next.js: 688µs, application-code: 405ms)
+ POST /api/products 200 in 400ms (next.js: 5ms, application-code: 395ms)
+ POST /admin/collections/products/55 200 in 571ms (next.js: 2ms, application-code: 569ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 563ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 398ms (next.js: 896µs, application-code: 397ms)
+ POST /admin/collections/products/55 200 in 568ms (next.js: 1094µs, application-code: 567ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 562ms src/app/(payload)/layout.tsx
+[05:05:03] [32mINFO[39m: [36msale check: onSale=true, priceInUSD=null (object), salePrice=10000 (number)[39m
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 399ms (next.js: 1006µs, application-code: 398ms)
+[05:05:05] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?depth=0 200 in 2.1s (next.js: 3ms, application-code: 2.1s)
+ POST /api/products/access/55 200 in 280ms (next.js: 4ms, application-code: 276ms)
+ POST /api/products/access/55 200 in 254ms (next.js: 1359µs, application-code: 253ms)
+ POST /admin/collections/products/55 200 in 241ms (next.js: 2ms, application-code: 239ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 236ms src/app/(payload)/layout.tsx
+ GET /admin/collections/products 200 in 937ms (next.js: 4ms, application-code: 933ms)
+ GET /admin/collections/products/6 200 in 1077ms (next.js: 4ms, application-code: 1073ms)
+ POST /api/media 200 in 402ms (next.js: 9ms, application-code: 394ms)
+ POST /api/media 200 in 390ms (next.js: 3ms, application-code: 387ms)
+ POST /api/media 200 in 384ms (next.js: 3ms, application-code: 381ms)
+ POST /api/media 200 in 410ms (next.js: 3ms, application-code: 407ms)
+ POST /api/media 200 in 419ms (next.js: 5ms, application-code: 415ms)
+ POST /api/media 200 in 411ms (next.js: 2ms, application-code: 409ms)
+ POST /api/categories 200 in 380ms (next.js: 851µs, application-code: 379ms)
+ POST /api/collections 200 in 394ms (next.js: 3ms, application-code: 392ms)
+ POST /api/variantTypes 200 in 392ms (next.js: 511µs, application-code: 392ms)
+ POST /admin/collections/products/6 200 in 565ms (next.js: 1814µs, application-code: 563ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 558ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 402ms (next.js: 2ms, application-code: 400ms)
+ POST /admin/collections/products/6 200 in 567ms (next.js: 1255µs, application-code: 566ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 559ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 405ms (next.js: 1428µs, application-code: 404ms)
+ POST /api/products 200 in 684ms (next.js: 7ms, application-code: 677ms)
+ POST /admin/collections/products/6 200 in 649ms (next.js: 5ms, application-code: 644ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 637ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 395ms (next.js: 1871µs, application-code: 393ms)
+[05:05:21] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+ POST /api/products 200 in 393ms (next.js: 744µs, application-code: 392ms)
+[05:05:22] [32mINFO[39m: [36mRevalidating product cache: kesari-kudi[39m
+ PATCH /api/products/6?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1508ms (next.js: 3ms, application-code: 1505ms)
+ POST /admin/collections/products/6 200 in 1047ms (next.js: 3ms, application-code: 1043ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 1036ms src/app/(payload)/layout.tsx
+ POST /admin/collections/products/6 200 in 249ms (next.js: 5ms, application-code: 244ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 239ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 396ms (next.js: 1951µs, application-code: 394ms)
+ POST /admin/collections/products/6 200 in 728ms (next.js: 5ms, application-code: 722ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 717ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 397ms (next.js: 1859µs, application-code: 395ms)
+[05:05:26] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:05:27] [32mINFO[39m: [36mRevalidating product cache: kesari-kudi[39m
+ POST /admin/collections/products/6 200 in 496ms (next.js: 4ms, application-code: 492ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 486ms src/app/(payload)/layout.tsx
+ PATCH /api/products/6?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1705ms (next.js: 7ms, application-code: 1698ms)
+ POST /api/products 200 in 399ms (next.js: 1740µs, application-code: 397ms)
+ POST /admin/collections/products/6 200 in 248ms (next.js: 1127µs, application-code: 247ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 244ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 409ms (next.js: 1025µs, application-code: 408ms)
+[05:05:30] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:05:31] [32mINFO[39m: [36mRevalidating product cache: kesari-kudi[39m
+ PATCH /api/products/6?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1542ms (next.js: 6ms, application-code: 1536ms)
+ POST /admin/collections/products/6 200 in 262ms (next.js: 8ms, application-code: 254ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 248ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 393ms (next.js: 2ms, application-code: 391ms)
+ POST /admin/collections/products/6 200 in 650ms (next.js: 4ms, application-code: 646ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 640ms src/app/(payload)/layout.tsx
+[05:05:35] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:05:36] [32mINFO[39m: [36mRevalidating product cache: kesari-kudi[39m
+ PATCH /api/products/6?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1714ms (next.js: 6ms, application-code: 1708ms)
+ POST /admin/collections/products/6 200 in 266ms (next.js: 7ms, application-code: 259ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 253ms src/app/(payload)/layout.tsx
+[05:05:40] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:05:42] [32mINFO[39m: [36mRevalidating product cache: kesari-kudi[39m
+ PATCH /api/products/6?depth=0 200 in 2.1s (next.js: 3ms, application-code: 2.1s)
+ POST /api/products/access/6 200 in 238ms (next.js: 2ms, application-code: 236ms)
+ POST /api/products/access/6 200 in 249ms (next.js: 1567µs, application-code: 247ms)
+ POST /admin/collections/products/6 200 in 245ms (next.js: 2ms, application-code: 243ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 240ms src/app/(payload)/layout.tsx
+ GET /admin/collections/orders 200 in 713ms (next.js: 7ms, application-code: 706ms)
+ GET /admin/collections/orders?depth=1&limit=10 200 in 1424ms (next.js: 6ms, application-code: 1418ms)
+ GET /api/payload-preferences/nav 200 in 395ms (next.js: 756µs, application-code: 395ms)
+ GET /api/users/me 200 in 482ms (next.js: 2ms, application-code: 480ms)
+ GET /shop 200 in 1494ms (next.js: 2ms, application-code: 1492ms)
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me 200 in 628ms (next.js: 1057µs, application-code: 627ms)
+ GET /api/users/me 200 in 658ms (next.js: 2ms, application-code: 656ms)
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 919ms (next.js: 3ms, application-code: 916ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 923ms (next.js: 21ms, application-code: 902ms)
+ GET /shop 200 in 998ms (next.js: 5ms, application-code: 993ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 2 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /shop 200 in 1498ms (next.js: 4ms, application-code: 1495ms)
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 322ms (next.js: 672µs, application-code: 322ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 645ms (next.js: 2ms, application-code: 642ms)
+ GET /products/kesari-kudi 200 in 1010ms (next.js: 6ms, application-code: 1003ms)
+ GET /admin/collections/products 200 in 1059ms (next.js: 7ms, application-code: 1052ms)
+ GET /admin/collections/products/6 200 in 1094ms (next.js: 7ms, application-code: 1087ms)
+ POST /api/media 200 in 382ms (next.js: 584µs, application-code: 382ms)
+ GET /api/payload-preferences/collection-products-6 200 in 393ms (next.js: 5ms, application-code: 388ms)
+ POST /api/media 200 in 416ms (next.js: 5ms, application-code: 411ms)
+ POST /api/media 200 in 407ms (next.js: 2ms, application-code: 405ms)
+ POST /api/media 200 in 415ms (next.js: 6ms, application-code: 409ms)
+ POST /api/media 200 in 419ms (next.js: 3ms, application-code: 416ms)
+ POST /api/media 200 in 384ms (next.js: 709µs, application-code: 383ms)
+ GET /api/payload-preferences/collection-products 200 in 386ms (next.js: 509µs, application-code: 385ms)
+ POST /api/collections 200 in 402ms (next.js: 3ms, application-code: 399ms)
+ POST /api/categories 200 in 409ms (next.js: 1373µs, application-code: 408ms)
+ POST /api/variantTypes 200 in 409ms (next.js: 955µs, application-code: 408ms)
+ POST /admin/collections/products/6 200 in 584ms (next.js: 7ms, application-code: 577ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 570ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 382ms (next.js: 796µs, application-code: 381ms)
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 410ms (next.js: 1748µs, application-code: 408ms)
+ POST /admin/collections/products/6 200 in 589ms (next.js: 1211µs, application-code: 588ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 582ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 416ms (next.js: 854µs, application-code: 415ms)
+ POST /admin/collections/products/6 200 in 721ms (next.js: 6ms, application-code: 715ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 707ms src/app/(payload)/layout.tsx
+[05:07:22] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:07:24] [32mINFO[39m: [36mRevalidating product cache: kesari-kudi[39m
+ PATCH /api/products/6?depth=0 200 in 2.3s (next.js: 2ms, application-code: 2.3s)
+ POST /api/products/access/6 200 in 323ms (next.js: 5ms, application-code: 318ms)
+ POST /api/products/access/6 200 in 281ms (next.js: 2ms, application-code: 278ms)
+ POST /admin/collections/products/6 200 in 259ms (next.js: 2ms, application-code: 256ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 253ms src/app/(payload)/layout.tsx
+ GET /admin/collections/products 200 in 953ms (next.js: 8ms, application-code: 945ms)
+ GET /admin/collections/products/5 200 in 1076ms (next.js: 3ms, application-code: 1073ms)
+ POST /api/media 200 in 385ms (next.js: 6ms, application-code: 379ms)
+ POST /api/media 200 in 383ms (next.js: 2ms, application-code: 380ms)
+ GET /api/payload-preferences/collection-products-5 200 in 400ms (next.js: 5ms, application-code: 396ms)
+ POST /api/media 200 in 402ms (next.js: 3ms, application-code: 399ms)
+ POST /api/media 200 in 423ms (next.js: 6ms, application-code: 417ms)
+ POST /api/media 200 in 415ms (next.js: 2ms, application-code: 412ms)
+ POST /api/media 200 in 388ms (next.js: 843µs, application-code: 388ms)
+ POST /api/categories 200 in 382ms (next.js: 630µs, application-code: 381ms)
+ POST /api/collections 200 in 399ms (next.js: 973µs, application-code: 398ms)
+ POST /api/variantTypes 200 in 408ms (next.js: 873µs, application-code: 408ms)
+ POST /admin/collections/products/5 200 in 584ms (next.js: 5ms, application-code: 579ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 574ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 402ms (next.js: 1857µs, application-code: 400ms)
+ POST /admin/collections/products/5 200 in 584ms (next.js: 1124µs, application-code: 583ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 578ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 408ms (next.js: 774µs, application-code: 408ms)
+ POST /api/products 200 in 419ms (next.js: 6ms, application-code: 413ms)
+ POST /admin/collections/products/5 200 in 685ms (next.js: 6ms, application-code: 679ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 673ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 425ms (next.js: 1980µs, application-code: 423ms)
+[05:07:38] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+ POST /admin/collections/products/5 200 in 504ms (next.js: 2ms, application-code: 502ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 499ms src/app/(payload)/layout.tsx
+[05:07:39] [32mINFO[39m: [36mRevalidating product cache: gulabo[39m
+ PATCH /api/products/5?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1476ms (next.js: 6ms, application-code: 1470ms)
+ POST /api/products 200 in 409ms (next.js: 2ms, application-code: 407ms)
+ POST /admin/collections/products/5 200 in 249ms (next.js: 2ms, application-code: 246ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 243ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 409ms (next.js: 815µs, application-code: 408ms)
+ POST /admin/collections/products/5 200 in 664ms (next.js: 8ms, application-code: 656ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 650ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 415ms (next.js: 1772µs, application-code: 413ms)
+[05:07:42] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:07:43] [32mINFO[39m: [36mRevalidating product cache: gulabo[39m
+ PATCH /api/products/5?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1725ms (next.js: 5ms, application-code: 1720ms)
+ POST /admin/collections/products/5 200 in 651ms (next.js: 4ms, application-code: 647ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 643ms src/app/(payload)/layout.tsx
+ POST /admin/collections/products/5 200 in 260ms (next.js: 1059µs, application-code: 259ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 255ms src/app/(payload)/layout.tsx
+[05:07:46] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:07:47] [32mINFO[39m: [36mRevalidating product cache: gulabo[39m
+ PATCH /api/products/5?depth=0 200 in 2.3s (next.js: 2ms, application-code: 2.3s)
+ POST /api/products/access/5 200 in 252ms (next.js: 5ms, application-code: 247ms)
+ POST /api/products/access/5 200 in 254ms (next.js: 1599µs, application-code: 253ms)
+ POST /admin/collections/products/5 200 in 248ms (next.js: 2ms, application-code: 246ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 243ms src/app/(payload)/layout.tsx
+ GET /admin/collections/products 200 in 950ms (next.js: 19ms, application-code: 930ms)
+ GET /admin/collections/products/4 200 in 1069ms (next.js: 6ms, application-code: 1062ms)
+ POST /api/media 200 in 392ms (next.js: 6ms, application-code: 386ms)
+ POST /api/media 200 in 388ms (next.js: 3ms, application-code: 385ms)
+ POST /api/media 200 in 410ms (next.js: 7ms, application-code: 403ms)
+ POST /api/media 200 in 411ms (next.js: 3ms, application-code: 408ms)
+ POST /api/media 200 in 400ms (next.js: 2ms, application-code: 398ms)
+ GET /api/payload-preferences/collection-products-4 200 in 416ms (next.js: 5ms, application-code: 411ms)
+ POST /api/media 200 in 382ms (next.js: 657µs, application-code: 381ms)
+ POST /api/collections 200 in 383ms (next.js: 4ms, application-code: 379ms)
+ POST /api/categories 200 in 407ms (next.js: 716µs, application-code: 407ms)
+ POST /api/variantTypes 200 in 395ms (next.js: 10ms, application-code: 385ms)
+ POST /admin/collections/products/4 200 in 562ms (next.js: 18ms, application-code: 544ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 536ms src/app/(payload)/layout.tsx
+ POST /api/payload-preferences/collection-products-4 200 in 663ms (next.js: 5ms, application-code: 658ms)
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 403ms (next.js: 1364µs, application-code: 402ms)
+ POST /admin/collections/products/4 200 in 537ms (next.js: 1582µs, application-code: 535ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 528ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 387ms (next.js: 3ms, application-code: 384ms)
+ POST /api/products 200 in 386ms (next.js: 873µs, application-code: 385ms)
+ POST /admin/collections/products/4 200 in 628ms (next.js: 7ms, application-code: 620ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 614ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 404ms (next.js: 1710µs, application-code: 402ms)
+ POST /admin/collections/products/4 200 in 500ms (next.js: 4ms, application-code: 496ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 491ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 376ms (next.js: 1982µs, application-code: 374ms)
+[05:08:11] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+ POST /admin/collections/products/4 200 in 497ms (next.js: 1973µs, application-code: 495ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 492ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 382ms (next.js: 714µs, application-code: 381ms)
+[05:08:11] [32mINFO[39m: [36mRevalidating product cache: rangeen-rush[39m
+ PATCH /api/products/4?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1388ms (next.js: 4ms, application-code: 1384ms)
+ POST /admin/collections/products/4 200 in 233ms (next.js: 4ms, application-code: 229ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 224ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 377ms (next.js: 1777µs, application-code: 375ms)
+[05:08:14] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:08:15] [32mINFO[39m: [36mRevalidating product cache: rangeen-rush[39m
+ PATCH /api/products/4?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1446ms (next.js: 6ms, application-code: 1441ms)
+ POST /admin/collections/products/4 200 in 249ms (next.js: 8ms, application-code: 241ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 234ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 375ms (next.js: 1773µs, application-code: 374ms)
+ POST /admin/collections/products/4 200 in 612ms (next.js: 8ms, application-code: 604ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 597ms src/app/(payload)/layout.tsx
+[05:08:19] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:08:20] [32mINFO[39m: [36mRevalidating product cache: rangeen-rush[39m
+ PATCH /api/products/4?depth=0 200 in 2.1s (next.js: 3ms, application-code: 2.0s)
+ POST /api/products/access/4 200 in 229ms (next.js: 2ms, application-code: 226ms)
+ POST /api/products/access/4 200 in 227ms (next.js: 1616µs, application-code: 226ms)
+ POST /admin/collections/products/4 200 in 231ms (next.js: 2ms, application-code: 229ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 226ms src/app/(payload)/layout.tsx
+[05:08:24] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:08:24] [32mINFO[39m: [36mRevalidating product cache: rangeen-rush[39m
+ PATCH /api/products/4?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1223ms (next.js: 3ms, application-code: 1220ms)
+ GET /admin/collections/products 200 in 919ms (next.js: 3ms, application-code: 916ms)
+ POST /admin/collections/products 200 in 249ms (next.js: 2ms, application-code: 247ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 244ms src/app/(payload)/layout.tsx
+ GET /admin/collections/products/3 200 in 1368ms (next.js: 7ms, application-code: 1361ms)
+ POST /api/media 200 in 377ms (next.js: 9ms, application-code: 368ms)
+ POST /api/media 200 in 386ms (next.js: 4ms, application-code: 382ms)
+ POST /api/media 200 in 384ms (next.js: 1894µs, application-code: 382ms)
+ GET /api/payload-preferences/collection-products-3 200 in 410ms (next.js: 5ms, application-code: 404ms)
+ POST /api/media 200 in 365ms (next.js: 1134µs, application-code: 364ms)
+ POST /api/categories 200 in 376ms (next.js: 722µs, application-code: 375ms)
+ POST /api/collections 200 in 421ms (next.js: 1011µs, application-code: 420ms)
+ POST /api/media 200 in 908ms (next.js: 3ms, application-code: 905ms)
+ POST /api/media 200 in 906ms (next.js: 3ms, application-code: 904ms)
+ POST /api/variantTypes 200 in 411ms (next.js: 10ms, application-code: 401ms)
+ POST /admin/collections/products/3 200 in 570ms (next.js: 17ms, application-code: 553ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 544ms src/app/(payload)/layout.tsx
+ POST /api/payload-preferences/collection-products-3 200 in 646ms (next.js: 5ms, application-code: 640ms)
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 397ms (next.js: 734µs, application-code: 396ms)
+ POST /admin/collections/products/3 200 in 552ms (next.js: 1300µs, application-code: 551ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 544ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 393ms (next.js: 3ms, application-code: 390ms)
+ POST /api/products 200 in 403ms (next.js: 12ms, application-code: 390ms)
+ POST /admin/collections/products/3 200 in 640ms (next.js: 5ms, application-code: 635ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 628ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 397ms (next.js: 1742µs, application-code: 395ms)
+[05:08:41] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:08:42] [32mINFO[39m: [36mRevalidating product cache: neel-noor[39m
+ POST /admin/collections/products/3 200 in 685ms (next.js: 2ms, application-code: 682ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 679ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 400ms (next.js: 1699µs, application-code: 399ms)
+ PATCH /api/products/3?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1425ms (next.js: 7ms, application-code: 1418ms)
+ POST /admin/collections/products/3 200 in 241ms (next.js: 4ms, application-code: 238ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 234ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 391ms (next.js: 713µs, application-code: 390ms)
+ POST /admin/collections/products/3 200 in 640ms (next.js: 3ms, application-code: 637ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 633ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 396ms (next.js: 1644µs, application-code: 395ms)
+[05:08:47] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+ POST /admin/collections/products/3 200 in 469ms (next.js: 2ms, application-code: 467ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 463ms src/app/(payload)/layout.tsx
+[05:08:47] [32mINFO[39m: [36mRevalidating product cache: neel-noor[39m
+ PATCH /api/products/3?autosave=true&depth=0&draft=true&fallback-locale=null 200 in 1662ms (next.js: 6ms, application-code: 1656ms)
+ POST /admin/collections/products/3 200 in 245ms (next.js: 4ms, application-code: 241ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 236ms src/app/(payload)/layout.tsx
+[05:08:49] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:08:50] [32mINFO[39m: [36mRevalidating product cache: neel-noor[39m
+ PATCH /api/products/3?depth=0 200 in 2.0s (next.js: 5ms, application-code: 2.0s)
+ POST /api/products/access/3 200 in 241ms (next.js: 5ms, application-code: 236ms)
+ POST /api/products/access/3 200 in 240ms (next.js: 2ms, application-code: 237ms)
+ POST /admin/collections/products/3 200 in 239ms (next.js: 2ms, application-code: 237ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 234ms src/app/(payload)/layout.tsx
+ GET /admin/collections/products 200 in 943ms (next.js: 6ms, application-code: 937ms)
+ GET /admin/collections/products/2 200 in 1046ms (next.js: 8ms, application-code: 1038ms)
+ POST /api/media 200 in 404ms (next.js: 5ms, application-code: 398ms)
+ POST /api/media 200 in 395ms (next.js: 3ms, application-code: 393ms)
+ POST /api/media 200 in 403ms (next.js: 6ms, application-code: 397ms)
+ POST /api/media 200 in 386ms (next.js: 1046µs, application-code: 385ms)
+ POST /api/collections 200 in 398ms (next.js: 1109µs, application-code: 397ms)
+ POST /api/categories 200 in 416ms (next.js: 539µs, application-code: 416ms)
+ GET /api/payload-preferences/collection-products-2 200 in 812ms (next.js: 4ms, application-code: 808ms)
+ POST /api/media 200 in 876ms (next.js: 3ms, application-code: 873ms)
+ POST /api/media 200 in 888ms (next.js: 4ms, application-code: 884ms)
+ POST /api/variantTypes 200 in 365ms (next.js: 744µs, application-code: 365ms)
+ POST /admin/collections/products/2 200 in 568ms (next.js: 5ms, application-code: 564ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 558ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 369ms (next.js: 1908µs, application-code: 367ms)
+ POST /admin/collections/products/2 200 in 555ms (next.js: 1029µs, application-code: 554ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 547ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 387ms (next.js: 923µs, application-code: 386ms)
+ POST /api/products 200 in 370ms (next.js: 881µs, application-code: 370ms)
+ POST /admin/collections/products/2 200 in 605ms (next.js: 7ms, application-code: 598ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 592ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 396ms (next.js: 1788µs, application-code: 395ms)
+ POST /admin/collections/products/2 200 in 494ms (next.js: 3ms, application-code: 491ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 488ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 375ms (next.js: 1717µs, application-code: 374ms)
+ POST /admin/collections/products/2 200 in 445ms (next.js: 3ms, application-code: 442ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 438ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 410ms (next.js: 1811µs, application-code: 408ms)
+ POST /admin/collections/products/2 200 in 493ms (next.js: 5ms, application-code: 488ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 483ms src/app/(payload)/layout.tsx
+[05:09:14] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:09:15] [32mINFO[39m: [36mRevalidating product cache: moo-mood[39m
+ PATCH /api/products/2?depth=0 200 in 2.2s (next.js: 4ms, application-code: 2.2s)
+ POST /api/products/access/2 200 in 255ms (next.js: 3ms, application-code: 251ms)
+ POST /api/products/access/2 200 in 235ms (next.js: 938µs, application-code: 234ms)
+ POST /admin/collections/products/2 200 in 241ms (next.js: 2ms, application-code: 239ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 236ms src/app/(payload)/layout.tsx
+ GET /admin/collections/products 200 in 901ms (next.js: 6ms, application-code: 895ms)
+ GET /admin/collections/products/1 200 in 1035ms (next.js: 8ms, application-code: 1027ms)
+ POST /api/media 200 in 372ms (next.js: 1425µs, application-code: 371ms)
+ POST /api/media 200 in 402ms (next.js: 6ms, application-code: 396ms)
+ POST /api/media 200 in 395ms (next.js: 2ms, application-code: 393ms)
+ POST /api/media 200 in 407ms (next.js: 4ms, application-code: 403ms)
+ POST /api/media 200 in 402ms (next.js: 2ms, application-code: 400ms)
+ GET /api/payload-preferences/collection-products-1 200 in 406ms (next.js: 3ms, application-code: 402ms)
+ POST /api/media 200 in 358ms (next.js: 886µs, application-code: 357ms)
+ POST /api/collections 200 in 379ms (next.js: 707µs, application-code: 378ms)
+ POST /api/categories 200 in 399ms (next.js: 827µs, application-code: 398ms)
+ POST /api/variantTypes 200 in 399ms (next.js: 9ms, application-code: 390ms)
+ POST /admin/collections/products/1 200 in 530ms (next.js: 16ms, application-code: 514ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 506ms src/app/(payload)/layout.tsx
+ POST /api/payload-preferences/collection-products-1 200 in 644ms (next.js: 4ms, application-code: 640ms)
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 396ms (next.js: 779µs, application-code: 395ms)
+ POST /admin/collections/products/1 200 in 512ms (next.js: 1110µs, application-code: 511ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 503ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 406ms (next.js: 4ms, application-code: 402ms)
+ POST /admin/collections/products/1 200 in 644ms (next.js: 6ms, application-code: 638ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 632ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 407ms (next.js: 2ms, application-code: 405ms)
+ POST /admin/collections/products/1 200 in 493ms (next.js: 5ms, application-code: 489ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 484ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 359ms (next.js: 2ms, application-code: 357ms)
+ POST /admin/collections/products/1 200 in 491ms (next.js: 4ms, application-code: 487ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 483ms src/app/(payload)/layout.tsx
+ POST /admin/collections/products/1 200 in 494ms (next.js: 3ms, application-code: 491ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 486ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 363ms (next.js: 1860µs, application-code: 361ms)
+ POST /admin/collections/products/1 200 in 440ms (next.js: 2ms, application-code: 437ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 434ms src/app/(payload)/layout.tsx
+ POST /api/products 200 in 397ms (next.js: 1867µs, application-code: 395ms)
+ POST /admin/collections/products/1 200 in 569ms (next.js: 3ms, application-code: 567ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 563ms src/app/(payload)/layout.tsx
+[05:09:33] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=null (object)[39m
+[05:09:35] [32mINFO[39m: [36mRevalidating product cache: neel-paisley[39m
+ PATCH /api/products/1?depth=0 200 in 2.2s (next.js: 5ms, application-code: 2.2s)
+ POST /api/products/access/1 200 in 246ms (next.js: 5ms, application-code: 241ms)
+ POST /api/products/access/1 200 in 251ms (next.js: 1817µs, application-code: 249ms)
+ POST /admin/collections/products/1 200 in 242ms (next.js: 2ms, application-code: 240ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 237ms src/app/(payload)/layout.tsx
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 325ms (next.js: 6ms, application-code: 319ms)
+ GET /api/users/me 200 in 494ms (next.js: 1929µs, application-code: 492ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 599ms (next.js: 4ms, application-code: 595ms)
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 321ms (next.js: 825µs, application-code: 320ms)
+ GET /products/kesari-kudi 200 in 1005ms (next.js: 7ms, application-code: 998ms)
+ GET /api/users/me 200 in 487ms (next.js: 859µs, application-code: 486ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 2 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 576ms (next.js: 971µs, application-code: 575ms)
+ GET /products/kesari-kudi 200 in 1473ms (next.js: 8ms, application-code: 1465ms)
+ GET /shop 200 in 1009ms (next.js: 3ms, application-code: 1005ms)
+ GET /admin/collections/products 200 in 953ms (next.js: 6ms, application-code: 947ms)
+ GET /admin/collections/products/55 200 in 1057ms (next.js: 8ms, application-code: 1049ms)
+ POST /api/media 200 in 379ms (next.js: 5ms, application-code: 374ms)
+ POST /api/media 200 in 406ms (next.js: 1776µs, application-code: 404ms)
+ POST /api/media 200 in 415ms (next.js: 3ms, application-code: 412ms)
+ POST /api/media 200 in 394ms (next.js: 556µs, application-code: 394ms)
+ POST /api/media 200 in 404ms (next.js: 3ms, application-code: 401ms)
+ GET /api/payload-preferences/collection-products-55 200 in 408ms (next.js: 1724µs, application-code: 407ms)
+ POST /api/media 200 in 377ms (next.js: 655µs, application-code: 376ms)
+ POST /api/categories 200 in 380ms (next.js: 717µs, application-code: 380ms)
+ POST /api/collections 200 in 388ms (next.js: 607µs, application-code: 388ms)
+ POST /api/variantTypes 200 in 395ms (next.js: 802µs, application-code: 394ms)
+ POST /api/products 200 in 408ms (next.js: 8ms, application-code: 400ms)
+ POST /admin/collections/products/55 200 in 523ms (next.js: 6ms, application-code: 518ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 512ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 389ms (next.js: 1919µs, application-code: 387ms)
+ POST /admin/collections/products/55 200 in 518ms (next.js: 1119µs, application-code: 517ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"variants","columns":"[Array]","enableRowSelections":false,"...":"5 items not stringified"},"name":"table-state"}) in 511ms src/app/(payload)/layout.tsx
+ GET /api/variantOptions?depth=0&limit=250&where%5Bid%5D%5Bin%5D=1%2C2%2C3%2C4%2C5& 200 in 383ms (next.js: 1018µs, application-code: 382ms)
+ POST /admin/collections/products/55 200 in 601ms (next.js: 2ms, application-code: 598ms)
+  └─ ƒ <inline action>({"args":{"checkForStaleData":false,"collectionSlug":"products","docPermissions":"[Object]","...":"10 items not stringified"},"name":"form-state"}) in 595ms src/app/(payload)/layout.tsx
+[05:09:58] [32mINFO[39m: [36msale check: onSale=false, priceInUSD=null (object), salePrice=10000 (number)[39m
+[05:09:59] [32mINFO[39m: [36mRevalidating product cache: indigo-ivory[39m
+ PATCH /api/products/55?depth=0 200 in 2.1s (next.js: 4ms, application-code: 2.1s)
+ POST /api/products/access/55 200 in 281ms (next.js: 2ms, application-code: 279ms)
+ POST /api/products/access/55 200 in 232ms (next.js: 1321µs, application-code: 230ms)
+ POST /admin/collections/products/55 200 in 256ms (next.js: 2ms, application-code: 254ms)
+  └─ ƒ <inline action>({"args":{"collectionSlug":"products","data":"[Object]","docPermissions":"[Object]","...":"11 items not stringified"},"name":"form-state"}) in 251ms src/app/(payload)/layout.tsx
+[browser] Image with src "/logo.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me 200 in 545ms (next.js: 2ms, application-code: 543ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 720ms (next.js: 4ms, application-code: 716ms)
+ GET /shop 200 in 957ms (next.js: 3ms, application-code: 955ms)
+ GET /shop 200 in 884ms (next.js: 1772µs, application-code: 882ms)
+ GET /api/users/me?depth=0&select%5Bid%5D=true&select%5Bcart%5D=true 200 in 876ms (next.js: 7ms, application-code: 869ms)
+[browser] Image with src "https://pub-d3b8720870694b2e9b6e960b39c48883.r2.dev/Untitled design - 2 (1).PNG" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /api/users/me 200 in 466ms (next.js: 700µs, application-code: 466ms)
+ GET /api/addresses?depth=0&limit=0&pagination=false 200 in 311ms (next.js: 871µs, application-code: 311ms)
+ GET /api/carts/14?depth=2&populate%5Bproducts%5D%5BpriceInUSD%5D=true&populate%5Bproducts%5D%5Bslug%5D=true&populate%5Bproducts%5D%5Btitle%5D=true&populate%5Bproducts%5D%5Bgallery%5D=true&populate%5Bproducts%5D%5Binventory%5D=true&populate%5Bvariants%5D%5Boptions%5D=true&populate%5Bvariants%5D%5BpriceInUSD%5D=true&populate%5Bvariants%5D%5Btitle%5D=true&populate%5Bvariants%5D%5Binventory%5D=true&select%5Bitems%5D=true&select%5Bsubtotal%5D=true 200 in 620ms (next.js: 3ms, application-code: 617ms)
+ GET /products/rangeen-rush 200 in 1019ms (next.js: 5ms, application-code: 1013ms)
+ GET /products/moo-mood 200 in 1051ms (next.js: 6ms, application-code: 1046ms)
+ GET /shop 200 in 1035ms (next.js: 3ms, application-code: 1031ms)

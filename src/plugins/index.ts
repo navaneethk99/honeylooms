@@ -339,6 +339,52 @@ export const plugins: Plugin[] = [
     carts: {
       cartsCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
+        hooks: {
+          ...defaultCollection?.hooks,
+          beforeChange: [
+            ...(defaultCollection?.hooks?.beforeChange || []),
+            async ({ data, req }) => {
+              if (data.items && Array.isArray(data.items)) {
+                let subtotal = 0
+                for (const item of data.items) {
+                  const productID = typeof item.product === 'object' ? item.product?.id : item.product
+                  const variantID = typeof item.variant === 'object' ? item.variant?.id : item.variant
+                  const quantity = Number(item.quantity || 0)
+
+                  if (productID) {
+                    const product = await req.payload.findByID({
+                      collection: 'products',
+                      id: productID,
+                      req,
+                    })
+                    if (product) {
+                      let itemPrice = product.priceInUSD || 0
+                      
+                      // Check for product level sale
+                      if (product.onSale && product.salePrice) {
+                        itemPrice = product.salePrice
+                      }
+
+                      // Check for variant level override
+                      if (variantID && product.variants?.docs) {
+                        const variantObj = product.variants.docs.find(
+                          (v: any) => v.id === variantID || v._id === variantID,
+                        ) as any
+                        if (variantObj && typeof variantObj.priceInUSD === 'number') {
+                          itemPrice = variantObj.priceInUSD
+                        }
+                      }
+
+                      subtotal += itemPrice * quantity
+                    }
+                  }
+                }
+                data.subtotal = subtotal
+              }
+              return data
+            },
+          ],
+        },
         fields: applyCosmeticCurrencyAdminOverrides(defaultCollection.fields),
       }),
     },
