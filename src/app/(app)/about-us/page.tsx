@@ -16,14 +16,12 @@ export default async function AboutUsPage() {
             <p>
               Welcome to Honeylooms, founded by <strong>Aarna Kudeshia</strong>, where tradition
               meets contemporary design. We specialize in producing premium, handcrafted clothing
-              and lifestyle textiles that celebrate the art of weaving and the beauty of natural
-              fibers.
+              and lifestyle textiles that celebrate the beauty of natural fibers.
             </p>
 
             <p>
-              Our mission is to revive and celebrate the craft of loom weaving, creating timeless
-              garments that feel as good as they look. Every piece we make is meticulously crafted
-              from sustainably sourced materials, ensuring comfort, style, and long-lasting
+              Our mission is to create timeless garments that feel as good as they look. Every piece
+              we make is meticulously crafted to ensuring comfort, style, and long-lasting
               durability.
             </p>
 

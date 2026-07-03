@@ -30,9 +30,8 @@ export default async function DeliveriesAndReturnsPage() {
         </ol>
         <p>
           To initiate a return, please contact our support team or use our online returns portal.
-          Return shipping costs are the responsibility of the customer unless the item received was
-          damaged, defective, or incorrect. Once we receive and inspect your returned items, your
-          refund will be processed back to your original payment method within 5–7 business days.
+          Once we receive and inspect your returned items, your refund will be processed back to
+          your original payment method within 5–7 business days.
         </p>
         <p>
           Please note that final sale items, custom orders, and gift cards are not eligible for
@@ -51,7 +50,7 @@ export default async function DeliveriesAndReturnsPage() {
         </p>
         <p>
           If more than 15 business days have passed since we’ve approved your return, please contact
-          us at contact@titritfashion.com
+          us at contact@honeylooms.in
         </p>
       </div>
       <h1 className="text-3xl mt-10 font-semibold tracking-tight text-neutral-900 dark:text-neutral-50 mb-6">
@@ -73,7 +72,7 @@ export default async function DeliveriesAndReturnsPage() {
         <p>
           Shipments are dispatched within 48 working hours of orders placed in normal circumstances.
           However, in case of pre-booked orders or orders that require finishing prior to dispatch
-          may take longer. For further assistance you can email contact@titritfashion.coms
+          may take longer. For further assistance you can email contact@honeylooms.in
         </p>
       </div>
     </div>
