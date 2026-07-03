@@ -23,7 +23,7 @@ export async function Footer() {
         <div className="flex w-full flex-col gap-6 border-t border-neutral-200 py-12 text-sm md:flex-row md:gap-12 dark:border-neutral-700">
           <div>
             <Link className="flex items-center gap-2 text-black md:pt-1 dark:text-white" href="/">
-              <LogoIcon className="w-6" />
+              <LogoIcon className="w-45 h-auto" />
               <span className="sr-only">{SITE_NAME}</span>
             </Link>
           </div>

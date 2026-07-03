@@ -20,6 +20,7 @@ import { Collections } from '@/collections/Collections'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
+import { PromoCodes } from '@/collections/PromoCodes'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { FeaturedOutfits } from '@/globals/FeaturedOutfits'
@@ -41,7 +42,7 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Pages, Categories, Media, Collections],
+  collections: [Users, Pages, Categories, Media, Collections, PromoCodes],
   db: postgresAdapter({
     pool: {
       connectionString: getDatabaseURL(process.env.DATABASE_URL),

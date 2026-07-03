@@ -3,6 +3,7 @@ import { CMSLink } from '@/components/Link'
 import { Cart } from '@/components/Cart'
 import { OpenCartButton } from '@/components/Cart/OpenCart'
 import Link from 'next/link'
+import Image from 'next/image'
 import React, { Suspense } from 'react'
 
 import { MobileMenu } from './MobileMenu'
@@ -29,9 +30,16 @@ export function HeaderClient({ header }: Props) {
           </Suspense>
         </div>
         <div className="flex w-full items-end justify-between">
-          <div className="flex w-full items-end gap-6 md:w-1/3">
+          <div className="flex w-full items-end gap-6 md:w-auto md:flex-1">
             <Link className="flex w-full items-center justify-center pt-4 pb-4 md:w-auto" href="/">
-              <LogoIcon className="w-6 h-auto" />
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                width={1000}
+                height={75}
+                className="w-full h-auto max-w-[160px] sm:max-w-[200px] md:max-w-[130px] lg:max-w-[160px] xl:max-w-[180px]"
+                priority
+              />
             </Link>
             {menu.length ? (
               <ul className="hidden gap-4 text-sm md:flex md:items-center">
@@ -54,7 +62,7 @@ export function HeaderClient({ header }: Props) {
             ) : null}
           </div>
 
-          <div className="flex justify-end md:w-1/3 gap-4">
+          <div className="flex justify-end md:w-auto md:shrink-0 gap-4">
             <Suspense fallback={<OpenCartButton />}>
               <Cart />
             </Suspense>

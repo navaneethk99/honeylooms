@@ -244,22 +244,34 @@ export function HomepageAnimation({ products }: Props) {
 
   if (isMobile) {
     return (
-      <div className="w-full bg-[#D9A322] text-zinc-950 py-16 flex flex-col justify-between overflow-hidden relative min-h-[85vh]">
-        {/* Static Honeycomb grid background */}
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none flex items-center justify-center opacity-30">
-          {hexagons.slice(0, 32).map((hex) => (
+      <div className="w-full bg-[#D9A322] text-zinc-950 flex flex-col items-center justify-center overflow-hidden relative min-h-[85vh]">
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes breathe-hex {
+            0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(0.97); }
+            50% { opacity: 1.0; transform: translate(-50%, -50%) scale(1.03); }
+          }
+          .animate-breathe {
+            animation: breathe-hex var(--breathe-duration, 8s) ease-in-out infinite;
+            animation-delay: var(--breathe-delay, 0s);
+          }
+        `}} />
+        {/* Animated Honeycomb grid background */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none flex items-center justify-center">
+          {hexagons.map((hex, index) => (
             <div
               key={hex.id}
-              className="absolute"
+              className="absolute animate-breathe"
               style={{
-                left: `calc(50% + ${hex.x * 0.75}px)`,
-                top: `calc(50% + ${hex.y * 0.75}px)`,
+                left: `calc(50% + ${hex.x}px)`,
+                top: `calc(50% + ${hex.y}px)`,
                 transform: 'translate(-50%, -50%)',
-              }}
+                '--breathe-delay': `${(index % 7) * -1.3}s`,
+                '--breathe-duration': `${7 + (index % 5) * 1.5}s`,
+              } as React.CSSProperties}
             >
               <svg
                 viewBox="0 0 100 86.6"
-                className="w-[80px] h-[70px] text-white/10 fill-current stroke-white/20 stroke-[1px]"
+                className="w-[100px] h-[87px] text-white/10 fill-current stroke-white/25 stroke-[1px]"
               >
                 <polygon points="25,0 75,0 100,43.3 75,86.6 25,86.6 0,43.3" />
               </svg>
@@ -267,74 +279,9 @@ export function HomepageAnimation({ products }: Props) {
           ))}
         </div>
 
-        {/* Brand Header */}
-        <div className="text-center z-10 pointer-events-none select-none mb-10">
-          <h1 className="text-5xl font-bold text-white tracking-widest uppercase font-sans drop-shadow-[0_2px_10px_rgba(0,0,0,0.1)]">
-            honeylooms
-          </h1>
-        </div>
-
-        {/* Horizontal scroll list of the 6 outfits */}
-        <div className="w-full overflow-x-auto scrollbar-none snap-x snap-mandatory flex gap-5 px-6 pb-8 z-10">
-          {outfits.map((product, index) => {
-            const gallery = product.gallery
-            const images =
-              gallery?.filter(
-                (
-                  item,
-                ): item is NonNullable<NonNullable<Product['gallery']>[number]> & {
-                  image: Exclude<NonNullable<Product['gallery']>[number]['image'], string | number>
-                } =>
-                  Boolean(
-                    item?.image &&
-                    typeof item.image === 'object' &&
-                    'url' in item.image &&
-                    item.image.url,
-                  ),
-              ) ?? []
-            const primaryImage = images[0]?.image
-
-            return (
-              <Link
-                key={`mobile-${product.id}-${index}`}
-                href={`/products/${product.slug}`}
-                className="snap-center shrink-0 w-[65vw] sm:w-[45vw] aspect-[2/3] overflow-hidden bg-neutral-900 border border-white/5 rounded-lg shadow-xl relative block group"
-              >
-                {primaryImage ? (
-                  <div className="relative w-full h-full">
-                    <Media
-                      fill
-                      className="absolute inset-0 w-full h-full"
-                      imgClassName="object-cover"
-                      resource={primaryImage}
-                      size="65vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-80" />
-
-                    <div className="absolute bottom-0 left-0 w-full p-4 flex flex-col gap-0.5 z-10">
-                      <span className="text-[10px] uppercase tracking-widest text-zinc-200 font-mono truncate">
-                        {product.title}
-                      </span>
-                      {typeof product.priceInUSD === 'number' && (
-                        <Price
-                          amount={product.priceInUSD}
-                          className="text-xs font-semibold text-white font-mono"
-                        />
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-xs text-zinc-500 bg-neutral-900">
-                    No Outfit Image
-                  </div>
-                )}
-              </Link>
-            )
-          })}
-        </div>
-
-        {/* Footer Explore Store button */}
-        <div className="text-center z-10 select-none mt-6 flex justify-center">
+        {/* Buttons Centered */}
+        <div className="flex flex-col gap-6 items-center justify-center z-10 w-full px-6 py-12">
+          {/* Explore Store button */}
           <a
             href="/shop"
             className="group relative p-[1px] transition-transform duration-300 hover:scale-105 active:scale-[0.98]"
@@ -351,13 +298,52 @@ export function HomepageAnimation({ products }: Props) {
             />
             {/* Content layer */}
             <div
-              className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 group-active:bg-neutral-100 text-zinc-900 transition-colors duration-300 flex items-center justify-center min-w-[160px] h-11"
+              className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 group-active:bg-neutral-100 text-zinc-900 transition-colors duration-300 flex items-center justify-center w-[240px] h-12"
               style={{
                 clipPath: 'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
               }}
             >
-              <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em]">
+              <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em] uppercase tracking-[0.1em] font-medium">
                 {"Explore Store".split("").map((char, index) => (
+                  <span
+                    key={index}
+                    className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-1/2 group-active:-translate-y-1/2"
+                    style={{ transitionDelay: `${index * 25}ms`, height: '2.4em' }}
+                  >
+                    <span className="h-[1.2em] flex items-center justify-center">{char === ' ' ? '\u00A0' : char}</span>
+                    <span className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold" aria-hidden="true">
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                  </span>
+                ))}
+              </span>
+            </div>
+          </a>
+
+          {/* All Collections button */}
+          <a
+            href="/collections"
+            className="group relative p-[1px] transition-transform duration-300 hover:scale-105 active:scale-[0.98]"
+            style={{
+              clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+            }}
+          >
+            {/* Border layer */}
+            <div
+              className="absolute inset-0 bg-zinc-900/10 group-hover:bg-zinc-900/25 group-active:bg-zinc-900/30 transition-colors duration-300"
+              style={{
+                clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+              }}
+            />
+            {/* Content layer */}
+            <div
+              className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 group-active:bg-neutral-100 text-zinc-900 transition-colors duration-300 flex items-center justify-center w-[240px] h-12"
+              style={{
+                clipPath: 'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
+              }}
+            >
+              <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em] uppercase tracking-[0.1em] font-medium">
+                {"All Collections".split("").map((char, index) => (
                   <span
                     key={index}
                     className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-1/2 group-active:-translate-y-1/2"

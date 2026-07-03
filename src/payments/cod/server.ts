@@ -52,7 +52,37 @@ export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
       // Cash on Delivery adds Rs. 25 charge (2500 paise)
       const codFee = 2500
       const subtotal = data.cart?.subtotal || 0
-      const amount = subtotal + codFee
+      
+      let discountAmount = 0
+      const promoCode = (data as any).promoCode
+      if (promoCode) {
+        const promoCodes = await payload.find({
+          collection: 'promo-codes',
+          where: {
+            and: [
+              { code: { equals: promoCode } },
+              { active: { equals: true } },
+            ],
+          },
+          req,
+        })
+        const promo = promoCodes.docs?.[0]
+        if (promo) {
+          const minOrder = (promo.minOrderValue || 0) * 100
+          if (subtotal >= minOrder) {
+            let discount = Math.round(subtotal * (promo.discountPercentage / 100))
+            if (promo.maxDiscount) {
+              const maxD = promo.maxDiscount * 100
+              if (discount > maxD) {
+                discount = maxD
+              }
+            }
+            discountAmount = discount
+          }
+        }
+      }
+
+      const amount = subtotal - discountAmount + codFee
 
       const flattenedCart = cart.items.map((item: any) => {
         const productID = typeof item.product === 'object' ? item.product.id : item.product

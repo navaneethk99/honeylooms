@@ -43,6 +43,11 @@ export const CheckoutPage: React.FC = () => {
   const [isInitiatingPayment, setIsInitiatingPayment] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'cashfree' | 'cod'>('cashfree')
 
+  const [couponCode, setCouponCode] = useState('')
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number; message: string } | null>(null)
+  const [couponError, setCouponError] = useState<string | null>(null)
+  const [validatingCoupon, setValidatingCoupon] = useState(false)
+
   const billingPhone = billingAddress?.phone?.trim()
   const shippingPhone = shippingAddress?.phone?.trim()
 
@@ -102,6 +107,7 @@ export const CheckoutPage: React.FC = () => {
             ...(email ? { customerEmail: email } : {}),
             billingAddress,
             shippingAddress: selectedShippingAddress,
+            ...(appliedDiscount ? { promoCode: appliedDiscount.code } : {}),
           },
         })) as Record<string, unknown>
 
@@ -146,8 +152,42 @@ export const CheckoutPage: React.FC = () => {
         setIsInitiatingPayment(false)
       }
     },
-    [billingAddress, billingAddressSameAsShipping, email, initiatePayment, shippingAddress, user, clearCart, router],
+    [billingAddress, billingAddressSameAsShipping, email, initiatePayment, shippingAddress, user, clearCart, router, appliedDiscount],
   )
+
+  const handleApplyCoupon = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!couponCode.trim()) return
+    setValidatingCoupon(true)
+    setCouponError(null)
+    try {
+      const res = await fetch(`/api/promo-codes/validate?code=${encodeURIComponent(couponCode)}&subtotal=${cart?.subtotal || 0}`)
+      const data = await res.json()
+      if (data.valid) {
+        setAppliedDiscount({
+          code: data.code,
+          amount: data.discountAmount,
+          message: data.message,
+        })
+        toast.success(data.message)
+      } else {
+        setCouponError(data.message || 'Invalid coupon code')
+        toast.error(data.message || 'Invalid coupon code')
+      }
+    } catch (err) {
+      setCouponError('Failed to validate coupon')
+      toast.error('Failed to validate coupon')
+    } finally {
+      setValidatingCoupon(false)
+    }
+  }, [couponCode, cart?.subtotal])
+
+  const handleRemoveCoupon = useCallback(() => {
+    setAppliedDiscount(null)
+    setCouponCode('')
+    setCouponError(null)
+    toast.success('Coupon removed')
+  }, [])
 
   if (cartIsEmpty && isProcessingPayment) {
     return (
@@ -508,11 +548,60 @@ export const CheckoutPage: React.FC = () => {
             return null
           })}
           <hr />
+          <div className="flex flex-col gap-2 my-2">
+            <label htmlFor="coupon" className="text-sm font-medium text-foreground">Have a discount coupon?</label>
+            {appliedDiscount ? (
+              <div className="flex items-center justify-between p-2 border border-dashed border-emerald-500 rounded bg-emerald-500/5">
+                <div className="flex flex-col">
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">
+                    {appliedDiscount.code} applied
+                  </span>
+                  <span className="text-xs text-emerald-500">
+                    Saved <Price amount={appliedDiscount.amount} as="span" />
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRemoveCoupon}
+                  className="h-8 text-xs text-muted-foreground hover:text-foreground hover:cursor-pointer"
+                >
+                  Remove
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                <Input
+                  id="coupon"
+                  placeholder="Enter code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  className="h-9 grow"
+                />
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={validatingCoupon || !couponCode.trim()}
+                  className="h-9 hover:cursor-pointer"
+                >
+                  {validatingCoupon ? 'Applying...' : 'Apply'}
+                </Button>
+              </form>
+            )}
+            {couponError && <p className="text-xs text-destructive">{couponError}</p>}
+          </div>
+          <hr />
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>Subtotal</span>
               <Price amount={cart.subtotal || 0} />
             </div>
+            {appliedDiscount && (
+              <div className="flex justify-between items-center text-sm text-emerald-600 dark:text-emerald-400">
+                <span>Discount ({appliedDiscount.code})</span>
+                <span className="flex items-center gap-1">- <Price amount={appliedDiscount.amount} as="span" /></span>
+              </div>
+            )}
             {selectedPaymentMethod === 'cod' && (
               <div className="flex justify-between items-center text-sm text-muted-foreground">
                 <span>COD Handling Charge</span>
@@ -524,7 +613,7 @@ export const CheckoutPage: React.FC = () => {
               <span className="uppercase font-medium">Total</span>
               <Price
                 className="text-3xl font-medium"
-                amount={(cart.subtotal || 0) + (selectedPaymentMethod === 'cod' ? 2500 : 0)}
+                amount={(cart.subtotal || 0) - (appliedDiscount?.amount || 0) + (selectedPaymentMethod === 'cod' ? 2500 : 0)}
               />
             </div>
           </div>

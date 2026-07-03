@@ -188,7 +188,6 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
         })
         throw new Error('Cashfree authentication configuration is missing or empty. Please check your environment variables and restart your server.')
       }
-      const amount = data.cart?.subtotal
       const billingAddress = data.billingAddress as CashfreeAddress | undefined
       const cart = data.cart
       const customerEmail = data.customerEmail
@@ -203,7 +202,39 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
         throw new Error('A valid customer email is required to make a purchase.')
       }
 
-      if (!amount || typeof amount !== 'number' || amount <= 0) {
+      const subtotal = data.cart?.subtotal || 0
+      let discountAmount = 0
+      const promoCode = (data as any).promoCode
+      if (promoCode) {
+        const promoCodes = await payload.find({
+          collection: 'promo-codes',
+          where: {
+            and: [
+              { code: { equals: promoCode } },
+              { active: { equals: true } },
+            ],
+          },
+          req,
+        })
+        const promo = promoCodes.docs?.[0]
+        if (promo) {
+          const minOrder = (promo.minOrderValue || 0) * 100
+          if (subtotal >= minOrder) {
+            let discount = Math.round(subtotal * (promo.discountPercentage / 100))
+            if (promo.maxDiscount) {
+              const maxD = promo.maxDiscount * 100
+              if (discount > maxD) {
+                discount = maxD
+              }
+            }
+            discountAmount = discount
+          }
+        }
+      }
+
+      const amount = subtotal - discountAmount
+
+      if (amount <= 0) {
         throw new Error('A valid amount is required to initiate a payment.')
       }
 
