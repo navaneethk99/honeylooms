@@ -14,13 +14,23 @@ export default async function AboutUsPage() {
           </h1>
           <div className="text-neutral-600 dark:text-neutral-400 space-y-4 text-sm leading-relaxed">
             <p>
-              Welcome to Honeylooms, where tradition meets contemporary design. We specialize in producing premium, handcrafted clothing and lifestyle textiles that celebrate the art of weaving and the beauty of natural fibers.
+              Welcome to Honeylooms, founded by <strong>Aarna Kudeshia</strong>, where tradition
+              meets contemporary design. We specialize in producing premium, handcrafted clothing
+              and lifestyle textiles that celebrate the art of weaving and the beauty of natural
+              fibers.
             </p>
+
             <p>
-              Our mission is to revive and celebrate the craft of loom weaving, creating timeless garments that feel as good as they look. Every piece we make is meticulously crafted from sustainably sourced materials, ensuring comfort, style, and long-lasting durability.
+              Our mission is to revive and celebrate the craft of loom weaving, creating timeless
+              garments that feel as good as they look. Every piece we make is meticulously crafted
+              from sustainably sourced materials, ensuring comfort, style, and long-lasting
+              durability.
             </p>
+
             <p>
-              By partnering with local artisans and using sustainable techniques, we hope to build a more conscious future for fashion. Thank you for being a part of our journey and supporting the beauty of slow, intentional craftsmanship.
+              By partnering with local artisans and using sustainable techniques, we hope to build a
+              more conscious future for fashion. Thank you for being a part of our journey and
+              supporting the beauty of slow, intentional craftsmanship.
             </p>
           </div>
         </div>
@@ -35,7 +45,8 @@ export default async function AboutUsPage() {
 }
 
 export const metadata: Metadata = {
-  description: 'Learn about Honeylooms, our mission, sustainable hand-loomed apparel, and commitment to fine artisan craftsmanship.',
+  description:
+    'Learn about Honeylooms, our mission, sustainable hand-loomed apparel, and commitment to fine artisan craftsmanship.',
   openGraph: mergeOpenGraph({
     title: 'About Us',
     url: '/about-us',
