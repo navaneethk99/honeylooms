@@ -27,14 +27,17 @@ export default async function CollectionsPage() {
           Curated Collections
         </h1>
         <p className="text-neutral-500 dark:text-neutral-400 text-lg leading-relaxed">
-          Explore our handpicked selections of premium products, designed to bring style, quality, and functionality to your everyday life.
+          Explore our handpicked selections of premium products, designed to bring style, quality,
+          and functionality to your everyday life.
         </p>
       </div>
 
       {/* Grid of collections */}
       {collections.docs.length === 0 ? (
         <div className="border border-dashed border-neutral-200 dark:border-neutral-800 rounded-lg p-12 text-center">
-          <p className="text-neutral-500 dark:text-neutral-400">No collections found. Add some collections in the admin panel to get started.</p>
+          <p className="text-neutral-500 dark:text-neutral-400">
+            No collections found. Add some collections in the admin panel to get started.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -49,7 +52,7 @@ export default async function CollectionsPage() {
                 href={`/collections/${slug}`}
                 className="group block space-y-4"
               >
-                <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-900">
+                <div className="relative aspect-[2/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-900">
                   {/* Background Image with Hover Zoom */}
                   {poster ? (
                     <Media
@@ -73,7 +76,9 @@ export default async function CollectionsPage() {
                   </h2>
                   <div className="inline-flex items-center gap-1 text-[10px] font-mono tracking-widest text-neutral-400 dark:text-neutral-500 uppercase transition-all duration-300 group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
                     <span>Explore Collection</span>
-                    <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
+                    <span className="transition-transform duration-300 group-hover:translate-x-1">
+                      &rarr;
+                    </span>
                   </div>
                 </div>
               </Link>

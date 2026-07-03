@@ -13,6 +13,13 @@ import { ProductGridItem } from '@/components/ProductGridItem'
 import { generateMeta } from '@/utilities/generateMeta'
 import type { Metadata } from 'next'
 import { DomeGalleryWrapper as DomeGallery } from '@/components/DomeGallery/DomeGalleryWrapper'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getHomepageData()
@@ -164,7 +171,7 @@ export default async function HomePage() {
             },
           ],
         },
-        limit: 6,
+        limit: 12,
       })
 
       return {
@@ -179,7 +186,7 @@ export default async function HomePage() {
       {/* GSAP ScrollTrigger Intro Animation */}
       {outfits.length > 0 && <HomepageAnimation products={outfits} />}
 
-      {/* 3x2 grid of items from each collection */}
+      {/* Carousel of items from each collection */}
       <div className="bg-background">
         {collectionsWithProducts.map(({ collection, products }) => {
           if (!products || products.length === 0) return null
@@ -200,19 +207,27 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              {/* 3x2 Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                {products.map((product) => (
-                  <div key={product.id} className="h-full w-full">
-                    <ProductGridItem product={product} />
-                  </div>
-                ))}
+              {/* 3-Column Carousel wrapper with desktop padding for navigation arrows */}
+              <div className="px-0 md:px-12">
+                <Carousel className="w-full" opts={{ loop: true }}>
+                  <CarouselContent className="-ml-4 md:-ml-6">
+                    {products.map((product) => (
+                      <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-1/2 md:basis-1/3">
+                        <div className="h-full w-full">
+                          <ProductGridItem product={product} />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="hidden md:flex" />
+                  <CarouselNext className="hidden md:flex" />
+                </Carousel>
               </div>
             </section>
           )
         })}
 
-        {/* Dome Gallery Section */}
+        {/* Dome Gallery Section
         {domeImages.length > 0 && (
           <section className="w-full h-[600px] relative overflow-hidden bg-white dark:bg-neutral-950 border-t border-neutral-100 dark:border-neutral-900 [--bg-gallery:#ffffff] dark:[--bg-gallery:#0a0a0a]">
             <div className="absolute inset-x-0 top-12 z-10 flex flex-col items-center justify-start pointer-events-none">
@@ -235,6 +250,7 @@ export default async function HomePage() {
             </div>
           </section>
         )}
+        */}
       </div>
     </article>
   )

@@ -16,7 +16,7 @@ type Props = {
 }
 
 export default async function ShopPage({ searchParams }: Props) {
-  const { q: searchValue, sort, category } = await searchParams
+  const { q: searchValue, sort, category, collection } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
   const products = await payload.find({
@@ -28,11 +28,12 @@ export default async function ShopPage({ searchParams }: Props) {
       slug: true,
       gallery: true,
       categories: true,
+      collections: true,
       priceInUSD: true,
       variants: true,
     },
     ...(sort ? { sort } : { sort: 'title' }),
-    ...(searchValue || category
+    ...(searchValue || category || collection
       ? {
           where: {
             and: [
@@ -68,6 +69,15 @@ export default async function ShopPage({ searchParams }: Props) {
                     },
                   ]
                 : []),
+              ...(collection
+                ? [
+                    {
+                      collections: {
+                        contains: collection,
+                      },
+                    },
+                  ]
+                : []),
             ],
           },
         }
@@ -77,7 +87,7 @@ export default async function ShopPage({ searchParams }: Props) {
   const resultsText = products.docs.length > 1 ? 'results' : 'result'
 
   return (
-    <div>
+    <div className="">
       {searchValue ? (
         <p className="mb-4">
           {products.docs?.length === 0
@@ -92,7 +102,7 @@ export default async function ShopPage({ searchParams }: Props) {
       )}
 
       {products?.docs.length > 0 ? (
-        <Grid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <Grid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
           {products.docs.map((product) => {
             return <ProductGridItem key={product.id} product={product} />
           })}

@@ -21,6 +21,7 @@ import { reduceInventory } from '@/hooks/reduceInventory'
 import { sendInvoiceEmail } from '@/hooks/sendInvoiceEmail'
 import { sendOrderStatusEmail } from '@/hooks/sendOrderStatusEmail'
 import { sendAdminNotificationEmail } from '@/hooks/sendAdminNotificationEmail'
+import { getOrCreateOrderInvoice } from '@/utilities/getOrCreateOrderInvoice'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Honeylooms` : 'Honeylooms'
@@ -142,6 +143,41 @@ export const plugins: Plugin[] = [
             sendAdminNotificationEmail,
           ],
         },
+        endpoints: [
+          ...(defaultCollection.endpoints || []),
+          {
+            path: '/:id/invoice',
+            method: 'get',
+            handler: async (req) => {
+              const id = req.routeParams?.id as string
+              try {
+                // Fetch the order document
+                const order = await req.payload.findByID({
+                  collection: 'orders',
+                  id,
+                  req,
+                })
+                
+                if (!order) {
+                  return new Response('Order not found', { status: 404 })
+                }
+                
+                // Generate and upload the invoice PDF using the helper
+                const { pdfBuffer } = await getOrCreateOrderInvoice(order, req)
+                
+                return new Response(pdfBuffer, {
+                  headers: {
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': 'inline; filename="invoice.pdf"',
+                  },
+                })
+              } catch (error) {
+                req.payload.logger.error(`Error generating invoice via custom endpoint for order #${id}: ${error}`)
+                return new Response('Internal Server Error', { status: 500 })
+              }
+            },
+          },
+        ],
         fields: applyCosmeticCurrencyAdminOverrides([
           ...defaultCollection.fields.map((field) => {
             if ('name' in field && field.name === 'status' && field.type === 'select') {
@@ -208,6 +244,16 @@ export const plugins: Plugin[] = [
             admin: {
               position: 'sidebar',
               readOnly: true,
+            },
+          },
+          {
+            name: 'printInvoiceUI',
+            type: 'ui',
+            admin: {
+              position: 'sidebar',
+              components: {
+                Field: '@/components/admin/PrintInvoiceButton#PrintInvoiceButton',
+              },
             },
           },
         ]),
