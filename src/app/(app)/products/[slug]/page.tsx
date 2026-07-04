@@ -166,7 +166,7 @@ function RelatedProducts({ products }: { products: Product[] }) {
       <ul className="flex w-full gap-4 overflow-x-auto pt-1">
         {products.map((product) => (
           <li
-            className="w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
+            className="w-40 min-45:w-45 min-50:w-50 sm:w-1/3 md:w-1/4 lg:w-1/5 flex-none"
             key={product.id}
           >
             <ProductGridItem product={product} />
