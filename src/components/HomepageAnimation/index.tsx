@@ -77,167 +77,171 @@ export function HomepageAnimation({ products }: Props) {
   const isMobile = windowWidth > 0 && windowWidth < 768
 
   useEffect(() => {
-    if (!containerRef.current || !stickyRef.current || outfits.length === 0 || isMobile)
-      return
+    if (!containerRef.current || !stickyRef.current || outfits.length === 0 || isMobile) return
 
     const mm = gsap.matchMedia(containerRef)
 
-    mm.add({
-      isDesktop: "(min-width: 1280px)",
-      isTablet: "(min-width: 768px) and (max-width: 1279px)",
-    }, (context) => {
-      const { isDesktop } = context.conditions as { isDesktop: boolean }
+    mm.add(
+      {
+        isDesktop: '(min-width: 1280px)',
+        isTablet: '(min-width: 768px) and (max-width: 1279px)',
+      },
+      (context) => {
+        const { isDesktop } = context.conditions as { isDesktop: boolean }
 
-      const styles = isDesktop ? [
-        { left: '4vw', top: '8vh', bottom: 'auto', right: 'auto' },
-        { left: '18vw', top: '36vh', bottom: 'auto', right: 'auto' },
-        { left: '4vw', top: 'auto', right: 'auto', bottom: '8vh' },
-        { left: 'auto', top: '8vh', right: '4vw', bottom: 'auto' },
-        { left: 'auto', top: '36vh', right: '18vw', bottom: 'auto' },
-        { left: 'auto', top: 'auto', right: '4vw', bottom: '8vh' },
-      ] : [
-        { left: '4vw', top: '8vh', bottom: 'auto', right: 'auto' },
-        { left: '20vw', top: '36vh', bottom: 'auto', right: 'auto' }, // hidden by CSS
-        { left: '4vw', top: 'auto', right: 'auto', bottom: '8vh' },
-        { left: 'auto', top: '8vh', right: '4vw', bottom: 'auto' },
-        { left: 'auto', top: '36vh', right: '20vw', bottom: 'auto' }, // hidden by CSS
-        { left: 'auto', top: 'auto', right: '4vw', bottom: '8vh' },
-      ]
+        const styles = isDesktop
+          ? [
+              { left: '4vw', top: '8vh', bottom: 'auto', right: 'auto' },
+              { left: '18vw', top: '36vh', bottom: 'auto', right: 'auto' },
+              { left: '4vw', top: 'auto', right: 'auto', bottom: '8vh' },
+              { left: 'auto', top: '8vh', right: '4vw', bottom: 'auto' },
+              { left: 'auto', top: '36vh', right: '18vw', bottom: 'auto' },
+              { left: 'auto', top: 'auto', right: '4vw', bottom: '8vh' },
+            ]
+          : [
+              { left: '4vw', top: '8vh', bottom: 'auto', right: 'auto' },
+              { left: '20vw', top: '36vh', bottom: 'auto', right: 'auto' }, // hidden by CSS
+              { left: '4vw', top: 'auto', right: 'auto', bottom: '8vh' },
+              { left: 'auto', top: '8vh', right: '4vw', bottom: 'auto' },
+              { left: 'auto', top: '36vh', right: '20vw', bottom: 'auto' }, // hidden by CSS
+              { left: 'auto', top: 'auto', right: '4vw', bottom: '8vh' },
+            ]
 
-      // Initialize card positions off-screen
-      cardsRef.current.forEach((card, index) => {
-        if (!card) return
-        const isLeft = index < 3
-        const startX = isLeft ? '-100vw' : '100vw'
-        const startY = isLeft ? (index % 3) * 150 - 150 : ((index - 3) % 3) * 150 - 150
-        const pos = styles[index]
-        gsap.set(card, {
-          x: startX,
-          y: startY,
-          opacity: 0,
-          scale: 0.6,
-          rotation: isLeft ? -45 : 45,
-          left: pos?.left || 'auto',
-          top: pos?.top || 'auto',
-          right: pos?.right || 'auto',
-          bottom: pos?.bottom || 'auto',
-        })
-      })
-
-      // Initialize title opacity and scale
-      gsap.set(titleRef.current, {
-        opacity: 0,
-        scale: 0.8,
-      })
-
-      // Establish ScrollTrigger timeline
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top top',
-          end: 'bottom bottom',
-          pin: stickyRef.current,
-          pinSpacing: true,
-          scrub: 1.2,
-          invalidateOnRefresh: true,
-        },
-      })
-
-      // 1. Fade out scroll indicator
-      tl.to(
-        scrollIndicatorRef.current,
-        {
-          opacity: 0,
-          y: -20,
-          pointerEvents: 'none',
-          duration: 0.8,
-        },
-        0,
-      )
-
-      // Disintegrate Honeycomb hexagons
-      const hexItems = gsap.utils.toArray('.hexagon-item') as HTMLElement[]
-      hexItems.forEach((item, index) => {
-        const hex = hexagons[index]
-        if (!hex) return
-        tl.to(
-          item,
-          {
-            x: hex.randomX,
-            y: hex.randomY,
-            rotation: hex.randomRot,
-            scale: hex.randomScale,
+        // Initialize card positions off-screen
+        cardsRef.current.forEach((card, index) => {
+          if (!card) return
+          const isLeft = index < 3
+          const startX = isLeft ? '-100vw' : '100vw'
+          const startY = isLeft ? (index % 3) * 150 - 150 : ((index - 3) % 3) * 150 - 150
+          const pos = styles[index]
+          gsap.set(card, {
+            x: startX,
+            y: startY,
             opacity: 0,
-            duration: 3.5,
-            ease: 'power1.inOut',
+            scale: 0.6,
+            rotation: isLeft ? -45 : 45,
+            left: pos?.left || 'auto',
+            top: pos?.top || 'auto',
+            right: pos?.right || 'auto',
+            bottom: pos?.bottom || 'auto',
+          })
+        })
+
+        // Initialize title opacity and scale
+        gsap.set(titleRef.current, {
+          opacity: 0,
+          scale: 0.8,
+        })
+
+        // Establish ScrollTrigger timeline
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top top',
+            end: 'bottom bottom',
+            pin: stickyRef.current,
+            pinSpacing: true,
+            scrub: 1.2,
+            invalidateOnRefresh: true,
+          },
+        })
+
+        // 1. Fade out scroll indicator
+        tl.to(
+          scrollIndicatorRef.current,
+          {
+            opacity: 0,
+            y: -20,
+            pointerEvents: 'none',
+            duration: 0.8,
           },
           0,
         )
-      })
 
-      // 2. Bring Title forward and fade it in
-      tl.to(
-        titleRef.current,
-        {
-          opacity: 1,
-          scale: 1.1,
-          letterSpacing: '0.14em',
-          duration: 2.0,
-          ease: 'power1.inOut',
-        },
-        0.5,
-      )
+        // Disintegrate Honeycomb hexagons
+        const hexItems = gsap.utils.toArray('.hexagon-item') as HTMLElement[]
+        hexItems.forEach((item, index) => {
+          const hex = hexagons[index]
+          if (!hex) return
+          tl.to(
+            item,
+            {
+              x: hex.randomX,
+              y: hex.randomY,
+              rotation: hex.randomRot,
+              scale: hex.randomScale,
+              opacity: 0,
+              duration: 3.5,
+              ease: 'power1.inOut',
+            },
+            0,
+          )
+        })
 
-      // 3. Stagger-in the clothing products into view
-      cardsRef.current.forEach((card, index) => {
-        if (!card) return
-        const pos = styles[index]
-        if (!pos) return
+        // 2. Bring Title forward and fade it in
+        tl.to(
+          titleRef.current,
+          {
+            opacity: 1,
+            scale: 1.1,
+            letterSpacing: '0.14em',
+            duration: 2.0,
+            ease: 'power1.inOut',
+          },
+          0.5,
+        )
+
+        // 3. Stagger-in the clothing products into view
+        cardsRef.current.forEach((card, index) => {
+          if (!card) return
+          const pos = styles[index]
+          if (!pos) return
+
+          tl.to(
+            card,
+            {
+              x: 0,
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              rotation: 0,
+              ease: 'power2.out',
+              duration: 3.5,
+            },
+            1.5,
+          )
+        })
+
+        // 4. Hold frame for display
+        tl.to({}, { duration: 2.0 })
+
+        // 5. Fade out title and cards at the end
+        tl.to(
+          titleRef.current,
+          {
+            opacity: 0,
+            scale: 0.8,
+            y: -60,
+            filter: 'blur(8px)',
+            duration: 1.2,
+            ease: 'power2.inOut',
+          },
+          '>-0.2',
+        )
 
         tl.to(
-          card,
+          cardsRef.current,
           {
-            x: 0,
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            rotation: 0,
-            ease: 'power2.out',
-            duration: 3.5,
+            opacity: 0,
+            scale: 0.9,
+            y: 50,
+            duration: 1.2,
+            ease: 'power2.inOut',
           },
-          1.5,
+          '<',
         )
-      })
-
-      // 4. Hold frame for display
-      tl.to({}, { duration: 2.0 })
-
-      // 5. Fade out title and cards at the end
-      tl.to(
-        titleRef.current,
-        {
-          opacity: 0,
-          scale: 0.8,
-          y: -60,
-          filter: 'blur(8px)',
-          duration: 1.2,
-          ease: 'power2.inOut',
-        },
-        '>-0.2',
-      )
-
-      tl.to(
-        cardsRef.current,
-        {
-          opacity: 0,
-          scale: 0.9,
-          y: 50,
-          duration: 1.2,
-          ease: 'power2.inOut',
-        },
-        '<',
-      )
-    })
+      },
+    )
 
     return () => mm.revert()
   }, [outfits, isMobile])
@@ -245,7 +249,9 @@ export function HomepageAnimation({ products }: Props) {
   if (isMobile) {
     return (
       <div className="w-full bg-[#D9A322] text-zinc-950 flex flex-col items-center justify-center overflow-hidden relative min-h-[85vh]">
-        <style dangerouslySetInnerHTML={{ __html: `
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
           @keyframes breathe-hex {
             0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(0.97); }
             50% { opacity: 1.0; transform: translate(-50%, -50%) scale(1.03); }
@@ -254,20 +260,24 @@ export function HomepageAnimation({ products }: Props) {
             animation: breathe-hex var(--breathe-duration, 8s) ease-in-out infinite;
             animation-delay: var(--breathe-delay, 0s);
           }
-        `}} />
+        `,
+          }}
+        />
         {/* Animated Honeycomb grid background */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none flex items-center justify-center">
           {hexagons.map((hex, index) => (
             <div
               key={hex.id}
               className="absolute animate-breathe"
-              style={{
-                left: `calc(50% + ${hex.x}px)`,
-                top: `calc(50% + ${hex.y}px)`,
-                transform: 'translate(-50%, -50%)',
-                '--breathe-delay': `${(index % 7) * -1.3}s`,
-                '--breathe-duration': `${7 + (index % 5) * 1.5}s`,
-              } as React.CSSProperties}
+              style={
+                {
+                  left: `calc(50% + ${hex.x}px)`,
+                  top: `calc(50% + ${hex.y}px)`,
+                  transform: 'translate(-50%, -50%)',
+                  '--breathe-delay': `${(index % 7) * -1.3}s`,
+                  '--breathe-duration': `${7 + (index % 5) * 1.5}s`,
+                } as React.CSSProperties
+              }
             >
               <svg
                 viewBox="0 0 100 86.6"
@@ -286,32 +296,40 @@ export function HomepageAnimation({ products }: Props) {
             href="/shop"
             className="group relative p-[1px] transition-transform duration-300 hover:scale-105 active:scale-[0.98]"
             style={{
-              clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+              clipPath:
+                'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
             }}
           >
             {/* Border layer */}
             <div
               className="absolute inset-0 bg-zinc-900/10 group-hover:bg-zinc-900/25 group-active:bg-zinc-900/30 transition-colors duration-300"
               style={{
-                clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                clipPath:
+                  'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
               }}
             />
             {/* Content layer */}
             <div
               className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 group-active:bg-neutral-100 text-zinc-900 transition-colors duration-300 flex items-center justify-center w-[240px] h-12"
               style={{
-                clipPath: 'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
+                clipPath:
+                  'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
               }}
             >
               <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em] uppercase tracking-[0.1em] font-medium">
-                {"Explore Store".split("").map((char, index) => (
+                {'Explore Store'.split('').map((char, index) => (
                   <span
                     key={index}
                     className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-1/2 group-active:-translate-y-1/2"
                     style={{ transitionDelay: `${index * 25}ms`, height: '2.4em' }}
                   >
-                    <span className="h-[1.2em] flex items-center justify-center">{char === ' ' ? '\u00A0' : char}</span>
-                    <span className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold" aria-hidden="true">
+                    <span className="h-[1.2em] flex items-center justify-center">
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                    <span
+                      className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold"
+                      aria-hidden="true"
+                    >
                       {char === ' ' ? '\u00A0' : char}
                     </span>
                   </span>
@@ -325,32 +343,40 @@ export function HomepageAnimation({ products }: Props) {
             href="/collections"
             className="group relative p-[1px] transition-transform duration-300 hover:scale-105 active:scale-[0.98]"
             style={{
-              clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+              clipPath:
+                'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
             }}
           >
             {/* Border layer */}
             <div
               className="absolute inset-0 bg-zinc-900/10 group-hover:bg-zinc-900/25 group-active:bg-zinc-900/30 transition-colors duration-300"
               style={{
-                clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                clipPath:
+                  'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
               }}
             />
             {/* Content layer */}
             <div
               className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 group-active:bg-neutral-100 text-zinc-900 transition-colors duration-300 flex items-center justify-center w-[240px] h-12"
               style={{
-                clipPath: 'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
+                clipPath:
+                  'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
               }}
             >
               <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em] uppercase tracking-[0.1em] font-medium">
-                {"All Collections".split("").map((char, index) => (
+                {'All Collections'.split('').map((char, index) => (
                   <span
                     key={index}
                     className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-1/2 group-active:-translate-y-1/2"
                     style={{ transitionDelay: `${index * 25}ms`, height: '2.4em' }}
                   >
-                    <span className="h-[1.2em] flex items-center justify-center">{char === ' ' ? '\u00A0' : char}</span>
-                    <span className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold" aria-hidden="true">
+                    <span className="h-[1.2em] flex items-center justify-center">
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                    <span
+                      className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold"
+                      aria-hidden="true"
+                    >
                       {char === ' ' ? '\u00A0' : char}
                     </span>
                   </span>
@@ -406,32 +432,40 @@ export function HomepageAnimation({ products }: Props) {
                 href="/shop"
                 className="group relative p-[1px] transition-transform duration-300 hover:scale-105 active:scale-[0.98]"
                 style={{
-                  clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                  clipPath:
+                    'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
                 }}
               >
                 {/* Border layer */}
                 <div
                   className="absolute inset-0 bg-zinc-900/10 group-hover:bg-zinc-900/25 group-active:bg-zinc-900/30 transition-colors duration-300"
                   style={{
-                    clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                    clipPath:
+                      'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
                   }}
                 />
                 {/* Content layer */}
                 <div
                   className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 group-active:bg-neutral-100 text-zinc-900 transition-colors duration-300 flex items-center justify-center min-w-[160px] h-11"
                   style={{
-                    clipPath: 'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
+                    clipPath:
+                      'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
                   }}
                 >
                   <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em]">
-                    {"Explore Store".split("").map((char, index) => (
+                    {'Explore Store'.split('').map((char, index) => (
                       <span
                         key={index}
                         className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-1/2 group-active:-translate-y-1/2"
                         style={{ transitionDelay: `${index * 25}ms`, height: '2.4em' }}
                       >
-                        <span className="h-[1.2em] flex items-center justify-center">{char === ' ' ? '\u00A0' : char}</span>
-                        <span className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold" aria-hidden="true">
+                        <span className="h-[1.2em] flex items-center justify-center">
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                        <span
+                          className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold"
+                          aria-hidden="true"
+                        >
                           {char === ' ' ? '\u00A0' : char}
                         </span>
                       </span>
@@ -443,32 +477,40 @@ export function HomepageAnimation({ products }: Props) {
                 href="/collections"
                 className="group relative p-[1px] transition-transform duration-300 hover:scale-105 active:scale-[0.98]"
                 style={{
-                  clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                  clipPath:
+                    'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
                 }}
               >
                 {/* Border layer */}
                 <div
                   className="absolute inset-0 bg-zinc-900/10 group-hover:bg-zinc-900/25 group-active:bg-zinc-900/30 transition-colors duration-300"
                   style={{
-                    clipPath: 'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
+                    clipPath:
+                      'polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%)',
                   }}
                 />
                 {/* Content layer */}
                 <div
                   className="relative px-8 py-3 bg-white group-hover:bg-neutral-50 group-active:bg-neutral-100 text-zinc-900 transition-colors duration-300 flex items-center justify-center min-w-[160px] h-11"
                   style={{
-                    clipPath: 'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
+                    clipPath:
+                      'polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%)',
                   }}
                 >
                   <span className="relative z-10 flex overflow-hidden h-[1.2em] leading-[1.2em]">
-                    {"All Collections".split("").map((char, index) => (
+                    {'All Collections'.split('').map((char, index) => (
                       <span
                         key={index}
                         className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-1/2 group-active:-translate-y-1/2"
                         style={{ transitionDelay: `${index * 25}ms`, height: '2.4em' }}
                       >
-                        <span className="h-[1.2em] flex items-center justify-center">{char === ' ' ? '\u00A0' : char}</span>
-                        <span className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold" aria-hidden="true">
+                        <span className="h-[1.2em] flex items-center justify-center">
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                        <span
+                          className="h-[1.2em] flex items-center justify-center text-zinc-950 font-bold"
+                          aria-hidden="true"
+                        >
                           {char === ' ' ? '\u00A0' : char}
                         </span>
                       </span>
@@ -485,12 +527,12 @@ export function HomepageAnimation({ products }: Props) {
 
         {/* Central Title */}
         <div className="text-center z-10 pointer-events-none select-none">
-          <h1
+          <p
             ref={titleRef}
-            className="text-[clamp(2.5rem,5.5vw,5.5rem)] font-bold text-white tracking-widest uppercase font-sans drop-shadow-[0_2px_15px_rgba(0,0,0,0.15)]"
+            className="text-6xl font-bold text-white tracking-tightest uppercase font-sans drop-shadow-[0_2px_15px_rgba(0,0,0,0.15)]"
           >
             honeylooms
-          </h1>
+          </p>
         </div>
 
         {/* Staggered Outfits grid */}
@@ -520,7 +562,7 @@ export function HomepageAnimation({ products }: Props) {
                 cardsRef.current[index] = el
               }}
               className={`absolute aspect-[2/3] w-[min(16vw,22vh)] xl:w-[min(13vw,20vh)] overflow-hidden bg-neutral-900 border border-white/5 rounded-md shadow-2xl transition-transform duration-300 hover:scale-[1.03] group z-20 pointer-events-auto card-item
-                ${(index === 1 || index === 4) ? 'hidden xl:block' : ''}
+                ${index === 1 || index === 4 ? 'hidden xl:block' : ''}
               `}
             >
               {/* Image with zoom effect on hover */}
