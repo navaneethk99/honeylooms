@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import React, { Suspense } from 'react'
 
 import { FilterList } from './filter'
-import { CategoryItem } from './Categories.client'
+import { CategoryItem, CategorySelect } from './Categories.client'
 
 async function CategoryList() {
   const payload = await getPayload({ config: configPromise })
@@ -18,7 +18,7 @@ async function CategoryList() {
     <div>
       <h3 className="text-xs mb-2 text-neutral-500 dark:text-neutral-400">Category</h3>
 
-      <ul>
+      <ul className="hidden md:block">
         {categories.docs.map((category) => {
           return (
             <li key={category.id}>
@@ -27,6 +27,10 @@ async function CategoryList() {
           )
         })}
       </ul>
+
+      <div className="block md:hidden">
+        <CategorySelect categories={categories.docs} />
+      </div>
     </div>
   )
 }

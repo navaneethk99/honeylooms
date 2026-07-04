@@ -3,7 +3,7 @@ import { getPayload } from 'payload'
 import clsx from 'clsx'
 import React, { Suspense } from 'react'
 
-import { CollectionItem } from './Collections.client'
+import { CollectionItem, CollectionSelect } from './Collections.client'
 
 async function CollectionList() {
   const payload = await getPayload({ config: configPromise })
@@ -17,7 +17,7 @@ async function CollectionList() {
     <div>
       <h3 className="text-xs mb-2 text-neutral-500 dark:text-neutral-400">Collection</h3>
 
-      <ul>
+      <ul className="hidden md:block">
         {collections.docs.map((collection) => {
           return (
             <li key={collection.id}>
@@ -26,6 +26,10 @@ async function CollectionList() {
           )
         })}
       </ul>
+
+      <div className="block md:hidden">
+        <CollectionSelect collections={collections.docs} />
+      </div>
     </div>
   )
 }
