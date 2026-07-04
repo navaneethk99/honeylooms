@@ -24,6 +24,7 @@ import { PromoCodes } from '@/collections/PromoCodes'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { FeaturedOutfits } from '@/globals/FeaturedOutfits'
+import { PromoBanner } from '@/globals/PromoBanner'
 import { getDatabaseURL } from '@/utilities/getDatabaseURL'
 import { plugins } from './plugins'
 
@@ -107,7 +108,7 @@ export default buildConfig({
       })()
     : {}),
   endpoints: [],
-  globals: [Header, Footer, FeaturedOutfits],
+  globals: [Header, Footer, FeaturedOutfits, PromoBanner],
   plugins,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

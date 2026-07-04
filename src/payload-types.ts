@@ -136,11 +136,13 @@ export interface Config {
     header: Header;
     footer: Footer;
     'featured-outfits': FeaturedOutfit;
+    'promo-banner': PromoBanner;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'featured-outfits': FeaturedOutfitsSelect<false> | FeaturedOutfitsSelect<true>;
+    'promo-banner': PromoBannerSelect<false> | PromoBannerSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1953,6 +1955,23 @@ export interface FeaturedOutfit {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promo-banner".
+ */
+export interface PromoBanner {
+  id: number;
+  enabled?: boolean | null;
+  messages?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  interval?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -2003,6 +2022,23 @@ export interface FooterSelect<T extends boolean = true> {
  */
 export interface FeaturedOutfitsSelect<T extends boolean = true> {
   outfits?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promo-banner_select".
+ */
+export interface PromoBannerSelect<T extends boolean = true> {
+  enabled?: T;
+  messages?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  interval?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

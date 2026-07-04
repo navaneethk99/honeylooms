@@ -41,7 +41,7 @@ const colorVariantOptions = [
   { label: 'White', value: 'white' },
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+const globals: GlobalSlug[] = ['header', 'footer', 'promo-banner']
 
 const baseAddressUSData: Transaction['billingAddress'] = {
   title: 'Dr.',
@@ -573,6 +573,18 @@ export const seed = async ({
             },
           },
         ],
+      },
+    }),
+    payload.updateGlobal({
+      slug: 'promo-banner',
+      data: {
+        enabled: true,
+        messages: [
+          { text: '✨ Welcome to Honeylooms! Discover our curated organic collections.' },
+          { text: '🚚 Free shipping on orders above $100!' },
+          { text: '🎟️ Use code HONEY10 for 10% off on your first purchase.' },
+        ],
+        interval: 4,
       },
     }),
   ])
