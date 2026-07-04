@@ -1,4 +1,5 @@
 import { generateInvoicePDF } from '@/utilities/generateInvoicePDF'
+import { getEffectiveProductPrice } from '@/utilities/pricing'
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import type { Order } from '@/payload-types'
 import type { PayloadRequest } from 'payload'
@@ -69,7 +70,7 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
         })
         if (product) {
           title = product.title
-          price = (product.onSale && product.salePrice) ? product.salePrice : (product.priceInUSD || 0)
+          price = getEffectiveProductPrice(product)
         }
 
         if (variantID && product?.variants?.docs) {
@@ -77,7 +78,7 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
             (v: any) => v.id === variantID || v._id === variantID,
           ) as any
           if (variantObj) {
-            price = variantObj.priceInUSD || price
+            price = getEffectiveProductPrice(product, variantObj)
             if (variantObj.options && Array.isArray(variantObj.options)) {
               variantOptionsText = variantObj.options
                 .map((opt: any) => (typeof opt === 'object' ? opt.label : opt))

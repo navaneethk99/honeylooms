@@ -21,6 +21,7 @@ import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
 import { Product, Variant } from '@/payload-types'
+import { getEffectiveProductPrice, getOriginalProductPrice, isProductOnSale } from '@/utilities/pricing'
 
 export function CartModal() {
   const { cart } = useCart()
@@ -78,12 +79,16 @@ export function CartModal() {
                       : undefined
 
                   let image = firstGalleryImage || metaImage
-                  let price = (product.onSale && product.salePrice) ? product.salePrice : product.priceInUSD
+                  const productOnSale = isProductOnSale(product)
+                  let price = getEffectiveProductPrice(product)
+                  let originalPrice = getOriginalProductPrice(product, variant)
 
                   const isVariant = Boolean(variant) && typeof variant === 'object'
 
                   if (isVariant) {
-                    price = variant?.priceInUSD
+                    if (!product.onSale && typeof variant?.priceInUSD === 'number') {
+                      price = variant.priceInUSD
+                    }
 
                     const imageVariant = product.gallery?.find((item) => {
                       if (!item.variantOption) return false
@@ -129,6 +134,11 @@ export function CartModal() {
 
                           <div className="flex flex-1 flex-col text-base">
                             <span className="leading-tight">{product?.title}</span>
+                            {/*{productOnSale ? (
+                              <span className="mt-1 inline-flex w-fit items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                                Sale
+                              </span>
+                            ) : null}*/}
                             {isVariant && variant ? (
                               <p className="text-sm text-neutral-500 dark:text-neutral-400 capitalize">
                                 {variant.options
@@ -143,10 +153,18 @@ export function CartModal() {
                         </Link>
                         <div className="flex h-16 flex-col justify-between">
                           {typeof price === 'number' && (
-                            <Price
-                              amount={price}
-                              className="flex justify-end space-y-2 text-right text-sm"
-                            />
+                            <div className="flex flex-col items-end text-right">
+                              <Price
+                                amount={price}
+                                className="text-sm font-semibold text-black dark:text-white"
+                              />
+                              {productOnSale ? (
+                                <Price
+                                  amount={originalPrice}
+                                  className="text-xs text-neutral-400 line-through dark:text-neutral-500"
+                                />
+                              ) : null}
+                            </div>
                           )}
                           <div className="ml-auto flex h-9 flex-row items-center rounded-lg border">
                             <EditItemQuantityButton item={item} type="minus" />

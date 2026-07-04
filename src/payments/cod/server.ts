@@ -1,5 +1,6 @@
 import type { GroupField } from 'payload'
 import type { PaymentAdapter, PaymentAdapterArgs } from '@payloadcms/plugin-ecommerce/types'
+import { calculateCartSubtotalFromStoredItems } from '@/utilities/pricing'
 
 export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
   const { label = 'Cash on Delivery', groupOverrides } = props
@@ -51,7 +52,7 @@ export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
 
       // Cash on Delivery adds Rs. 25 charge (2500 paise)
       const codFee = 2500
-      const subtotal = data.cart?.subtotal || 0
+      const subtotal = await calculateCartSubtotalFromStoredItems(req, cart.items)
       
       let discountAmount = 0
       const promoCode = (data as any).promoCode

@@ -3,6 +3,7 @@ import type { PaymentAdapter, PaymentAdapterArgs } from '@payloadcms/plugin-ecom
 
 import type { Order, Transaction } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { calculateCartSubtotalFromStoredItems } from '@/utilities/pricing'
 
 type CashfreeEnvironment = 'production' | 'sandbox'
 
@@ -202,7 +203,7 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
         throw new Error('A valid customer email is required to make a purchase.')
       }
 
-      const subtotal = data.cart?.subtotal || 0
+      const subtotal = await calculateCartSubtotalFromStoredItems(req, cart.items)
       let discountAmount = 0
       const promoCode = (data as any).promoCode
       if (promoCode) {

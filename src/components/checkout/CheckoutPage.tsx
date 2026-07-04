@@ -22,6 +22,7 @@ import { FormItem } from '@/components/forms/FormItem'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { LottieLoader } from '@/components/LottieLoader'
+import { calculateCartSubtotalFromItems, getEffectiveProductPrice, getOriginalProductPrice, isProductOnSale } from '@/utilities/pricing'
 
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
@@ -52,6 +53,16 @@ export const CheckoutPage: React.FC = () => {
   const shippingPhone = shippingAddress?.phone?.trim()
 
   const cartIsEmpty = !cart || !cart.items || !cart.items.length
+  const resolvedSubtotal = calculateCartSubtotalFromItems(
+    cart?.items?.map((item) => ({
+      product: typeof item.product === 'object' ? item.product : undefined,
+      quantity: item.quantity,
+      variant: typeof item.variant === 'object' ? item.variant : undefined,
+    })),
+  )
+  const checkoutSubtotal = resolvedSubtotal || cart?.subtotal || 0
+  const checkoutTotal =
+    checkoutSubtotal - (appliedDiscount?.amount || 0) + (selectedPaymentMethod === 'cod' ? 2500 : 0)
 
   const canGoToPayment = Boolean(
     (email || user) && billingAddress && (billingAddressSameAsShipping || shippingAddress),
@@ -161,7 +172,7 @@ export const CheckoutPage: React.FC = () => {
     setValidatingCoupon(true)
     setCouponError(null)
     try {
-      const res = await fetch(`/api/promo-codes/validate?code=${encodeURIComponent(couponCode)}&subtotal=${cart?.subtotal || 0}`)
+      const res = await fetch(`/api/promo-codes/validate?code=${encodeURIComponent(couponCode)}&subtotal=${checkoutSubtotal}`)
       const data = await res.json()
       if (data.valid) {
         setAppliedDiscount({
@@ -180,7 +191,7 @@ export const CheckoutPage: React.FC = () => {
     } finally {
       setValidatingCoupon(false)
     }
-  }, [couponCode, cart?.subtotal])
+  }, [checkoutSubtotal, couponCode])
 
   const handleRemoveCoupon = useCallback(() => {
     setAppliedDiscount(null)
@@ -485,12 +496,16 @@ export const CheckoutPage: React.FC = () => {
               if (!quantity) return null
 
               let image = gallery?.[0]?.image || meta?.image
-              let price = (product && 'onSale' in product && product.onSale && 'salePrice' in product && product.salePrice) ? product.salePrice : product?.priceInUSD
+              const productOnSale = isProductOnSale(product)
+              let price = getEffectiveProductPrice(product)
+              let originalPrice = getOriginalProductPrice(product, variant)
 
               const isVariant = Boolean(variant) && typeof variant === 'object'
 
               if (isVariant) {
-                price = variant?.priceInUSD
+                if (!product.onSale && typeof variant?.priceInUSD === 'number') {
+                  price = variant.priceInUSD
+                }
 
                 const imageVariant = product.gallery?.find((item: any) => {
                   if (!item.variantOption) return false
@@ -524,6 +539,11 @@ export const CheckoutPage: React.FC = () => {
                   <div className="flex grow justify-between items-center">
                     <div className="flex flex-col gap-1">
                       <p className="font-medium text-lg">{title}</p>
+                      {/*{productOnSale ? (
+                        <span className="inline-flex w-fit items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                          Sale
+                        </span>
+                      ) : null}*/}
                       {variant && typeof variant === 'object' && (
                         <p className="text-sm font-mono text-primary/50 tracking-widest">
                           {variant.options
@@ -540,7 +560,17 @@ export const CheckoutPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {typeof price === 'number' && <Price amount={price} />}
+                    {typeof price === 'number' && (
+                      <div className="flex flex-col items-end">
+                        <Price amount={price} />
+                        {productOnSale ? (
+                          <Price
+                            amount={originalPrice}
+                            className="text-xs text-muted-foreground line-through"
+                          />
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
@@ -594,7 +624,7 @@ export const CheckoutPage: React.FC = () => {
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>Subtotal</span>
-              <Price amount={cart.subtotal || 0} />
+              <Price amount={checkoutSubtotal} />
             </div>
             {appliedDiscount && (
               <div className="flex justify-between items-center text-sm text-emerald-600 dark:text-emerald-400">
@@ -613,7 +643,7 @@ export const CheckoutPage: React.FC = () => {
               <span className="uppercase font-medium">Total</span>
               <Price
                 className="text-3xl font-medium"
-                amount={(cart.subtotal || 0) - (appliedDiscount?.amount || 0) + (selectedPaymentMethod === 'cod' ? 2500 : 0)}
+                amount={checkoutTotal}
               />
             </div>
           </div>

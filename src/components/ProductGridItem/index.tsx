@@ -5,19 +5,22 @@ import React from 'react'
 import clsx from 'clsx'
 import { Media } from '@/components/Media'
 import { Price } from '@/components/Price'
+import { getEffectiveProductPrice, getOriginalProductPrice, isProductOnSale } from '@/utilities/pricing'
 
 type Props = {
   product: Partial<Product>
 }
 
 export const ProductGridItem: React.FC<Props> = ({ product }) => {
-  const { gallery, priceInUSD, title } = product
+  const { gallery, title } = product
+  const salePrice = isProductOnSale(product) ? product.salePrice ?? 0 : 0
 
-  let price = priceInUSD
+  let price = getEffectiveProductPrice(product)
+  let originalPrice = getOriginalProductPrice(product)
 
   const variants = product.variants?.docs
 
-  if (variants && variants.length > 0) {
+  if (!isProductOnSale(product) && variants && variants.length > 0) {
     const variant = variants[0]
     if (
       variant &&
@@ -26,6 +29,7 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
       typeof variant.priceInUSD === 'number'
     ) {
       price = variant.priceInUSD
+      originalPrice = variant.priceInUSD
     }
   }
 
@@ -54,7 +58,7 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
     >
       {/* Image container: sharp 2:3 aspect ratio */}
       <div className="relative aspect-[2/3] w-full overflow-hidden bg-neutral-50 dark:bg-neutral-950">
-        {product.onSale ? (
+        {isProductOnSale(product) ? (
           <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow">
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -109,14 +113,14 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
           {/* Price / Cost of the item */}
           {typeof price === 'number' && (
             <div className="flex flex-col items-end gap-0.5 shrink-0">
-              {product.onSale && product.salePrice ? (
+              {isProductOnSale(product) ? (
                 <>
                   <Price
-                    amount={product.salePrice}
+                    amount={salePrice}
                     className="font-mono text-sm font-semibold text-red-600 dark:text-red-400 tracking-tight"
                   />
                   <Price
-                    amount={price}
+                    amount={originalPrice}
                     className="font-mono text-[11px] text-neutral-400 dark:text-neutral-500 line-through tracking-tight"
                   />
                 </>
@@ -133,4 +137,3 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
     </Link>
   )
 }
-
