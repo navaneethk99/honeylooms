@@ -77,7 +77,7 @@ export function ProductDescription({ product }: { product: Product }) {
           {hasVariants ? (
             productOnSale ? (
               <div className="flex items-center gap-3">
-                <Price amount={salePrice} className="text-red-600 dark:text-red-400 font-bold" />
+                <Price amount={salePrice} className="text-black dark:text-red-400 font-bold" />
                 {lowestAmount > 0 ? (
                   <Price
                     highestAmount={highestAmount}
