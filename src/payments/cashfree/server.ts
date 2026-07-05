@@ -205,7 +205,7 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
 
       const subtotal = await calculateCartSubtotalFromStoredItems(req, cart.items)
       let discountAmount = 0
-      const promoCode = (data as any).promoCode
+      const promoCode = (data as any).promoCode || (req.data as any)?.promoCode
       if (promoCode) {
         const promoCodes = await payload.find({
           collection: 'promo-codes',
