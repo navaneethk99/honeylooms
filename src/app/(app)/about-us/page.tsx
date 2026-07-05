@@ -34,9 +34,9 @@ export default async function AboutUsPage() {
         </div>
 
         {/* Lanyard Section */}
-        <div className="flex justify-center items-start h-full pt-0">
-          <Lanyard frontImage="/lanyard.PNG" backImage="/lanyard_back.svg" />
-        </div>
+        {/*<div className="flex justify-center items-start h-full pt-0">
+          <Lanyard frontImage="/lanyard.jpg" backImage="/lanyard_back.svg" />
+        </div>*/}
       </div>
     </div>
   )

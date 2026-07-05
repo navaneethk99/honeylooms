@@ -165,7 +165,7 @@ function Band({
 
   // Load static assets directly from the public folder
   const { nodes, materials } = useGLTF('/card.glb') as any
-  const texture = useTexture(lanyardImage || '/lanyard.PNG') as THREE.Texture
+  const texture = useTexture(lanyardImage || '/lanyard.jpg') as THREE.Texture
   const frontTex = useTexture(frontImage || BLANK_PIXEL) as THREE.Texture
   const backTex = useTexture(backImage || BLANK_PIXEL) as THREE.Texture
 
@@ -262,7 +262,8 @@ function Band({
       band.current.geometry
     ) {
       ;[j1, j2].forEach((ref) => {
-        if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation())
+        if (!ref.current.lerped)
+          ref.current.lerped = new THREE.Vector3().copy(ref.current.translation())
         const clampedDistance = Math.max(
           0.1,
           Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())),
@@ -312,7 +313,8 @@ function Band({
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerUp={(e) => (
-              (e.target as HTMLElement).releasePointerCapture(e.pointerId), drag(false)
+              (e.target as HTMLElement).releasePointerCapture(e.pointerId),
+              drag(false)
             )}
             onPointerDown={(e) => (
               (e.target as HTMLElement).setPointerCapture(e.pointerId),
