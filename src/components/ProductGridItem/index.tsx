@@ -58,7 +58,7 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
     >
       {/* Image container: sharp 2:3 aspect ratio */}
       <div className="relative aspect-[2/3] w-full overflow-hidden bg-neutral-50 dark:bg-neutral-950">
-        {isProductOnSale(product) ? (
+        {/*{isProductOnSale(product) ? (
           <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow">
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -66,7 +66,7 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
             </svg>
             {product.discountPercentage ? `SALE −${product.discountPercentage}%` : 'SALE'}
           </div>
-        ) : null}
+        ) : null}*/}
         {primaryImage ? (
           <>
             <Media
@@ -117,7 +117,7 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
                 <>
                   <Price
                     amount={salePrice}
-                    className="font-mono text-sm font-semibold text-red-600 dark:text-red-400 tracking-tight"
+                    className="font-mono text-sm font-semibold text-black dark:text-red-400 tracking-tight"
                   />
                   <Price
                     amount={originalPrice}
