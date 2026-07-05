@@ -411,7 +411,12 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         y = 50
       }
 
-      const signaturePath = process.env.SIGNATURE_IMAGE_PATH
+      let signaturePath = process.env.SIGNATURE_IMAGE_PATH
+      const defaultSignaturePath = path.join(process.cwd(), 'src/assets/signature.png')
+      if (!signaturePath || !fs.existsSync(signaturePath)) {
+        signaturePath = defaultSignaturePath
+      }
+
       let sigDrawn = false
       if (signaturePath && fs.existsSync(signaturePath)) {
         try {
