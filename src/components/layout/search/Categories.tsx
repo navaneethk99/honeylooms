@@ -1,5 +1,3 @@
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import clsx from 'clsx'
 import React, { Suspense } from 'react'
 
@@ -7,6 +5,8 @@ import { FilterList } from './filter'
 import { CategoryItem, CategorySelect } from './Categories.client'
 
 async function CategoryList() {
+  const { getPayload } = await import('payload')
+  const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })
 
   const categories = await payload.find({

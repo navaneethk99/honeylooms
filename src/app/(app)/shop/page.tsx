@@ -1,7 +1,5 @@
 import { Grid } from '@/components/Grid'
 import { ProductGridItem } from '@/components/ProductGridItem'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
 
 export const metadata = {
@@ -17,6 +15,8 @@ type Props = {
 
 export default async function ShopPage({ searchParams }: Props) {
   const { q: searchValue, sort, category, collection } = await searchParams
+  const { getPayload } = await import('payload')
+  const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })
 
   const products = await payload.find({
