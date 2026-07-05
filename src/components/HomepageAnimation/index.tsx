@@ -529,7 +529,7 @@ export function HomepageAnimation({ products }: Props) {
         <div className="text-center z-10 pointer-events-none select-none">
           <p
             ref={titleRef}
-            className="text-6xl font-bold text-white tracking-tightest uppercase font-sans drop-shadow-[0_2px_15px_rgba(0,0,0,0.15)]"
+            className="text-6xl font-bold text-white tracking-tightest uppercase font-sans drop-shadow-[0_2px_15px_rgba(0,0,0,0.15)] opacity-0"
           >
             honeylooms
           </p>
@@ -561,7 +561,7 @@ export function HomepageAnimation({ products }: Props) {
               ref={(el) => {
                 cardsRef.current[index] = el
               }}
-              className={`absolute aspect-[2/3] w-[min(16vw,22vh)] xl:w-[min(13vw,20vh)] overflow-hidden bg-neutral-900 border border-white/5 rounded-md shadow-2xl transition-transform duration-300 hover:scale-[1.03] group z-20 pointer-events-auto card-item
+              className={`absolute aspect-[2/3] w-[min(16vw,22vh)] xl:w-[min(13vw,20vh)] overflow-hidden bg-neutral-900 border border-white/5 rounded-md shadow-2xl transition-transform duration-300 hover:scale-[1.03] group z-20 pointer-events-auto card-item opacity-0
                 ${index === 1 || index === 4 ? 'hidden xl:block' : ''}
               `}
             >
