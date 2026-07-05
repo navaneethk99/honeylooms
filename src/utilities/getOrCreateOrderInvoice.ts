@@ -112,7 +112,9 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
   // 5. Calculate Subtotal, COD Fee, and Total
   const codFee = doc.paymentMethod === 'cod' ? 2500 : 0
   const amount = doc.amount || 0
-  const subtotal = amount - codFee
+  const itemsTotal = resolvedItems.reduce((sum, item) => sum + (item.total || 0), 0)
+  const subtotal = itemsTotal
+  const discountAmount = Math.max(0, itemsTotal + codFee - amount)
 
   // 6. Get billing address from transaction if possible
   let billingAddress = doc.shippingAddress || {}
@@ -168,6 +170,7 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
     subtotal,
     codFee,
     totalAmount: amount,
+    discountAmount,
   })
 
   // 8. Generate standard R2 filename: orderno_custname_date.pdf
@@ -193,5 +196,6 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
     paymentMethodLabel,
     subtotal,
     codFee,
+    discountAmount,
   }
 }

@@ -39,6 +39,7 @@ export interface InvoiceData {
   subtotal: number
   codFee: number
   totalAmount: number
+  discountAmount?: number
 }
 
 export function drawLogo(
@@ -319,16 +320,29 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       const summaryRowHeight = 20
       const summaryBoxStartY = y
 
-      const summaryRows = [
+      const discount = data.discountAmount || 0
+      const taxableValue = Math.max(0, data.subtotal - discount)
+
+      const summaryRows: Array<{ label: string; subLabel?: string; value: string; isBold?: boolean }> = [
         { label: 'Subtotal', value: `Rs. ${(data.subtotal / 100).toFixed(2)}` },
+      ]
+
+      if (discount > 0) {
+        summaryRows.push({
+          label: 'Discount',
+          value: `- Rs. ${(discount / 100).toFixed(2)}`,
+        })
+      }
+
+      summaryRows.push(
         {
           label: 'Tax',
           subLabel: 'IGST (5%)',
-          value: `Rs. ${((data.subtotal * 0.05) / 100).toFixed(2)}`,
+          value: `Rs. ${((taxableValue * 0.05) / 100).toFixed(2)}`,
         },
         { label: 'Shipping (COD)', value: `Rs. ${(data.codFee / 100).toFixed(2)}` },
         { label: 'Total', value: `Rs. ${(data.totalAmount / 100).toFixed(2)}`, isBold: true },
-      ]
+      )
 
       let currentY = summaryBoxStartY
       for (const row of summaryRows) {

@@ -11,7 +11,57 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 
-import { CheckoutForm } from '@/components/forms/CheckoutForm'
+type CashfreeInstance = {
+  checkout: (options: {
+    paymentSessionId: string
+    redirectTarget?: '_blank' | '_modal' | '_self' | '_top'
+  }) => Promise<unknown>
+}
+
+declare global {
+  interface Window {
+    Cashfree?: (options: { mode: 'production' | 'sandbox' }) => CashfreeInstance
+  }
+}
+
+let cashfreeScriptPromise: Promise<void> | null = null
+
+const loadCashfreeScript = async () => {
+  if (typeof window === 'undefined') return
+
+  if (window.Cashfree) return
+
+  if (!cashfreeScriptPromise) {
+    cashfreeScriptPromise = new Promise((resolve, reject) => {
+      const existingScript = document.querySelector<HTMLScriptElement>(
+        'script[src="https://sdk.cashfree.com/js/v3/cashfree.js"]',
+      )
+
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(), { once: true })
+        existingScript.addEventListener(
+          'error',
+          () => reject(new Error('Failed to load Cashfree SDK.')),
+          {
+            once: true,
+          },
+        )
+        return
+      }
+
+      const script = document.createElement('script')
+
+      script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js'
+      script.async = true
+      script.onload = () => resolve()
+      script.onerror = () => reject(new Error('Failed to load Cashfree SDK.'))
+
+      document.body.appendChild(script)
+    })
+  }
+
+  await cashfreeScriptPromise
+}
 import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
 import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
@@ -34,8 +84,7 @@ export const CheckoutPage: React.FC = () => {
    */
   const [email, setEmail] = useState('')
   const [emailEditable, setEmailEditable] = useState(true)
-  const [paymentData, setPaymentData] = useState<null | Record<string, unknown>>(null)
-  const { initiatePayment } = usePayments()
+  const { initiatePayment, confirmOrder } = usePayments()
   const { addresses } = useAddresses()
   const [shippingAddress, setShippingAddress] = useState<Partial<Address>>()
   const [billingAddress, setBillingAddress] = useState<Partial<Address>>()
@@ -139,7 +188,58 @@ export const CheckoutPage: React.FC = () => {
             return
           }
 
-          setPaymentData(paymentData)
+          if (paymentID === 'cashfree') {
+            await loadCashfreeScript()
+
+            if (!window.Cashfree) {
+              throw new Error('Cashfree SDK is unavailable.')
+            }
+
+            const cashfree = window.Cashfree({
+              mode: process.env.NEXT_PUBLIC_CASHFREE_ENV === 'production' ? 'production' : 'sandbox',
+            })
+
+            const paymentSessionID = paymentData.paymentSessionID as string
+            const orderID = paymentData.orderID as string
+
+            await cashfree.checkout({
+              paymentSessionId: paymentSessionID,
+              redirectTarget: '_modal',
+            })
+
+            setProcessingPayment(true)
+            setIsInitiatingPayment(false)
+
+            const customerEmail = email || user?.email
+            const confirmResult = await confirmOrder('cashfree', {
+              additionalData: {
+                ...(customerEmail ? { customerEmail } : {}),
+                orderID,
+              },
+            })
+
+            if (confirmResult && typeof confirmResult === 'object' && 'orderID' in confirmResult) {
+              const accessToken =
+                'accessToken' in confirmResult ? (confirmResult.accessToken as string) : ''
+              const queryParams = new URLSearchParams()
+
+              if (customerEmail) {
+                queryParams.set('email', customerEmail)
+              }
+
+              if (accessToken) {
+                queryParams.set('accessToken', accessToken)
+              }
+
+              clearCart()
+
+              const queryString = queryParams.toString()
+              router.push(`/orders/${confirmResult.orderID}${queryString ? `?${queryString}` : ''}`)
+              return
+            }
+
+            throw new Error('Order confirmation did not return an order ID.')
+          }
         }
       } catch (error) {
         let errorData: Record<string, any> = {}
@@ -163,7 +263,7 @@ export const CheckoutPage: React.FC = () => {
         setIsInitiatingPayment(false)
       }
     },
-    [billingAddress, billingAddressSameAsShipping, email, initiatePayment, shippingAddress, user, clearCart, router, appliedDiscount],
+    [billingAddress, billingAddressSameAsShipping, email, initiatePayment, confirmOrder, shippingAddress, user, clearCart, router, appliedDiscount],
   )
 
   const handleApplyCoupon = useCallback(async (e: React.FormEvent) => {
@@ -289,7 +389,7 @@ export const CheckoutPage: React.FC = () => {
               actions={
                 <Button
                   variant={'outline'}
-                  disabled={Boolean(paymentData)}
+                  disabled={isProcessingPayment || isInitiatingPayment}
                   onClick={(e) => {
                     e.preventDefault()
                     setBillingAddress(undefined)
@@ -322,7 +422,7 @@ export const CheckoutPage: React.FC = () => {
           <Checkbox
             id="shippingTheSameAsBilling"
             checked={billingAddressSameAsShipping}
-            disabled={Boolean(paymentData || (!user && (!email || Boolean(emailEditable))))}
+            disabled={isProcessingPayment || isInitiatingPayment || (!user && (!email || Boolean(emailEditable)))}
             onCheckedChange={(state) => {
               setBillingAddressSameAsShipping(state as boolean)
             }}
@@ -338,7 +438,7 @@ export const CheckoutPage: React.FC = () => {
                   actions={
                     <Button
                       variant={'outline'}
-                      disabled={Boolean(paymentData)}
+                      disabled={isProcessingPayment || isInitiatingPayment}
                       onClick={(e) => {
                         e.preventDefault()
                         setShippingAddress(undefined)
@@ -373,71 +473,69 @@ export const CheckoutPage: React.FC = () => {
           </>
         )}
 
-        {!paymentData && (
-          <div className="flex flex-col gap-4 my-6">
-            <h3 className="text-xl font-medium">Select Payment Method</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* UPI Option */}
-              <div
-                className={`p-4 border rounded-lg cursor-pointer transition-all flex flex-col gap-1 ${
-                  selectedPaymentMethod === 'cashfree'
-                    ? 'border-[#D9A321] bg-[#D9A321]/5 ring-1 ring-[#D9A321]'
-                    : 'border-border hover:border-foreground/50'
-                }`}
-                onClick={() => setSelectedPaymentMethod('cashfree')}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-lg">Pay Using UPI</span>
-                  <span className="text-xs uppercase font-mono tracking-widest text-emerald-600 bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-400 px-2 py-0.5 rounded">
-                    Free
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Instant confirmation via UPI apps (GPay, PhonePe, Paytm, etc.)
-                </p>
+        <div className="flex flex-col gap-4 my-6">
+          <h3 className="text-xl font-medium">Select Payment Method</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* UPI Option */}
+            <div
+              className={`p-4 border rounded-lg cursor-pointer transition-all flex flex-col gap-1 ${
+                selectedPaymentMethod === 'cashfree'
+                  ? 'border-[#D9A321] bg-[#D9A321]/5 ring-1 ring-[#D9A321]'
+                  : 'border-border hover:border-foreground/50'
+              }`}
+              onClick={() => setSelectedPaymentMethod('cashfree')}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-lg">Pay Using UPI</span>
+                <span className="text-xs uppercase font-mono tracking-widest text-emerald-600 bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-400 px-2 py-0.5 rounded">
+                  Free
+                </span>
               </div>
-
-              {/* COD Option */}
-              <div
-                className={`p-4 border rounded-lg cursor-pointer transition-all flex flex-col gap-1 ${
-                  selectedPaymentMethod === 'cod'
-                    ? 'border-[#D9A321] bg-[#D9A321]/5 ring-1 ring-[#D9A321]'
-                    : 'border-border hover:border-foreground/50'
-                }`}
-                onClick={() => setSelectedPaymentMethod('cod')}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-lg">Cash on Delivery</span>
-                  <span className="text-xs uppercase font-mono tracking-widest text-primary/70 bg-primary/10 px-2 py-0.5 rounded">
-                    + Rs. 25
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Pay with cash when your package is delivered.
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                Instant confirmation via UPI apps (GPay, PhonePe, Paytm, etc.)
+              </p>
             </div>
 
-            <Button
-              className="self-start min-w-[200px] mt-4"
-              disabled={!canGoToPayment || isInitiatingPayment}
-              onClick={(e) => {
-                e.preventDefault()
-                void initiatePaymentIntent(selectedPaymentMethod)
-              }}
+            {/* COD Option */}
+            <div
+              className={`p-4 border rounded-lg cursor-pointer transition-all flex flex-col gap-1 ${
+                selectedPaymentMethod === 'cod'
+                  ? 'border-[#D9A321] bg-[#D9A321]/5 ring-1 ring-[#D9A321]'
+                  : 'border-border hover:border-foreground/50'
+              }`}
+              onClick={() => setSelectedPaymentMethod('cod')}
             >
-              {isInitiatingPayment ? (
-                'Processing...'
-              ) : selectedPaymentMethod === 'cod' ? (
-                'Place Order (COD)'
-              ) : (
-                'Proceed to Pay'
-              )}
-            </Button>
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-lg">Cash on Delivery</span>
+                <span className="text-xs uppercase font-mono tracking-widest text-primary/70 bg-primary/10 px-2 py-0.5 rounded">
+                  + Rs. 25
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Pay with cash when your package is delivered.
+              </p>
+            </div>
           </div>
-        )}
 
-        {!paymentData?.['paymentSessionID'] && error && (
+          <Button
+            className="self-start min-w-[200px] mt-4"
+            disabled={!canGoToPayment || isInitiatingPayment || isProcessingPayment}
+            onClick={(e) => {
+              e.preventDefault()
+              void initiatePaymentIntent(selectedPaymentMethod)
+            }}
+          >
+            {isInitiatingPayment || isProcessingPayment ? (
+              'Processing...'
+            ) : selectedPaymentMethod === 'cod' ? (
+              'Place Order (COD)'
+            ) : (
+              'Proceed to Pay'
+            )}
+          </Button>
+        </div>
+
+        {error && (
           <div className="my-8">
             <Message error={error} />
 
@@ -452,33 +550,6 @@ export const CheckoutPage: React.FC = () => {
             </Button>
           </div>
         )}
-
-        <Suspense fallback={<React.Fragment />}>
-          {paymentData &&
-            Boolean(paymentData['paymentSessionID']) &&
-            Boolean(paymentData['orderID']) && (
-              <div className="pb-16">
-                <h2 className="font-medium text-3xl">Payment</h2>
-                {error && <p>{`Error: ${error}`}</p>}
-                <div className="flex flex-col gap-8">
-                  <CheckoutForm
-                    billingAddress={billingAddress}
-                    customerEmail={email}
-                    orderID={paymentData['orderID'] as string}
-                    paymentSessionID={paymentData['paymentSessionID'] as string}
-                    setProcessingPayment={setProcessingPayment}
-                  />
-                  <Button
-                    variant="ghost"
-                    className="self-start"
-                    onClick={() => setPaymentData(null)}
-                  >
-                    Cancel payment
-                  </Button>
-                </div>
-              </div>
-            )}
-        </Suspense>
       </div>
 
       {!cartIsEmpty && (

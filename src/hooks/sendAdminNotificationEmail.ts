@@ -1,6 +1,6 @@
 import type { CollectionAfterChangeHook } from 'payload'
 import { getServerSideURL } from '@/utilities/getURL'
-import { generateInvoicePDF } from '@/utilities/generateInvoicePDF'
+import { getOrCreateOrderInvoice } from '@/utilities/getOrCreateOrderInvoice'
 
 export const sendAdminNotificationEmail: CollectionAfterChangeHook = async ({
   doc,
@@ -33,145 +33,12 @@ export const sendAdminNotificationEmail: CollectionAfterChangeHook = async ({
   }
 
   try {
-    // 1. Get customer name & email
-    let toEmail = doc.customerEmail
-    let customerName = ''
-
-    if (doc.customer) {
-      const customerID = typeof doc.customer === 'object' ? doc.customer.id : doc.customer
-      const customer = await payload.findByID({
-        collection: 'users',
-        id: customerID,
-        req,
-      })
-      if (customer) {
-        toEmail = toEmail || customer.email
-        customerName = customer.name || ''
-      }
-    }
-
-    const addr = doc.shippingAddress || {}
-    if (addr.firstName || addr.lastName) {
-      customerName = [addr.firstName, addr.lastName].filter(Boolean).join(' ')
-    }
-
-    // 2. Resolve items, prices, and variants
-    const resolvedItems = []
-    if (doc.items && Array.isArray(doc.items)) {
-      for (const item of doc.items) {
-        const productID = typeof item.product === 'object' ? item.product.id : item.product
-        const variantID = typeof item.variant === 'object' ? item.variant?.id : item.variant
-
-        let title = 'Product'
-        let price = 0
-        let variantOptionsText = ''
-
-        if (productID) {
-          const product = await payload.findByID({
-            collection: 'products',
-            id: productID,
-            req,
-          })
-          if (product) {
-            title = product.title
-            price = product.priceInUSD || 0
-          }
-
-          if (variantID && product?.variants?.docs) {
-            const variantObj = product.variants.docs.find(
-              (v: any) => v.id === variantID || v._id === variantID,
-            ) as any
-            if (variantObj) {
-              price = variantObj.priceInUSD || price
-              if (variantObj.options && Array.isArray(variantObj.options)) {
-                variantOptionsText = variantObj.options
-                  .map((opt: any) => (typeof opt === 'object' ? opt.label : opt))
-                  .join(', ')
-              }
-            }
-          }
-        }
-
-        resolvedItems.push({
-          title,
-          variantOptionsText,
-          quantity: item.quantity,
-          price,
-          total: price * item.quantity,
-        })
-      }
-    }
-
-    // 3. Format Date
-    const formattedDate = new Date(doc.createdAt).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-
-    // 4. Payment method label
-    const paymentMethodLabel =
-      doc.paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 'Pay Using UPI'
-
-    // 5. Calculate Subtotal, COD Fee, and Total
-    const codFee = doc.paymentMethod === 'cod' ? 2500 : 0
-    const subtotal = doc.amount - codFee
-
-    // 6. Get billing address from transaction if possible
-    let billingAddress = doc.shippingAddress || {}
-    let billingName = customerName
-
-    if (doc.transactions && doc.transactions.length > 0) {
-      const firstTx = doc.transactions[0]
-      const txID = typeof firstTx === 'object' ? firstTx.id : firstTx
-      try {
-        const transaction = await payload.findByID({
-          collection: 'transactions',
-          id: txID,
-          req,
-        })
-        if (transaction && transaction.billingAddress) {
-          billingAddress = transaction.billingAddress
-          if (billingAddress.firstName || billingAddress.lastName) {
-            billingName = [billingAddress.firstName, billingAddress.lastName].filter(Boolean).join(' ')
-          }
-        }
-      } catch (error) {
-        payload.logger.error(`Error fetching transaction for billing address in admin notification: ${error}`)
-      }
-    }
-
-    // 7. Generate Invoice PDF Buffer
-    const pdfBuffer = await generateInvoicePDF({
-      orderId: doc.id,
-      date: formattedDate,
-      paymentMethodLabel,
+    const {
+      pdfBuffer,
+      toEmail,
       customerName,
-      customerEmail: toEmail || '',
-      shippingAddress: {
-        addressLine1: addr.addressLine1 || '',
-        addressLine2: addr.addressLine2 || '',
-        city: addr.city || '',
-        state: addr.state || '',
-        postalCode: addr.postalCode || '',
-        country: addr.country || '',
-        phone: addr.phone || '',
-      },
-      billingName,
-      billingAddress: {
-        addressLine1: billingAddress.addressLine1 || '',
-        addressLine2: billingAddress.addressLine2 || '',
-        city: billingAddress.city || '',
-        state: billingAddress.state || '',
-        postalCode: billingAddress.postalCode || '',
-        country: billingAddress.country || '',
-        phone: billingAddress.phone || '',
-      },
-      items: resolvedItems,
-      subtotal,
-      codFee,
-      totalAmount: doc.amount,
-    })
+      paymentMethodLabel,
+    } = await getOrCreateOrderInvoice(doc, req)
 
     // 8. Construct Dashboard Order URL
     const serverURL = getServerSideURL()

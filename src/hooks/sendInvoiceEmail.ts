@@ -16,6 +16,7 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, op
         paymentMethodLabel,
         subtotal,
         codFee,
+        discountAmount,
       } = await getOrCreateOrderInvoice(doc, req)
 
       if (!toEmail) {
@@ -275,6 +276,14 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, op
                   <span>Subtotal</span>
                   <span>₹${subtotalFormatted}</span>
                 </div>
+                ${
+                  discountAmount > 0
+                    ? `<div class="summary-row" style="color: #10b981;">
+                        <span>Discount</span>
+                        <span>- ₹${(discountAmount / 100).toFixed(2)}</span>
+                      </div>`
+                    : ''
+                }
                 ${
                   doc.paymentMethod === 'cod'
                     ? `<div class="summary-row">
