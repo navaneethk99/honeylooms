@@ -166,7 +166,7 @@ export default async function HomePage() {
             },
             {
               collections: {
-                contains: collectionDoc.id,
+                equals: collectionDoc.id,
               },
             },
           ],

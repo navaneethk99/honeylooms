@@ -108,7 +108,7 @@ export default async function CollectionSlugPage({ params }: Args) {
         },
         {
           collections: {
-            contains: collection.id,
+            equals: collection.id,
           },
         },
       ],

@@ -23,18 +23,6 @@ export default async function ShopPage({ searchParams }: Props) {
     collection: 'products',
     draft: false,
     overrideAccess: false,
-    select: {
-      title: true,
-      slug: true,
-      gallery: true,
-      categories: true,
-      collections: true,
-      priceInUSD: true,
-      variants: true,
-      onSale: true,
-      salePrice: true,
-      discountPercentage: true,
-    },
     ...(sort ? { sort } : { sort: 'title' }),
     ...(searchValue || category || collection
       ? {
@@ -67,7 +55,7 @@ export default async function ShopPage({ searchParams }: Props) {
                 ? [
                     {
                       categories: {
-                        contains: category,
+                        equals: category,
                       },
                     },
                   ]
@@ -76,7 +64,7 @@ export default async function ShopPage({ searchParams }: Props) {
                 ? [
                     {
                       collections: {
-                        contains: collection,
+                        equals: collection,
                       },
                     },
                   ]
