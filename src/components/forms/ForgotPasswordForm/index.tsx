@@ -25,16 +25,13 @@ export const ForgotPasswordForm: React.FC = () => {
   } = useForm<FormData>()
 
   const onSubmit = useCallback(async (data: FormData) => {
-    const response = await fetch(
-      '/api/users/forgot-password',
-      {
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
+    const response = await fetch('/api/users/forgot-password', {
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+      method: 'POST',
+    })
 
     if (response.ok) {
       setSuccess(true)
@@ -52,11 +49,11 @@ export const ForgotPasswordForm: React.FC = () => {
         <React.Fragment>
           <h1 className="text-xl mb-4">Forgot Password</h1>
           <div className="prose dark:prose-invert mb-8">
-            <p>
+            {/*<p>
               {`Please enter your email below. You will receive an email message with instructions on
               how to reset your password. To manage your all users, `}
               <Link href="/admin/collections/users">login to the admin dashboard</Link>.
-            </p>
+            </p>*/}
           </div>
           <form className="max-w-lg" onSubmit={handleSubmit(onSubmit)}>
             <Message className="mb-8" error={error} />

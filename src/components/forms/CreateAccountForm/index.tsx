@@ -74,10 +74,10 @@ export const CreateAccountForm: React.FC = () => {
   return (
     <form className="max-w-lg py-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="prose dark:prose-invert mb-6">
-        <p>
+        {/*<p>
           {`This is where new customers can signup and create a new account. To manage all users, `}
           <Link href="/admin/collections/users">login to the admin dashboard</Link>.
-        </p>
+        </p>*/}
       </div>
 
       <Message error={error} />
