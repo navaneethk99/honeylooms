@@ -51,14 +51,7 @@ export function LottieLoader({
             ? 'fixed inset-0 z-[9999] bg-[#D9A322]'
             : className,
         )}
-      >
-        <div
-          className={cn(
-            'animate-pulse rounded-full bg-white/30',
-            sizeClasses[size === 'full' ? 'xl' : size],
-          )}
-        />
-      </div>
+      />
     )
   }
 

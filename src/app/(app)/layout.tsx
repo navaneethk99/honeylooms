@@ -10,6 +10,7 @@ import { InitTheme } from '@/providers/Theme/InitTheme'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import React from 'react'
+import { LottiePrefetcher } from '@/components/LottiePrefetcher'
 import './globals.css'
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
@@ -56,6 +57,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <Providers>
           <AdminBar />
           <LivePreviewListener />
+          <LottiePrefetcher />
 
           <Header />
           <main className="flex-1 bg-white text-black">{children}</main>
