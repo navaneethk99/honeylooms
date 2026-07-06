@@ -93,7 +93,8 @@ export const AccountForm: React.FC = () => {
     <form className="max-w-xl" onSubmit={handleSubmit(onSubmit)}>
       {!changePassword ? (
         <Fragment>
-          <div className="prose dark:prose-invert mb-8">
+          <p className='mb-8'>Change your account details below</p>
+          {/*<div className="prose dark:prose-invert mb-8">
             <p className="">
               {'Change your account details below, or '}
               <Button
@@ -106,7 +107,7 @@ export const AccountForm: React.FC = () => {
               </Button>
               {' to change your password.'}
             </p>
-          </div>
+          </div>*/}
 
           <div className="flex flex-col gap-8 mb-8">
             <FormItem>
