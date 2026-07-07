@@ -9,7 +9,7 @@ const defaultOpenGraph: Metadata['openGraph'] = {
     'Discover handcrafted Indian clothing that blends timeless craftsmanship with contemporary style. Made with premium fabrics and designed to last.',
   images: [
     {
-      url: '/logo.svg',
+      url: 'https://honeylooms.in/logo.svg',
       width: 1200,
       height: 630,
       alt: 'Honeylooms',
