@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
+import { RecentlyViewedTracker } from '@/components/RecentlyViewed'
 
 type Args = {
   params: Promise<{
@@ -118,6 +119,7 @@ export default async function ProductPage({ params }: Args) {
         }}
         type="application/ld+json"
       />
+      <RecentlyViewedTracker product={product} />
       <div className="container max-w-7xl pt-10 pb-20">
         <Link 
           href="/shop" 

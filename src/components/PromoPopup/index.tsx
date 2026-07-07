@@ -17,7 +17,13 @@ export function PromoPopup() {
   useEffect(() => {
     if (!ENABLE_PROMO_POPUP) return
 
+    // Check if the user has already seen the popup in the current session
+    const isShown = sessionStorage.getItem('honeylooms_promo_shown')
+    if (isShown === 'true') return
+
     setOpen(true)
+    sessionStorage.setItem('honeylooms_promo_shown', 'true')
+
     // Smallest possible tick to allow the DOM to register open before animating visibility
     const timer = setTimeout(() => {
       setIsVisible(true)

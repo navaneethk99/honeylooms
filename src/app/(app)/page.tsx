@@ -13,6 +13,7 @@ import { ProductGridItem } from '@/components/ProductGridItem'
 import { generateMeta } from '@/utilities/generateMeta'
 import type { Metadata } from 'next'
 import { PromoPopup } from '@/components/PromoPopup'
+import { RecentlyViewedList } from '@/components/RecentlyViewed'
 import { DomeGalleryWrapper as DomeGallery } from '@/components/DomeGallery/DomeGalleryWrapper'
 import {
   Carousel,
@@ -189,6 +190,7 @@ export default async function HomePage() {
 
       {/* Carousel of items from each collection */}
       <div className="bg-background">
+        <RecentlyViewedList />
         {collectionsWithProducts.map(({ collection, products }) => {
           if (!products || products.length === 0) return null
 
