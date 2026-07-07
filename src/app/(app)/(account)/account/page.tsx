@@ -56,16 +56,20 @@ export default async function AccountPage() {
       <div>
         <div className="flex items-center justify-between mb-6 pb-2 border-b border-neutral-100 dark:border-neutral-900">
           <h2 className="text-xl font-semibold">Recent Orders</h2>
-          <Button asChild variant="link" className="px-0 text-sm hover:underline hover:no-underline underline-offset-4 text-neutral-500 hover:text-neutral-950 dark:hover:text-neutral-50 font-mono uppercase tracking-wider text-xs">
+          <Button
+            asChild
+            variant="link"
+            className="px-0 text-sm hover:underline hover:no-underline underline-offset-4 text-neutral-500 hover:text-neutral-950 dark:hover:text-neutral-50 font-mono uppercase tracking-wider text-xs"
+          >
             <Link href="/orders">View all orders</Link>
           </Button>
         </div>
 
         <div className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
-          <p>
+          {/*<p>
             These are the most recent orders you have placed. Each order is associated with a
             payment. As you place more orders, they will appear in your orders list.
-          </p>
+          </p>*/}
         </div>
 
         {(!orders || !Array.isArray(orders) || orders?.length === 0) && (

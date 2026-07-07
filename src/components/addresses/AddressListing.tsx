@@ -1,8 +1,49 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useAddresses } from '@payloadcms/plugin-ecommerce/client/react'
 import { AddressItem } from '@/components/addresses/AddressItem'
+import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import type { DefaultDocumentIDType } from 'payload'
+
+const DeleteAddressButton: React.FC<{ addressID: DefaultDocumentIDType }> = ({ addressID }) => {
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this address?')) {
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      const res = await fetch(`/api/addresses/${addressID}`, {
+        method: 'DELETE',
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to delete address')
+      }
+
+      toast.success('Address deleted successfully.')
+      window.location.reload()
+    } catch (error) {
+      toast.error('Could not delete address. Please try again.')
+      setIsDeleting(false)
+    }
+  }
+
+  return (
+    <button
+      size="sm"
+      disabled={isDeleting}
+      onClick={handleDelete}
+      className="w-full bg-transparent text-red-500 text-sm hover:cursor-pointer"
+    >
+      {isDeleting ? 'Deleting...' : 'Delete'}
+    </button>
+  )
+}
 
 export const AddressListing: React.FC = () => {
   const { addresses } = useAddresses()
@@ -16,7 +57,10 @@ export const AddressListing: React.FC = () => {
       <ul className="flex flex-col gap-8">
         {addresses.map((address) => (
           <li key={address.id} className="border-b pb-8 last:border-none">
-            <AddressItem address={address} />
+            <AddressItem
+              address={address}
+              afterActions={address.id ? <DeleteAddressButton addressID={address.id} /> : null}
+            />
           </li>
         ))}
       </ul>
