@@ -230,6 +230,18 @@ export default async function Order({ params, searchParams }: PageProps) {
             </div>
           </div>
         )}
+
+        {/* Request Return/Refund Link */}
+        {order.status === 'completed' && (
+          <div className="mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-900 flex justify-end">
+            <Link
+              href={`/account/refunds?orderId=${order.id}${email ? `&email=${encodeURIComponent(email)}` : ''}${accessToken ? `&accessToken=${encodeURIComponent(accessToken)}` : ''}`}
+              className="text-[11px] text-neutral-400 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline font-mono uppercase tracking-widest transition-colors duration-300"
+            >
+              Request a Return or Refund
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

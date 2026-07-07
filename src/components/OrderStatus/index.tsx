@@ -14,14 +14,16 @@ export const OrderStatus: React.FC<Props> = ({ status, className }) => {
         className,
         {
           'bg-primary/10': status === 'processing',
-          'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300': status === 'confirmed',
+          'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300':
+            status === 'confirmed' || status === 'refund_requested',
           'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300': status === 'shipped',
-          'bg-success': status === 'completed',
-          'bg-destructive/10 text-destructive': status === 'cancelled' || status === 'refunded',
+          'bg-success': status === 'completed' || status === 'refund_approved',
+          'bg-destructive/10 text-destructive':
+            status === 'cancelled' || status === 'refunded' || status === 'refund_rejected',
         },
       )}
     >
-      {status}
+      {status?.replace('_', ' ')}
     </div>
   )
 }

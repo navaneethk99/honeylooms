@@ -34,14 +34,15 @@ const DeleteAddressButton: React.FC<{ addressID: DefaultDocumentIDType }> = ({ a
   }
 
   return (
-    <button
+    <Button
+      variant="destructive"
       size="sm"
       disabled={isDeleting}
       onClick={handleDelete}
-      className="w-full bg-transparent text-red-500 text-sm hover:cursor-pointer"
+      className="w-full"
     >
       {isDeleting ? 'Deleting...' : 'Delete'}
-    </button>
+    </Button>
   )
 }
 

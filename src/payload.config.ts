@@ -21,6 +21,7 @@ import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
 import { PromoCodes } from '@/collections/PromoCodes'
+import { Refunds } from '@/collections/Refunds'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { FeaturedOutfits } from '@/globals/FeaturedOutfits'
@@ -43,7 +44,7 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Pages, Categories, Media, Collections, PromoCodes],
+  collections: [Users, Pages, Categories, Media, Collections, PromoCodes, Refunds],
   db: postgresAdapter({
     pool: {
       connectionString: getDatabaseURL(process.env.DATABASE_URL),

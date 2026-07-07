@@ -10,7 +10,19 @@
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "OrderStatus".
  */
-export type OrderStatus = ('processing' | 'confirmed' | 'shipped' | 'completed' | 'cancelled' | 'refunded') | null;
+export type OrderStatus =
+  | (
+      | 'processing'
+      | 'confirmed'
+      | 'shipped'
+      | 'completed'
+      | 'refund_requested'
+      | 'refund_approved'
+      | 'refund_rejected'
+      | 'cancelled'
+      | 'refunded'
+    )
+  | null;
 /**
  * Supported timezones in IANA format.
  *
@@ -78,6 +90,7 @@ export interface Config {
     media: Media;
     collections: Collection;
     'promo-codes': PromoCode;
+    refunds: Refund;
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
@@ -113,6 +126,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     collections: CollectionsSelect<false> | CollectionsSelect<true>;
     'promo-codes': PromoCodesSelect<false> | PromoCodesSelect<true>;
+    refunds: RefundsSelect<false> | RefundsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
@@ -1078,6 +1092,23 @@ export interface PromoCode {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "refunds".
+ */
+export interface Refund {
+  id: number;
+  order: number | Order;
+  reason: 'size_issue' | 'manufacturing_defect';
+  explanation: string;
+  contactEmail: string;
+  contactPhone: string;
+  resolution: 'original_payment' | 'replacement';
+  images?: (number | Media)[] | null;
+  status?: ('pending' | 'approved' | 'rejected') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1140,6 +1171,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'promo-codes';
         value: number | PromoCode;
+      } | null)
+    | ({
+        relationTo: 'refunds';
+        value: number | Refund;
       } | null)
     | ({
         relationTo: 'forms';
@@ -1477,6 +1512,22 @@ export interface PromoCodesSelect<T extends boolean = true> {
   maxDiscount?: T;
   minOrderValue?: T;
   active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "refunds_select".
+ */
+export interface RefundsSelect<T extends boolean = true> {
+  order?: T;
+  reason?: T;
+  explanation?: T;
+  contactEmail?: T;
+  contactPhone?: T;
+  resolution?: T;
+  images?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
