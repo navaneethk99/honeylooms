@@ -12,6 +12,7 @@ import { HomepageAnimation } from '@/components/HomepageAnimation'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { generateMeta } from '@/utilities/generateMeta'
 import type { Metadata } from 'next'
+import { PromoPopup } from '@/components/PromoPopup'
 import { DomeGalleryWrapper as DomeGallery } from '@/components/DomeGallery/DomeGalleryWrapper'
 import {
   Carousel,
@@ -252,6 +253,7 @@ export default async function HomePage() {
         )}
         */}
       </div>
+      <PromoPopup />
     </article>
   )
 }
