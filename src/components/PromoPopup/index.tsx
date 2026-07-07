@@ -17,11 +17,11 @@ export function PromoPopup() {
   useEffect(() => {
     if (!ENABLE_PROMO_POPUP) return
 
-    // Trigger popup after a small delay for a premium experience
+    setOpen(true)
+    // Smallest possible tick to allow the DOM to register open before animating visibility
     const timer = setTimeout(() => {
-      setOpen(true)
-      setTimeout(() => setIsVisible(true), 50)
-    }, 1000)
+      setIsVisible(true)
+    }, 10)
 
     return () => clearTimeout(timer)
   }, [])
