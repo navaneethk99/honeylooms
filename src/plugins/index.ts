@@ -143,6 +143,24 @@ export const plugins: Plugin[] = [
             sendOrderStatusEmail,
             sendAdminNotificationEmail,
           ],
+          beforeDelete: [
+            ...(defaultCollection?.hooks?.beforeDelete || []),
+            async ({ req, id }) => {
+              try {
+                await req.payload.delete({
+                  collection: 'refunds',
+                  where: {
+                    order: {
+                      equals: id,
+                    },
+                  },
+                  req,
+                })
+              } catch (err) {
+                req.payload.logger.error(`Error deleting associated refunds for order #${id}: ${err}`)
+              }
+            },
+          ],
         },
         endpoints: [
           ...(defaultCollection.endpoints || []),

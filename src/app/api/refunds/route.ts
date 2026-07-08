@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import crypto from 'crypto'
+import {
+  REST_DELETE,
+  REST_GET,
+  REST_OPTIONS,
+  REST_PATCH,
+  REST_PUT,
+} from '@payloadcms/next/routes'
 
 export async function POST(request: Request) {
   try {
@@ -112,4 +119,54 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
+}
+
+export async function GET(request: Request, context: any) {
+  return REST_GET(configPromise)(request, {
+    ...context,
+    params: {
+      ...context?.params,
+      slug: ['refunds'],
+    },
+  })
+}
+
+export async function DELETE(request: Request, context: any) {
+  return REST_DELETE(configPromise)(request, {
+    ...context,
+    params: {
+      ...context?.params,
+      slug: ['refunds'],
+    },
+  })
+}
+
+export async function PATCH(request: Request, context: any) {
+  return REST_PATCH(configPromise)(request, {
+    ...context,
+    params: {
+      ...context?.params,
+      slug: ['refunds'],
+    },
+  })
+}
+
+export async function PUT(request: Request, context: any) {
+  return REST_PUT(configPromise)(request, {
+    ...context,
+    params: {
+      ...context?.params,
+      slug: ['refunds'],
+    },
+  })
+}
+
+export async function OPTIONS(request: Request, context: any) {
+  return REST_OPTIONS(configPromise)(request, {
+    ...context,
+    params: {
+      ...context?.params,
+      slug: ['refunds'],
+    },
+  })
 }

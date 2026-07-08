@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload'
+import { revalidateTag } from 'next/cache'
 import { adminOnly } from '@/access/adminOnly'
 
 export const FeaturedOutfits: GlobalConfig = {
@@ -6,6 +7,15 @@ export const FeaturedOutfits: GlobalConfig = {
   access: {
     read: () => true,
     update: adminOnly,
+  },
+  hooks: {
+    afterChange: [
+      ({ doc, req: { payload } }) => {
+        payload.logger.info(`Revalidating featured-outfits global...`)
+        revalidateTag('global_featured-outfits', 'max')
+        return doc
+      },
+    ],
   },
   fields: [
     {
