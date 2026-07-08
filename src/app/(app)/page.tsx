@@ -15,6 +15,7 @@ import type { Metadata } from 'next'
 import { PromoPopup } from '@/components/PromoPopup'
 import { RecentlyViewedList } from '@/components/RecentlyViewed'
 import { DomeGalleryWrapper as DomeGallery } from '@/components/DomeGallery/DomeGalleryWrapper'
+import { InstagramReels } from '@/components/InstagramReels'
 import {
   Carousel,
   CarouselContent,
@@ -75,7 +76,12 @@ export default async function HomePage() {
         const urls: string[] = []
         if (product.gallery && product.gallery.length > 0) {
           product.gallery.forEach((item) => {
-            if (item.image && typeof item.image === 'object' && 'url' in item.image && item.image.url) {
+            if (
+              item.image &&
+              typeof item.image === 'object' &&
+              'url' in item.image &&
+              item.image.url
+            ) {
               urls.push(item.image.url)
             }
           })
@@ -183,6 +189,19 @@ export default async function HomePage() {
     }),
   )
 
+  let instagramReelUrls: string[] = []
+  try {
+    const instagramReelsGlobal = await getCachedGlobal('instagram-reels', 0)()
+    if (instagramReelsGlobal?.reels && instagramReelsGlobal.reels.length > 0) {
+      instagramReelUrls = instagramReelsGlobal.reels
+        .map((reel) => reel.url)
+        .filter((url): url is string => typeof url === 'string' && url.trim().length > 0)
+        .slice(0, 4)
+    }
+  } catch (error) {
+    console.error('Error loading Instagram reels global:', error)
+  }
+
   return (
     <article className="pb-24">
       {/* GSAP ScrollTrigger Intro Animation */}
@@ -215,7 +234,10 @@ export default async function HomePage() {
                 <Carousel className="w-full" opts={{ loop: true }}>
                   <CarouselContent className="-ml-4 md:-ml-6">
                     {products.map((product) => (
-                      <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-1/2 md:basis-1/3">
+                      <CarouselItem
+                        key={product.id}
+                        className="pl-4 md:pl-6 basis-1/2 md:basis-1/3"
+                      >
                         <div className="h-full w-full">
                           <ProductGridItem product={product} />
                         </div>
@@ -229,6 +251,8 @@ export default async function HomePage() {
             </section>
           )
         })}
+
+        <InstagramReels urls={instagramReelUrls} />
 
         {/* Dome Gallery Section
         {domeImages.length > 0 && (

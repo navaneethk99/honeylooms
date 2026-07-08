@@ -150,12 +150,14 @@ export interface Config {
     header: Header;
     footer: Footer;
     'featured-outfits': FeaturedOutfit;
+    'instagram-reels': InstagramReel;
     'promo-banner': PromoBanner;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'featured-outfits': FeaturedOutfitsSelect<false> | FeaturedOutfitsSelect<true>;
+    'instagram-reels': InstagramReelsSelect<false> | InstagramReelsSelect<true>;
     'promo-banner': PromoBannerSelect<false> | PromoBannerSelect<true>;
   };
   locale: null;
@@ -2006,6 +2008,22 @@ export interface FeaturedOutfit {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagram-reels".
+ */
+export interface InstagramReel {
+  id: number;
+  /**
+   * Add exactly 4 Instagram reel URLs from @honeylooms. Replace a URL here to update the home page preview.
+   */
+  reels: {
+    url: string;
+    id?: string | null;
+  }[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "promo-banner".
  */
 export interface PromoBanner {
@@ -2073,6 +2091,21 @@ export interface FooterSelect<T extends boolean = true> {
  */
 export interface FeaturedOutfitsSelect<T extends boolean = true> {
   outfits?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagram-reels_select".
+ */
+export interface InstagramReelsSelect<T extends boolean = true> {
+  reels?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
