@@ -1,3 +1,18 @@
+'use client'
+
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import * as React from 'react'
+
+import { Button } from '@/components/ui/button'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  useCarousel,
+  type CarouselApi,
+} from '@/components/ui/carousel'
+import { cn } from '@/utilities/cn'
+
 type InstagramReelsProps = {
   urls: string[]
 }
@@ -27,7 +42,60 @@ const getInstagramEmbedUrl = (url: string) => {
   }
 }
 
+const CarouselPreviousMobile = () => {
+  const { scrollPrev } = useCarousel()
+  return (
+    <button
+      type="button"
+      className="flex h-10 w-10 items-center justify-center text-neutral-500 hover:text-neutral-800 active:text-neutral-950 dark:text-neutral-400 dark:hover:text-neutral-100 dark:active:text-neutral-50 transition-colors"
+      onClick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        scrollPrev()
+      }}
+      aria-label="Previous Instagram reel"
+    >
+      <ChevronLeft className="h-7 w-7" />
+    </button>
+  )
+}
+
+const CarouselNextMobile = () => {
+  const { scrollNext } = useCarousel()
+  return (
+    <button
+      type="button"
+      className="flex h-10 w-10 items-center justify-center text-neutral-500 hover:text-neutral-800 active:text-neutral-950 dark:text-neutral-400 dark:hover:text-neutral-100 dark:active:text-neutral-50 transition-colors"
+      onClick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        scrollNext()
+      }}
+      aria-label="Next Instagram reel"
+    >
+      <ChevronRight className="h-7 w-7" />
+    </button>
+  )
+}
+
+const CAROUSEL_OPTIONS = { loop: true }
+
 export const InstagramReels = ({ urls }: InstagramReelsProps) => {
+  const [carouselApi, setCarouselApi] = React.useState<CarouselApi>()
+  const [activeIndex, setActiveIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    if (!carouselApi) return
+    const onSelect = () => {
+      setActiveIndex(carouselApi.selectedScrollSnap())
+    }
+    carouselApi.on('select', onSelect)
+    onSelect()
+    return () => {
+      carouselApi.off('select', onSelect)
+    }
+  }, [carouselApi])
+
   const reels = urls
     .map((url) => ({
       embedUrl: getInstagramEmbedUrl(url),
@@ -58,19 +126,59 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
         </a>
       </div>
 
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {reels.map((reel, index) => (
-          <div key={`${reel.embedUrl}-${index}`} className="flex justify-center bg-background">
-            <iframe
-              src={reel.embedUrl}
-              title={`Honeylooms Instagram reel ${index + 1}`}
-              className="h-[580px] w-full max-w-[360px]"
-              loading="lazy"
-              scrolling="no"
-              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            />
+      <div className="px-0 md:px-12">
+        <Carousel className="w-full" opts={CAROUSEL_OPTIONS} setApi={setCarouselApi}>
+          <div className="relative">
+            {/* Mobile arrow keys positioned on the sides */}
+            <div className="absolute inset-y-0 left-2 z-30 flex items-center md:hidden">
+              <CarouselPreviousMobile />
+            </div>
+            <div className="absolute inset-y-0 right-2 z-30 flex items-center md:hidden">
+              <CarouselNextMobile />
+            </div>
+
+            <CarouselContent className="-ml-4 md:-ml-6">
+              {reels.map((reel, index) => {
+                const isActive = index === activeIndex
+                return (
+                  <CarouselItem
+                    key={`${reel.embedUrl}-${index}`}
+                    className="basis-[76%] pl-4 sm:basis-1/2 md:pl-6 lg:basis-1/4"
+                  >
+                    <div
+                      className={cn(
+                        "w-full transition-all duration-300 ease-in-out",
+                        isActive
+                          ? "opacity-100 scale-100 blur-none"
+                          : "opacity-40 scale-95 blur-[2px] pointer-events-none md:opacity-100 md:scale-100 md:blur-none md:pointer-events-auto"
+                      )}
+                    >
+                      <div className="flex justify-center bg-background">
+                        <div className="relative w-full max-w-[360px] h-[580px]">
+                          <iframe
+                            src={reel.embedUrl}
+                            title={`Honeylooms Instagram reel ${index + 1}`}
+                            className="h-full w-full"
+                            loading="lazy"
+                            scrolling="no"
+                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                          />
+                          <a
+                            href={reel.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="absolute inset-0 z-10 block cursor-pointer"
+                            aria-label={`Open Instagram reel ${index + 1} on Instagram`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </CarouselItem>
+                )
+              })}
+            </CarouselContent>
           </div>
-        ))}
+        </Carousel>
       </div>
     </section>
   )

@@ -25,8 +25,9 @@ export function RecentlyViewedList() {
         if (rawData) {
           const ids = JSON.parse(rawData)
           if (Array.isArray(ids) && ids.length > 0) {
-            const products = await fetchProductsByIds(ids)
-            setItems(products)
+            const slicedIds = ids.slice(0, 4)
+            const products = await fetchProductsByIds(slicedIds)
+            setItems(products.slice(0, 4))
           }
         }
       } catch (e) {
@@ -57,7 +58,7 @@ export function RecentlyViewedList() {
             {items.map((product) => (
               <CarouselItem
                 key={product.id}
-                className="pl-4 md:pl-6 basis-1/2 sm:basis-1/3 md:basis-1/6"
+                className="pl-4 md:pl-6 basis-1/2 sm:basis-1/3 md:basis-1/4"
               >
                 <div className="h-full w-full">
                   <ProductGridItem product={product} />
@@ -65,7 +66,7 @@ export function RecentlyViewedList() {
               </CarouselItem>
             ))}
           </CarouselContent>
-          {items.length > 6 && (
+          {items.length > 4 && (
             <>
               <CarouselPrevious className="hidden md:flex" />
               <CarouselNext className="hidden md:flex" />

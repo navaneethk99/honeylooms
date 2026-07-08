@@ -27,8 +27,8 @@ export function RecentlyViewedTracker({ product }: Props) {
       // Add to front of list
       list.unshift(product.id)
 
-      // Keep only the last 6 viewed items
-      list = list.slice(0, 6)
+      // Keep only the last 4 viewed items
+      list = list.slice(0, 4)
 
       localStorage.setItem(storageKey, JSON.stringify(list))
     } catch (e) {
