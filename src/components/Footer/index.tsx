@@ -20,7 +20,7 @@ export async function Footer() {
   return (
     <footer className="text-sm text-neutral-500 dark:text-neutral-400">
       <div className="container">
-        <div className="flex w-full flex-col gap-6 border-t border-neutral-200 py-12 text-sm md:flex-row md:gap-12 dark:border-neutral-700">
+        <div className="flex w-full flex-col gap-6 border-t border-neutral-200 py-8 text-sm md:flex-row md:gap-12 dark:border-neutral-700">
           <div>
             <Link className="flex items-center gap-2 text-black md:pt-1 dark:text-white" href="/">
               <LogoIcon className="w-45 h-auto" />
@@ -29,13 +29,17 @@ export async function Footer() {
           </div>
           <Suspense
             fallback={
-              <div className="flex h-[188px] w-[200px] flex-col gap-2">
-                <div className={skeleton} />
-                <div className={skeleton} />
-                <div className={skeleton} />
-                <div className={skeleton} />
-                <div className={skeleton} />
-                <div className={skeleton} />
+              <div className="flex flex-wrap gap-10 md:gap-16">
+                <div className="flex w-[120px] flex-col gap-1.5">
+                  <div className={skeleton} />
+                  <div className={skeleton} />
+                  <div className={skeleton} />
+                  <div className={skeleton} />
+                </div>
+                <div className="flex w-[120px] flex-col gap-1.5">
+                  <div className={skeleton} />
+                  <div className={skeleton} />
+                </div>
               </div>
             }
           >

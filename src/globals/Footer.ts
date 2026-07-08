@@ -28,7 +28,6 @@ export const Footer: GlobalConfig = {
           appearances: false,
         }),
       ],
-      maxRows: 6,
     },
   ],
 }
