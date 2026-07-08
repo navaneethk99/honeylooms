@@ -12,6 +12,7 @@ import type { Header } from 'src/payload-types'
 import { LogoIcon } from '@/components/icons/logo'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/cn'
+import { SearchModal } from '@/components/Search'
 
 type Props = {
   header: Header
@@ -50,9 +51,9 @@ export function HeaderClient({ header }: Props) {
                       size={'clear'}
                       className={cn('relative navLink', {
                         active:
-                          item.link.url && item.link.url !== '/'
-                            ? pathname.includes(item.link.url)
-                            : false,
+                        item.link.url && item.link.url !== '/'
+                        ? pathname.includes(item.link.url)
+                        : false,
                       })}
                       appearance="nav"
                     />
@@ -62,7 +63,8 @@ export function HeaderClient({ header }: Props) {
             ) : null}
           </div>
 
-          <div className="flex justify-end md:w-auto md:shrink-0 gap-4">
+          <div className="flex items-center justify-end md:w-auto md:shrink-0 gap-4 pb-2.5 md:pb-0">
+            <SearchModal />
             <Suspense fallback={<OpenCartButton />}>
               <Cart />
             </Suspense>

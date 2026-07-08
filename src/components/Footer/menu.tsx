@@ -18,17 +18,35 @@ export function FooterMenu({ menu }: Props) {
 
   return (
     <nav className="flex flex-wrap gap-10 md:gap-16">
-      {chunks.map((chunk, chunkIndex) => (
-        <ul key={chunkIndex} className="flex flex-col gap-1i">
-          {chunk.map((item) => {
-            return (
-              <li key={item.id}>
-                <CMSLink appearance="link" {...item.link} />
-              </li>
-            )
-          })}
-        </ul>
-      ))}
+      {chunks.map((chunk, chunkIndex) => {
+        let title = null
+        if (chunkIndex === 0) {
+          title = 'Policies'
+        } else if (chunkIndex === 1) {
+          title = 'Useful Links'
+        } else if (chunkIndex === 2) {
+          title = 'Collections'
+        }
+
+        return (
+          <div key={chunkIndex} className="flex flex-col gap-3">
+            {title && (
+              <h3 className="font-semibold text-[#D9A322] underline text-md tracking-wide">
+                {title}
+              </h3>
+            )}
+            <ul className="flex flex-col gap-0">
+              {chunk.map((item) => {
+                return (
+                  <li key={item.id}>
+                    <CMSLink appearance="link" {...item.link} />
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )
+      })}
     </nav>
   )
 }

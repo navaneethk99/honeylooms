@@ -113,7 +113,7 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
       <div className="mb-10 flex flex-col justify-between border-b border-neutral-100 pb-5 dark:border-neutral-900 md:flex-row md:items-end">
         <div className="flex flex-col gap-1">
           <h2 className="font-sans text-3xl font-semibold uppercase tracking-tight text-neutral-900 dark:text-neutral-100 md:text-4xl">
-            From Instagram
+            From Our Instagram
           </h2>
         </div>
         <a
