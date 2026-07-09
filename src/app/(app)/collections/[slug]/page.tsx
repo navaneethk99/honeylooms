@@ -43,7 +43,7 @@ const getCachedCollectionBySlug = unstable_cache(
   ['collections'],
   {
     tags: ['collections'],
-  }
+  },
 )
 
 const queryCollectionBySlug = async ({ slug }: { slug: string }) => {
@@ -116,6 +116,9 @@ export default async function CollectionSlugPage({ params }: Args) {
   })
 
   const banner = collection.banner as MediaType | null | undefined
+  const spotifyPlaylistUrl = collection.spotifyPlaylistUrl?.trim()
+  const appleMusicPlaylistUrl = collection.appleMusicPlaylistUrl?.trim()
+  const hasPlaylistLinks = Boolean(spotifyPlaylistUrl || appleMusicPlaylistUrl)
 
   return (
     <div>
@@ -185,6 +188,60 @@ export default async function CollectionSlugPage({ params }: Args) {
                 <ProductGridItem key={product.id} product={product} />
               ))}
             </Grid>
+          </div>
+        )}
+
+        {hasPlaylistLinks && (
+          <div className="mt-14 border-t border-neutral-100 dark:border-neutral-900 pt-8">
+            <h1 className='text-center mb-5 text-xl font-medium'>Immerse yourself in the sound of {collection.title} with our carefully curated playlist :)</h1>
+
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+              {spotifyPlaylistUrl && (
+                <Link
+                  href={spotifyPlaylistUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Listen to the ${collection.title} playlist on Spotify`}
+                  className="inline-flex h-12 w-64 items-center justify-center gap-3 rounded-xl border border-neutral-700 bg-neutral-800 px-4 text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-neutral-900"
+                >
+                  <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.22em] text-white">
+                    Listen on
+                  </span>
+                  <img
+                    src="/Spotify_logo_with_text.svg.webp"
+                    alt=""
+                    width={110}
+                    height={26}
+                  />
+                </Link>
+              )}
+
+              {appleMusicPlaylistUrl && (
+                <Link
+                  href={appleMusicPlaylistUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Listen to the ${collection.title} playlist on Apple Music`}
+                  className="inline-flex h-12 w-64 items-center justify-center gap-3 rounded-xl border border-neutral-700 bg-neutral-800 px-4 text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-neutral-900"
+                >
+                  <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.22em] text-white">
+                    Listen on
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <img
+                      src="/Apple_Music_icon.svg.webp"
+                      alt=""
+                      width={26}
+                      height={26}
+                      className="h-[30px] w-[30px] rounded-md"
+                    />
+                    <span className="text-md font-semibold leading-none tracking-tight">
+                      Apple Music
+                    </span>
+                  </span>
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </div>

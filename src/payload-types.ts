@@ -939,6 +939,8 @@ export interface Collection {
   showOnHomePage?: boolean | null;
   poster: number | Media;
   banner: number | Media;
+  spotifyPlaylistUrl?: string | null;
+  appleMusicPlaylistUrl?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -1499,6 +1501,8 @@ export interface CollectionsSelect<T extends boolean = true> {
   showOnHomePage?: T;
   poster?: T;
   banner?: T;
+  spotifyPlaylistUrl?: T;
+  appleMusicPlaylistUrl?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;

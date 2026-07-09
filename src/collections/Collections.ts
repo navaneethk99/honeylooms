@@ -73,6 +73,16 @@ export const Collections: CollectionConfig = {
       relationTo: 'media',
       required: true,
     },
+    {
+      name: 'spotifyPlaylistUrl',
+      type: 'text',
+      label: 'Spotify Playlist URL',
+    },
+    {
+      name: 'appleMusicPlaylistUrl',
+      type: 'text',
+      label: 'Apple Music Playlist URL',
+    },
     slugField({
       position: undefined,
     }),
