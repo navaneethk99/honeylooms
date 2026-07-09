@@ -40,6 +40,41 @@ const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : 
     }),
 } */
 
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  metadataBase: new URL('https://honeylooms.in'),
+  title: {
+    default: 'Honeylooms | Handcrafted Indian Fashion',
+    template: '%s | Honeylooms',
+  },
+  description:
+    'Discover handcrafted Indian clothing that blends timeless craftsmanship with contemporary style.',
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    url: 'https://honeylooms.in',
+    siteName: 'Honeylooms',
+    title: 'Honeylooms | Handcrafted Indian Fashion',
+    description:
+      'Discover handcrafted Indian clothing that blends timeless craftsmanship with contemporary style.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Honeylooms',
+      },
+    ],
+  },
+}
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html

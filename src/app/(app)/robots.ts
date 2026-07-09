@@ -1,13 +1,35 @@
-/* eslint-disable no-restricted-exports */
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : 'http://localhost:3000'
+import type { MetadataRoute } from 'next'
 
-export default function robots() {
+import { getServerSideURL } from '@/utilities/getURL'
+
+/* eslint-disable no-restricted-exports */
+export default function robots(): MetadataRoute.Robots {
+  const baseUrl = getServerSideURL()
+
   return {
     host: baseUrl,
     rules: [
       {
+        allow: '/',
+        disallow: [
+          '/account',
+          '/account/',
+          '/admin',
+          '/admin/',
+          '/api',
+          '/api/',
+          '/checkout',
+          '/checkout/',
+          '/create-account',
+          '/find-order',
+          '/forgot-password',
+          '/login',
+          '/logout',
+          '/next',
+          '/next/',
+          '/orders',
+          '/orders/',
+        ],
         userAgent: '*',
       },
     ],
