@@ -89,6 +89,7 @@ export interface Config {
     categories: Category;
     media: Media;
     collections: Collection;
+    gallery: Gallery;
     'promo-codes': PromoCode;
     refunds: Refund;
     forms: Form;
@@ -125,6 +126,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     collections: CollectionsSelect<false> | CollectionsSelect<true>;
+    gallery: GallerySelect<false> | GallerySelect<true>;
     'promo-codes': PromoCodesSelect<false> | PromoCodesSelect<true>;
     refunds: RefundsSelect<false> | RefundsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -1082,6 +1084,30 @@ export interface Address {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery".
+ */
+export interface Gallery {
+  id: number;
+  alt?: string | null;
+  submittedBy?: string | null;
+  product?: (number | null) | Product;
+  source?: ('admin' | 'community') | null;
+  status?: ('pending' | 'approved' | 'rejected') | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "promo-codes".
  */
 export interface PromoCode {
@@ -1171,6 +1197,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'collections';
         value: number | Collection;
+      } | null)
+    | ({
+        relationTo: 'gallery';
+        value: number | Gallery;
       } | null)
     | ({
         relationTo: 'promo-codes';
@@ -1507,6 +1537,29 @@ export interface CollectionsSelect<T extends boolean = true> {
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery_select".
+ */
+export interface GallerySelect<T extends boolean = true> {
+  alt?: T;
+  submittedBy?: T;
+  product?: T;
+  source?: T;
+  status?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

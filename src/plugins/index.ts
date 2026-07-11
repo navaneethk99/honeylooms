@@ -55,6 +55,15 @@ export const plugins: Plugin[] = [
           return `${r2PublicURL}/${key}`
         },
       },
+      gallery: {
+        disablePayloadAccessControl: true,
+        generateFileURL: ({ filename, prefix }) => {
+          const key = prefix ? `${prefix}/${filename}` : filename
+
+          return `${r2PublicURL}/${key}`
+        },
+        prefix: 'gallery',
+      },
     },
     bucket: process.env.R2_BUCKET || '',
     config: {

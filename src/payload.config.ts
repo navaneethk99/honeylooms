@@ -17,6 +17,7 @@ import { fileURLToPath } from 'url'
 
 import { Categories } from '@/collections/Categories'
 import { Collections } from '@/collections/Collections'
+import { Gallery } from '@/collections/Gallery'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
@@ -45,7 +46,7 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Pages, Categories, Media, Collections, PromoCodes, Refunds],
+  collections: [Users, Pages, Categories, Media, Collections, Gallery, PromoCodes, Refunds],
   db: postgresAdapter({
     pool: {
       connectionString: getDatabaseURL(process.env.DATABASE_URL),
