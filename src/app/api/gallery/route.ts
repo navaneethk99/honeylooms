@@ -7,6 +7,12 @@ import configPromise from '@payload-config'
 const MAX_FILES = 10
 const MAX_FILE_SIZE = 50 * 1024 * 1024
 
+const isUploadedFile = (value: FormDataEntryValue): value is File =>
+  typeof value !== 'string' &&
+  typeof value.arrayBuffer === 'function' &&
+  typeof value.size === 'number' &&
+  value.size > 0
+
 const getExtension = (filename: string) => {
   const extension = filename.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '')
   return extension || 'upload'
@@ -17,9 +23,7 @@ export async function POST(request: Request) {
     const formData = await request.formData()
     const submittedBy = formData.get('name')?.toString().trim()
     const productID = formData.get('product')?.toString()
-    const files = formData
-      .getAll('files')
-      .filter((value): value is File => value instanceof File && value.size > 0)
+    const files = formData.getAll('files').filter(isUploadedFile)
 
     if (!submittedBy || submittedBy.length > 100 || !productID) {
       return NextResponse.json({ error: 'Please enter your name and select the item you purchased.' }, { status: 400 })
