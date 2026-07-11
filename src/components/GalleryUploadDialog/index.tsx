@@ -34,12 +34,14 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
   const [files, setFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const resetForm = () => {
     setName('')
     setProduct('')
     setFiles([])
     setIsSuccess(false)
+    setSubmitError('')
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -66,10 +68,13 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
     event.preventDefault()
 
     if (!name.trim() || !product || files.length === 0) {
-      toast.error('Add your name, the item you purchased, and at least one file.')
+      const error = 'Add your name, the item you purchased, and at least one file.'
+      setSubmitError(error)
+      toast.error(error)
       return
     }
 
+    setSubmitError('')
     setIsSubmitting(true)
     try {
       const formData = new FormData()
@@ -83,7 +88,9 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
 
       setIsSuccess(true)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Unable to send your submission.')
+      const message = error instanceof Error ? error.message : 'Unable to send your submission.'
+      setSubmitError(message)
+      toast.error(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -188,6 +195,7 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
               <Button className="w-full rounded-none" disabled={isSubmitting} type="submit">
                 {isSubmitting ? 'Sending...' : 'Send for review'}
               </Button>
+              {submitError && <p className="text-center text-sm text-destructive">{submitError}</p>}
             </form>
           </>
         )}

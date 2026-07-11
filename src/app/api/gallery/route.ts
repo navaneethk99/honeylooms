@@ -23,17 +23,29 @@ export async function POST(request: Request) {
     const formData = await request.formData()
     const submittedBy = formData.get('name')?.toString().trim()
     const productID = formData.get('product')?.toString()
-    const files = formData.getAll('files').filter(isUploadedFile)
+    const uploadedValues = formData.getAll('files')
+    const files = uploadedValues.filter(isUploadedFile)
 
     if (!submittedBy || submittedBy.length > 100 || !productID) {
+      console.warn('Rejected gallery submission: missing name or product', {
+        hasName: Boolean(submittedBy),
+        hasProduct: Boolean(productID),
+      })
       return NextResponse.json({ error: 'Please enter your name and select the item you purchased.' }, { status: 400 })
     }
 
     if (files.length === 0 || files.length > MAX_FILES) {
+      console.warn('Rejected gallery submission: invalid file count', {
+        acceptedFiles: files.length,
+        receivedFiles: uploadedValues.length,
+      })
       return NextResponse.json({ error: `Upload between 1 and ${MAX_FILES} images or videos.` }, { status: 400 })
     }
 
     if (files.some((file) => !/^(image|video)\//.test(file.type) || file.size > MAX_FILE_SIZE)) {
+      console.warn('Rejected gallery submission: unsupported file', {
+        files: files.map((file) => ({ size: file.size, type: file.type || 'unknown' })),
+      })
       return NextResponse.json(
         { error: 'Files must be images or videos no larger than 50 MB each.' },
         { status: 400 },
