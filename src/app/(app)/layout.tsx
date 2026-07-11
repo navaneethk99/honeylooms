@@ -6,9 +6,10 @@ import { Header } from '@/components/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ensureStartsWith } from '@/utilities/ensureStartsWith'
 import { Providers } from '@/providers'
-import { InitTheme } from '@/providers/Theme/InitTheme'
+import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/shared'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import Script from 'next/script'
 import React from 'react'
 import { LottiePrefetcher } from '@/components/LottiePrefetcher'
 import './globals.css'
@@ -83,7 +84,17 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       suppressHydrationWarning
     >
       <head>
-        <InitTheme />
+        <Script
+          dangerouslySetInnerHTML={{
+            __html: `(function () {
+              var theme = '${defaultTheme}'
+              window.localStorage.setItem('${themeLocalStorageKey}', theme)
+              document.documentElement.setAttribute('data-theme', theme)
+            })();`,
+          }}
+          id="theme-script"
+          strategy="beforeInteractive"
+        />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         <link rel="preload" href="/Cat.lottie" as="fetch" crossOrigin="anonymous" />

@@ -126,6 +126,7 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
                 }}
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 25vw, 33vw"
                 src={item.url}
+                unoptimized
               />
             )}
             {item.submittedBy && (

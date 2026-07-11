@@ -82,7 +82,7 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
       formData.append('product', product)
       files.forEach((file) => formData.append('files', file))
 
-      const response = await fetch('/api/gallery', { method: 'POST', body: formData })
+      const response = await fetch('/api/gallery/submit', { method: 'POST', body: formData })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Unable to send your submission.')
 
