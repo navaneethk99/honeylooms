@@ -3,6 +3,7 @@ import React from 'react'
 
 import { GalleryBentoGrid } from '@/components/GalleryBentoGrid'
 import { GalleryUploadDialog } from '@/components/GalleryUploadDialog'
+import type { Product } from '@/payload-types'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
@@ -25,7 +26,7 @@ export default async function GalleryPage() {
   const [gallery, products] = await Promise.all([
     payload.find({
       collection: 'gallery',
-      depth: 1,
+      depth: 2,
       limit: 100,
       overrideAccess: false,
       sort: '-createdAt',
@@ -64,10 +65,8 @@ export default async function GalleryPage() {
         id: item.id,
         mimeType: item.mimeType,
         previewUrl: getMediaUrl(item.sizes?.preview?.url),
-        products: (item.products || []).flatMap((product) =>
-          typeof product === 'object' && product.slug
-            ? [{ slug: product.slug, title: product.title || 'Untitled product' }]
-            : [],
+        products: (item.products || []).filter(
+          (product): product is Product => Boolean(product) && typeof product === 'object' && 'slug' in product,
         ),
         submittedBy: item.submittedBy,
         url,

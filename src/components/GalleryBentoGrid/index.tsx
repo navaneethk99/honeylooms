@@ -4,7 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { ProductGridItem } from '@/components/ProductGridItem'
+import type { Product } from '@/payload-types'
 
 type GalleryItem = {
   alt: string
@@ -12,10 +13,7 @@ type GalleryItem = {
   id: number
   mimeType?: string | null
   previewUrl?: string | null
-  products: {
-    slug: string
-    title: string
-  }[]
+  products: Product[]
   submittedBy?: string | null
   url: string
   width?: number | null
@@ -72,6 +70,17 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
 
     return () => observer.disconnect()
   }, [])
+
+  useEffect(() => {
+    if (!selectedItem) return
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSelectedItem(null)
+    }
+
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [selectedItem])
 
   const columns = packItems(items, ratios, columnCount)
 
@@ -163,24 +172,40 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
           })}
         </div>
       ))}
-      <Dialog
-        open={Boolean(selectedItem)}
-        onOpenChange={(open) => {
-          if (!open) setSelectedItem(null)
-        }}
-      >
-        {selectedItem && (
-          <DialogContent className="!w-auto !max-w-none overflow-visible border-0 bg-transparent p-0 shadow-none" showCloseButton={false}>
-            <DialogTitle className="sr-only">{selectedItem.alt}</DialogTitle>
-            <div className="gallery-look-card justify-self-center" key={selectedItem.id}>
-              <div className="gallery-look-card__inner">
-                <div className="gallery-look-card__face gallery-look-card__front">
-                  <button
-                    aria-label="Close look details"
-                    className="absolute inset-0 z-10 cursor-pointer"
-                    onClick={() => setSelectedItem(null)}
-                    type="button"
-                  />
+      {selectedItem && (
+        <div
+          aria-label={selectedItem.alt}
+          aria-modal="true"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          role="dialog"
+        >
+          <button
+            aria-label="Close look details"
+            className="absolute inset-0 bg-black/70"
+            onClick={() => setSelectedItem(null)}
+            type="button"
+          />
+          <div
+            className="relative z-10"
+            key={selectedItem.id}
+            style={{
+              animation: 'gallery-look-enter 260ms ease-out both',
+              aspectRatio: '3 / 4',
+              perspective: '1200px',
+              width: 'min(90vw, 60vh, 34rem)',
+            }}
+          >
+            <div
+              className="relative size-full"
+              style={{
+                animation: 'gallery-look-flip 700ms cubic-bezier(0.22, 0.61, 0.36, 1) 420ms forwards',
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <div
+                className="absolute inset-0 overflow-hidden bg-background"
+                style={{ backfaceVisibility: 'hidden' }}
+              >
                   {selectedItem.mimeType?.startsWith('video/') ? (
                     <video autoPlay className="size-full object-contain" loop muted playsInline src={selectedItem.url} />
                   ) : (
@@ -194,48 +219,46 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
                     />
                   )}
                 </div>
-                <div className="gallery-look-card__face gallery-look-card__back">
+              <div
+                className="absolute inset-0 flex flex-col overflow-hidden bg-background p-5 text-foreground sm:p-6"
+                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+              >
                   <p className="font-mono text-[10px] tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
                     Worn by
                   </p>
                   <h2 className="mt-2 text-3xl font-semibold tracking-tight">
                     {selectedItem.submittedBy || 'The Honeylooms community'}
                   </h2>
-                  <div className="mt-8 border-y border-neutral-200 py-4 dark:border-neutral-800">
+                <div className="mt-5 min-h-0 flex-1 overflow-y-auto border-y border-neutral-200 py-4 dark:border-neutral-800">
                     <p className="font-mono text-[10px] tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
                       Wearing
                     </p>
                     {selectedItem.products.length ? (
-                      <ul className="mt-3 space-y-2">
+                      <div className="mt-3 grid grid-cols-2 items-start gap-3">
                         {selectedItem.products.map((product) => (
-                          <li key={product.slug}>
-                            <Link className="text-sm underline underline-offset-4 hover:text-neutral-500" href={`/products/${product.slug}`}>
-                              {product.title}
+                          <div className="self-start" key={product.id}>
+                            <ProductGridItem product={product} />
+                            <Link
+                              className="mt-2 inline-flex w-full items-center justify-center border border-neutral-900 px-2 py-2 font-mono text-[9px] tracking-wider text-neutral-900 uppercase transition-colors hover:bg-neutral-900 hover:text-white dark:border-neutral-50 dark:text-neutral-50 dark:hover:bg-neutral-50 dark:hover:text-neutral-950"
+                              href={`/products/${product.slug}`}
+                            >
+                              Shop this look
                             </Link>
-                          </li>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     ) : (
                       <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">Honeylooms pieces</p>
                     )}
                   </div>
-                  {selectedItem.products[0] && (
-                    <Link
-                      className="mt-7 inline-flex w-full items-center justify-center bg-neutral-900 px-5 py-3 font-mono text-xs tracking-widest text-white uppercase transition-colors hover:bg-neutral-800 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200"
-                      href={`/products/${selectedItem.products[0].slug}`}
-                    >
-                      Shop this look
-                    </Link>
-                  )}
-                  <button className="mt-4 w-full text-xs text-neutral-500 underline underline-offset-4" onClick={() => setSelectedItem(null)} type="button">
+                <button className="mt-4 w-full shrink-0 text-xs text-neutral-500 underline underline-offset-4" onClick={() => setSelectedItem(null)} type="button">
                     Back to gallery
                   </button>
                 </div>
               </div>
             </div>
-          </DialogContent>
-        )}
-      </Dialog>
+          </div>
+      )}
     </div>
   )
 }
