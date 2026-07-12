@@ -1090,7 +1090,7 @@ export interface Gallery {
   id: number;
   alt?: string | null;
   submittedBy?: string | null;
-  product?: (number | null) | Product;
+  products?: (number | Product)[] | null;
   source?: ('admin' | 'community') | null;
   status?: ('pending' | 'approved' | 'rejected') | null;
   prefix?: string | null;
@@ -1105,6 +1105,16 @@ export interface Gallery {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    preview?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1545,7 +1555,7 @@ export interface CollectionsSelect<T extends boolean = true> {
 export interface GallerySelect<T extends boolean = true> {
   alt?: T;
   submittedBy?: T;
-  product?: T;
+  products?: T;
   source?: T;
   status?: T;
   prefix?: T;
@@ -1560,6 +1570,20 @@ export interface GallerySelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        preview?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

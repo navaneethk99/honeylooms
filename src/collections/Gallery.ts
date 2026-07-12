@@ -24,7 +24,7 @@ export const Gallery: CollectionConfig = {
     update: adminOnly,
   },
   admin: {
-    defaultColumns: ['filename', 'submittedBy', 'product', 'source', 'status', 'createdAt'],
+    defaultColumns: ['filename', 'submittedBy', 'products', 'source', 'status', 'createdAt'],
     group: 'Gallery',
     useAsTitle: 'filename',
   },
@@ -40,8 +40,9 @@ export const Gallery: CollectionConfig = {
       label: 'Submitted by',
     },
     {
-      name: 'product',
+      name: 'products',
       type: 'relationship',
+      hasMany: true,
       relationTo: 'products',
     },
     {
@@ -94,6 +95,21 @@ export const Gallery: CollectionConfig = {
     ],
   },
   upload: {
+    imageSizes: [
+      {
+        name: 'preview',
+        width: 640,
+        height: 640,
+        fit: 'inside',
+        withoutEnlargement: true,
+        formatOptions: {
+          format: 'webp',
+          options: {
+            quality: 60,
+          },
+        },
+      },
+    ],
     mimeTypes: ['image/*', 'video/*'],
     staticDir: path.resolve(dirname, '../../public/gallery'),
   },

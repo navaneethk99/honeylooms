@@ -25,7 +25,7 @@ export default async function GalleryPage() {
   const [gallery, products] = await Promise.all([
     payload.find({
       collection: 'gallery',
-      depth: 0,
+      depth: 1,
       limit: 100,
       overrideAccess: false,
       sort: '-createdAt',
@@ -63,6 +63,12 @@ export default async function GalleryPage() {
         height: item.height,
         id: item.id,
         mimeType: item.mimeType,
+        previewUrl: getMediaUrl(item.sizes?.preview?.url),
+        products: (item.products || []).flatMap((product) =>
+          typeof product === 'object' && product.slug
+            ? [{ slug: product.slug, title: product.title || 'Untitled product' }]
+            : [],
+        ),
         submittedBy: item.submittedBy,
         url,
         width: item.width,

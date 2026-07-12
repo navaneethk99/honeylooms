@@ -30,7 +30,7 @@ const MAX_FILES = 10
 export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
-  const [product, setProduct] = useState('')
+  const [productIDs, setProductIDs] = useState<string[]>([])
   const [files, setFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -38,7 +38,7 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
 
   const resetForm = () => {
     setName('')
-    setProduct('')
+    setProductIDs([])
     setFiles([])
     setIsSuccess(false)
     setSubmitError('')
@@ -67,8 +67,8 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!name.trim() || !product || files.length === 0) {
-      const error = 'Add your name, the item you purchased, and at least one file.'
+    if (!name.trim() || productIDs.length === 0 || files.length === 0) {
+      const error = 'Add your name, at least one item you purchased, and at least one file.'
       setSubmitError(error)
       toast.error(error)
       return
@@ -79,7 +79,7 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
     try {
       const formData = new FormData()
       formData.append('name', name.trim())
-      formData.append('product', product)
+      productIDs.forEach((productID) => formData.append('products', productID))
       files.forEach((file) => formData.append('files', file))
 
       const response = await fetch('/api/gallery/submit', { method: 'POST', body: formData })
@@ -138,21 +138,26 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="gallery-product">Item purchased</Label>
+                <Label htmlFor="gallery-products">Items purchased</Label>
                 <select
-                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:bg-neutral-950"
-                  id="gallery-product"
-                  onChange={(event) => setProduct(event.target.value)}
+                  className="flex h-32 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:bg-neutral-950"
+                  id="gallery-products"
+                  multiple
+                  onChange={(event) =>
+                    setProductIDs(Array.from(event.currentTarget.selectedOptions, (option) => option.value))
+                  }
                   required
-                  value={product}
+                  value={productIDs}
                 >
-                  <option value="">Select your item</option>
                   {products.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.title}
                     </option>
                   ))}
                 </select>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                  Select one or more items. On desktop, hold Command or Ctrl to select multiple.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="gallery-files">Images or videos</Label>

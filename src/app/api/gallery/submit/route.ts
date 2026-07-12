@@ -22,16 +22,16 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData()
     const submittedBy = formData.get('name')?.toString().trim()
-    const productID = formData.get('product')?.toString()
+    const productIDs = [...new Set(formData.getAll('products').map((value) => value.toString()))]
     const uploadedValues = formData.getAll('files')
     const files = uploadedValues.filter(isUploadedFile)
 
-    if (!submittedBy || submittedBy.length > 100 || !productID) {
+    if (!submittedBy || submittedBy.length > 100 || productIDs.length === 0) {
       console.warn('Rejected gallery submission: missing name or product', {
         hasName: Boolean(submittedBy),
-        hasProduct: Boolean(productID),
+        hasProduct: productIDs.length > 0,
       })
-      return NextResponse.json({ error: 'Please enter your name and select the item you purchased.' }, { status: 400 })
+      return NextResponse.json({ error: 'Please enter your name and select at least one item you purchased.' }, { status: 400 })
     }
 
     if (files.length === 0 || files.length > MAX_FILES) {
@@ -53,15 +53,21 @@ export async function POST(request: Request) {
     }
 
     const payload = await getPayload({ config: configPromise })
-    const product = await payload.findByID({
+    const products = await payload.find({
       collection: 'products',
-      id: productID,
       depth: 0,
+      limit: productIDs.length,
       overrideAccess: false,
+      pagination: false,
+      where: {
+        id: {
+          in: productIDs,
+        },
+      },
     })
 
-    if (!product) {
-      return NextResponse.json({ error: 'The selected item could not be found.' }, { status: 400 })
+    if (products.docs.length !== productIDs.length) {
+      return NextResponse.json({ error: 'One or more selected items could not be found.' }, { status: 400 })
     }
 
     await Promise.all(
@@ -71,8 +77,8 @@ export async function POST(request: Request) {
         await payload.create({
           collection: 'gallery',
           data: {
-            alt: `${submittedBy}'s ${product.title || 'Honeylooms'} photo`,
-            product: product.id,
+            alt: `${submittedBy}'s Honeylooms look`,
+            products: products.docs.map((product) => product.id),
             source: 'community',
             status: 'pending',
             submittedBy,

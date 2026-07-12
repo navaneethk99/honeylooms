@@ -13,6 +13,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
+import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { Categories } from '@/collections/Categories'
@@ -114,6 +115,7 @@ export default buildConfig({
   globals: [Header, Footer, FeaturedOutfits, InstagramReels, PromoBanner],
   plugins,
   secret: process.env.PAYLOAD_SECRET || '',
+  sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
