@@ -1,12 +1,18 @@
-import { getCachedGlobal } from '@/utilities/getGlobals'
+import { connection } from 'next/server'
+
+import { getGlobal } from '@/utilities/getGlobals'
 
 import './index.css'
 import { HeaderClient } from './index.client'
 import { PromoBanner } from './PromoBanner'
 
 export async function Header() {
-  const header = await getCachedGlobal('header', 1)()
-  const promoBanner = await getCachedGlobal('promo-banner', 1)()
+  // Navigation is managed in Payload and must reflect admin changes immediately.
+  await connection()
+  const [header, promoBanner] = await Promise.all([
+    getGlobal('header', 1),
+    getGlobal('promo-banner', 1),
+  ])
 
   return (
     <>
@@ -15,4 +21,3 @@ export async function Header() {
     </>
   )
 }
-
