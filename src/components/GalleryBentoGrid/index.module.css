@@ -1,0 +1,33 @@
+@keyframes write-name {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 1;
+  }
+
+  to {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+}
+
+.signature {
+  clip-path: inset(0 100% 0 0);
+  opacity: 0;
+  transform: rotate(var(--signature-tilt));
+  transform-origin: left center;
+  white-space: nowrap;
+}
+
+.polaroid:hover .signature,
+.polaroid:focus-within .signature {
+  animation: write-name 600ms steps(14, end) 50ms forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .polaroid:hover .signature,
+  .polaroid:focus-within .signature {
+    animation: none;
+    clip-path: inset(0);
+    opacity: 1;
+  }
+}

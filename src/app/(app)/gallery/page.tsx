@@ -66,7 +66,8 @@ export default async function GalleryPage() {
         mimeType: item.mimeType,
         previewUrl: getMediaUrl(item.sizes?.preview?.url),
         products: (item.products || []).filter(
-          (product): product is Product => Boolean(product) && typeof product === 'object' && 'slug' in product,
+          (product): product is Product =>
+            Boolean(product) && typeof product === 'object' && 'slug' in product,
         ),
         submittedBy: item.submittedBy,
         url,
@@ -76,16 +77,16 @@ export default async function GalleryPage() {
   })
 
   return (
-    <div className="bg-background text-foreground">
-      <section className="container py-16 md:py-24">
+    <div className="bg-[#D9A322] text-foreground">
+      <section className="container placeholder-yellow-100 py-15 md:py-15">
         <div className="max-w-2xl">
-          <p className="mb-4 font-mono text-xs tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
+          {/*<p className="mb-4 font-mono text-xs tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
             Honeylooms in the wild
-          </p>
-          <h1 className="text-4xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-5xl">
-            Worn with a story.
+          </p>*/}
+          <h1 className="text-4xl font-semibold tracking-tight text-neutral-50 dark:text-neutral-50 md:text-5xl">
+            Honeylooms in the wild!
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-neutral-500 dark:text-neutral-400">
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-neutral-100 dark:text-neutral-400">
             A living collage of the people, places, and little moments that make Honeylooms yours.
           </p>
         </div>
