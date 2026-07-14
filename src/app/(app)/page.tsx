@@ -20,8 +20,11 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselMobileNext,
+  CarouselMobilePrevious,
   CarouselNext,
   CarouselPrevious,
+  CarouselSlideMotion,
 } from '@/components/ui/carousel'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -229,21 +232,31 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              {/* 3-Column Carousel wrapper with desktop padding for navigation arrows */}
-              <div className="px-0 md:px-12">
-                <Carousel className="w-full" opts={{ loop: true }}>
-                  <CarouselContent className="-ml-4 md:-ml-6">
-                    {products.map((product) => (
-                      <CarouselItem
-                        key={product.id}
-                        className="pl-4 md:pl-6 basis-1/2 md:basis-1/3"
-                      >
-                        <div className="h-full w-full">
-                          <ProductGridItem product={product} />
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
+              <div>
+                <Carousel className="w-full" opts={{ align: 'center', loop: true }}>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-2 z-30 flex items-center md:hidden">
+                      <CarouselMobilePrevious />
+                    </div>
+                    <div className="absolute inset-y-0 right-2 z-30 flex items-center md:hidden">
+                      <CarouselMobileNext />
+                    </div>
+
+                    <CarouselContent className="ml-0 p-1 md:-ml-2">
+                      {products.map((product, index) => (
+                        <CarouselItem
+                          key={product.id}
+                          className="basis-[88%] pl-0 md:basis-1/2 md:pl-2 xl:basis-1/3 2xl:basis-1/4"
+                        >
+                          <CarouselSlideMotion index={index} className="flex h-full justify-center">
+                            <div className="h-full w-full max-w-[400px]">
+                              <ProductGridItem product={product} />
+                            </div>
+                          </CarouselSlideMotion>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                  </div>
                   <CarouselPrevious className="hidden md:flex" />
                   <CarouselNext className="hidden md:flex" />
                 </Carousel>

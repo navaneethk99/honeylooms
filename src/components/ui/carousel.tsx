@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import useEmblaCarousel, { type UseEmblaCarouselType } from 'embla-carousel-react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { cn } from '@/utilities/cn'
 import { Button } from '@/components/ui/button'
@@ -26,6 +26,7 @@ type CarouselContextProps = {
   scrollNext: () => void
   canScrollPrev: boolean
   canScrollNext: boolean
+  selectedIndex: number
 } & CarouselProps
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null)
@@ -58,11 +59,13 @@ function Carousel({
   )
   const [canScrollPrev, setCanScrollPrev] = React.useState(false)
   const [canScrollNext, setCanScrollNext] = React.useState(false)
+  const [selectedIndex, setSelectedIndex] = React.useState(0)
 
   const onSelect = React.useCallback((api: CarouselApi) => {
     if (!api) return
     setCanScrollPrev(api.canScrollPrev())
     setCanScrollNext(api.canScrollNext())
+    setSelectedIndex(api.selectedScrollSnap())
   }, [])
 
   const scrollPrev = React.useCallback(() => {
@@ -99,6 +102,7 @@ function Carousel({
 
     return () => {
       api?.off('select', onSelect)
+      api?.off('reInit', onSelect)
     }
   }, [api, onSelect])
 
@@ -113,6 +117,7 @@ function Carousel({
         scrollNext,
         canScrollPrev,
         canScrollNext,
+        selectedIndex,
       }}
     >
       <div
@@ -220,4 +225,75 @@ function CarouselNext({
   )
 }
 
-export { type CarouselApi, Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, useCarousel }
+function CarouselMobilePrevious() {
+  const { scrollPrev } = useCarousel()
+
+  return (
+    <button
+      type="button"
+      className="flex size-10 items-center justify-center text-neutral-500 transition-colors hover:text-neutral-800 active:text-neutral-950 dark:text-neutral-400 dark:hover:text-neutral-100 dark:active:text-neutral-50"
+      onClick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        scrollPrev()
+      }}
+      aria-label="Previous slide"
+    >
+      <ChevronLeft className="size-7" />
+    </button>
+  )
+}
+
+function CarouselMobileNext() {
+  const { scrollNext } = useCarousel()
+
+  return (
+    <button
+      type="button"
+      className="flex size-10 items-center justify-center text-neutral-500 transition-colors hover:text-neutral-800 active:text-neutral-950 dark:text-neutral-400 dark:hover:text-neutral-100 dark:active:text-neutral-50"
+      onClick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        scrollNext()
+      }}
+      aria-label="Next slide"
+    >
+      <ChevronRight className="size-7" />
+    </button>
+  )
+}
+
+function CarouselSlideMotion({
+  index,
+  className,
+  ...props
+}: React.ComponentProps<'div'> & { index: number }) {
+  const { selectedIndex } = useCarousel()
+  const isActive = index === selectedIndex
+
+  return (
+    <div
+      className={cn(
+        'w-full transition-all duration-300 ease-in-out',
+        isActive
+          ? 'scale-100 opacity-100 blur-none'
+          : 'pointer-events-none scale-95 opacity-40 blur-[2px] md:pointer-events-auto md:scale-100 md:opacity-100 md:blur-none',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+export {
+  type CarouselApi,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  CarouselMobilePrevious,
+  CarouselMobileNext,
+  CarouselSlideMotion,
+  useCarousel,
+}

@@ -1,17 +1,15 @@
 'use client'
 
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
-import * as React from 'react'
 
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  useCarousel,
-  type CarouselApi,
+  CarouselMobileNext,
+  CarouselMobilePrevious,
+  CarouselSlideMotion,
 } from '@/components/ui/carousel'
-import { cn } from '@/utilities/cn'
 
 type InstagramReelsProps = {
   urls: string[]
@@ -42,60 +40,9 @@ const getInstagramEmbedUrl = (url: string) => {
   }
 }
 
-const CarouselPreviousMobile = () => {
-  const { scrollPrev } = useCarousel()
-  return (
-    <button
-      type="button"
-      className="flex h-10 w-10 items-center justify-center text-neutral-500 hover:text-neutral-800 active:text-neutral-950 dark:text-neutral-400 dark:hover:text-neutral-100 dark:active:text-neutral-50 transition-colors"
-      onClick={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        scrollPrev()
-      }}
-      aria-label="Previous Instagram reel"
-    >
-      <ChevronLeft className="h-7 w-7" />
-    </button>
-  )
-}
-
-const CarouselNextMobile = () => {
-  const { scrollNext } = useCarousel()
-  return (
-    <button
-      type="button"
-      className="flex h-10 w-10 items-center justify-center text-neutral-500 hover:text-neutral-800 active:text-neutral-950 dark:text-neutral-400 dark:hover:text-neutral-100 dark:active:text-neutral-50 transition-colors"
-      onClick={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        scrollNext()
-      }}
-      aria-label="Next Instagram reel"
-    >
-      <ChevronRight className="h-7 w-7" />
-    </button>
-  )
-}
-
-const CAROUSEL_OPTIONS = { loop: true }
+const CAROUSEL_OPTIONS = { align: 'center' as const, loop: true }
 
 export const InstagramReels = ({ urls }: InstagramReelsProps) => {
-  const [carouselApi, setCarouselApi] = React.useState<CarouselApi>()
-  const [activeIndex, setActiveIndex] = React.useState(0)
-
-  React.useEffect(() => {
-    if (!carouselApi) return
-    const onSelect = () => {
-      setActiveIndex(carouselApi.selectedScrollSnap())
-    }
-    carouselApi.on('select', onSelect)
-    onSelect()
-    return () => {
-      carouselApi.off('select', onSelect)
-    }
-  }, [carouselApi])
-
   const reels = urls
     .map((url) => ({
       embedUrl: getInstagramEmbedUrl(url),
@@ -127,32 +74,24 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
       </div>
 
       <div>
-        <Carousel className="w-full" opts={CAROUSEL_OPTIONS} setApi={setCarouselApi}>
+        <Carousel className="w-full" opts={CAROUSEL_OPTIONS}>
           <div className="relative">
             {/* Mobile arrow keys positioned on the sides */}
             <div className="absolute inset-y-0 left-2 z-30 flex items-center md:hidden">
-              <CarouselPreviousMobile />
+              <CarouselMobilePrevious />
             </div>
             <div className="absolute inset-y-0 right-2 z-30 flex items-center md:hidden">
-              <CarouselNextMobile />
+              <CarouselMobileNext />
             </div>
 
             <CarouselContent className="ml-0 p-1 md:-ml-2">
               {reels.map((reel, index) => {
-                const isActive = index === activeIndex
                 return (
                   <CarouselItem
                     key={`${reel.embedUrl}-${index}`}
-                    className="basis-full pl-0 md:basis-1/2 md:pl-2 xl:basis-1/3 2xl:basis-1/4"
+                    className="basis-[88%] pl-0 md:basis-1/2 md:pl-2 xl:basis-1/3 2xl:basis-1/4"
                   >
-                    <div
-                      className={cn(
-                        'w-full transition-all duration-300 ease-in-out',
-                        isActive
-                          ? 'opacity-100 scale-100 blur-none'
-                          : 'opacity-40 scale-95 blur-[2px] pointer-events-none md:opacity-100 md:scale-100 md:blur-none md:pointer-events-auto',
-                      )}
-                    >
+                    <CarouselSlideMotion index={index}>
                       <div className="flex justify-center">
                         <div className="relative w-full max-w-[400px] overflow-hidden bg-background shadow-[0_0_10px_rgba(0,0,0,0.1)] [container-type:inline-size]">
                           <div className="flex h-15 items-center gap-3 border-b border-neutral-200 bg-white px-4 text-neutral-950">
@@ -187,7 +126,7 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
                           />
                         </div>
                       </div>
-                    </div>
+                    </CarouselSlideMotion>
                   </CarouselItem>
                 )
               })}
