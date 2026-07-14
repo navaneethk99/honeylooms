@@ -8,7 +8,9 @@ const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
 
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
-const imageRemoteURLs = [NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL].filter(Boolean) as string[]
+const imageRemoteURLs = [NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL].filter(
+  Boolean,
+) as string[]
 const imageRemotePatterns = imageRemoteURLs.map((item) => {
   const url = new URL(item)
 
@@ -28,6 +30,9 @@ const nextConfig: NextConfig = {
   },
   images: {
     localPatterns: [
+      {
+        pathname: '/inverted_logo.png',
+      },
       {
         pathname: '/api/media/file/**',
       },

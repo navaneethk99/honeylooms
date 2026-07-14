@@ -1,9 +1,9 @@
 'use client'
 
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Image from 'next/image'
 import * as React from 'react'
 
-import { Button } from '@/components/ui/button'
 import {
   Carousel,
   CarouselContent,
@@ -126,7 +126,7 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
         </a>
       </div>
 
-      <div className="px-0 md:px-12">
+      <div>
         <Carousel className="w-full" opts={CAROUSEL_OPTIONS} setApi={setCarouselApi}>
           <div className="relative">
             {/* Mobile arrow keys positioned on the sides */}
@@ -137,32 +137,47 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
               <CarouselNextMobile />
             </div>
 
-            <CarouselContent className="-ml-4 md:-ml-6">
+            <CarouselContent className="ml-0 p-1 md:-ml-2">
               {reels.map((reel, index) => {
                 const isActive = index === activeIndex
                 return (
                   <CarouselItem
                     key={`${reel.embedUrl}-${index}`}
-                    className="basis-[76%] pl-4 sm:basis-1/2 md:pl-6 lg:basis-1/4"
+                    className="basis-full pl-0 md:basis-1/2 md:pl-2 xl:basis-1/3 2xl:basis-1/4"
                   >
                     <div
                       className={cn(
-                        "w-full transition-all duration-300 ease-in-out",
+                        'w-full transition-all duration-300 ease-in-out',
                         isActive
-                          ? "opacity-100 scale-100 blur-none"
-                          : "opacity-40 scale-95 blur-[2px] pointer-events-none md:opacity-100 md:scale-100 md:blur-none md:pointer-events-auto"
+                          ? 'opacity-100 scale-100 blur-none'
+                          : 'opacity-40 scale-95 blur-[2px] pointer-events-none md:opacity-100 md:scale-100 md:blur-none md:pointer-events-auto',
                       )}
                     >
-                      <div className="flex justify-center bg-background">
-                        <div className="relative w-full max-w-[360px] h-[580px]">
-                          <iframe
-                            src={reel.embedUrl}
-                            title={`Honeylooms Instagram reel ${index + 1}`}
-                            className="h-full w-full"
-                            loading="lazy"
-                            scrolling="no"
-                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                          />
+                      <div className="flex justify-center">
+                        <div className="relative w-full max-w-[400px] overflow-hidden bg-background shadow-[0_0_10px_rgba(0,0,0,0.1)] [container-type:inline-size]">
+                          <div className="flex h-15 items-center gap-3 border-b border-neutral-200 bg-white px-4 text-neutral-950">
+                            <div className="size-10 shrink-0 overflow-hidden rounded-full">
+                              <Image
+                                src="/inverted_logo.png"
+                                alt="Honeylooms"
+                                width={40}
+                                height={40}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <span className="truncate text-sm font-semibold">thehoneylooms</span>
+                          </div>
+
+                          <div className="relative h-[calc(clamp(580px,164.5cqw,658px)-84px)] overflow-hidden">
+                            <iframe
+                              src={reel.embedUrl}
+                              title={`Honeylooms Instagram reel ${index + 1}`}
+                              className="absolute -top-16 left-0 h-[clamp(580px,164.5cqw,658px)] w-full"
+                              loading="lazy"
+                              scrolling="no"
+                              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                            />
+                          </div>
                           <a
                             href={reel.url}
                             target="_blank"
