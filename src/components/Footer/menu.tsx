@@ -2,22 +2,22 @@ import type { Footer } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import React from 'react'
+import type { ReactNode } from 'react'
 
 interface Props {
+  children?: ReactNode
   menu: Footer['navItems']
 }
 
-export function FooterMenu({ menu }: Props) {
-  if (!menu?.length) return null
-
+export function FooterMenu({ children, menu }: Props) {
   // Chunk items into columns of max 4 rows
   const chunks = []
-  for (let i = 0; i < menu.length; i += 4) {
+  for (let i = 0; i < (menu?.length ?? 0); i += 4) {
     chunks.push(menu.slice(i, i + 4))
   }
 
   return (
-    <nav className="flex flex-wrap gap-10 md:gap-16">
+    <nav className="grid grid-cols-2 gap-x-8 gap-y-10 md:flex md:flex-wrap md:gap-16">
       {chunks.map((chunk, chunkIndex) => {
         let title = null
         if (chunkIndex === 0) {
@@ -47,6 +47,7 @@ export function FooterMenu({ menu }: Props) {
           </div>
         )
       })}
+      {children}
     </nav>
   )
 }

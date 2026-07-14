@@ -49,6 +49,27 @@ const socialLinks = [
   },
 ]
 
+const SocialLinks = () => (
+  <div className="flex min-w-0 flex-col gap-3">
+    <h3 className="text-md font-semibold tracking-wide text-[#D9A322] underline">Social Media</h3>
+    <ul className="flex flex-col gap-0">
+      {socialLinks.map((link) => (
+        <li key={link.href}>
+          <Link
+            className="inline-flex items-center gap-2 font-medium text-black hover:underline dark:text-white"
+            href={link.href}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {link.icon}
+            {link.label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+)
+
 export async function Footer() {
   const footer: Footer = await getCachedGlobal('footer', 1)()
   const menu = footer.navItems || []
@@ -84,28 +105,10 @@ export async function Footer() {
               </div>
             }
           >
-            <FooterMenu menu={menu} />
+            <FooterMenu menu={menu}>
+              <SocialLinks />
+            </FooterMenu>
           </Suspense>
-          <div className="flex flex-col gap-3">
-            <h3 className="text-md font-semibold tracking-wide text-[#D9A322] underline">
-              Social Media
-            </h3>
-            <ul className="flex flex-col gap-0">
-              {socialLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    className="inline-flex font-medium items-center gap-2 text-black hover:underline dark:text-white"
-                    href={link.href}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    {link.icon}
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
       <div className="border-t border-neutral-200 py-6 text-sm dark:border-neutral-700">
