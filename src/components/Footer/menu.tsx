@@ -11,9 +11,10 @@ interface Props {
 
 export function FooterMenu({ children, menu }: Props) {
   // Chunk items into columns of max 4 rows
+  const items = menu ?? []
   const chunks = []
-  for (let i = 0; i < (menu?.length ?? 0); i += 4) {
-    chunks.push(menu.slice(i, i + 4))
+  for (let i = 0; i < items.length; i += 4) {
+    chunks.push(items.slice(i, i + 4))
   }
 
   return (
