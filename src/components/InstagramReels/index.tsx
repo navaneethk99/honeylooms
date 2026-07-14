@@ -97,7 +97,7 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
                           <div className="flex h-15 items-center gap-3 border-b border-neutral-200 bg-white px-4 text-neutral-950">
                             <div className="size-10 shrink-0 overflow-hidden rounded-full">
                               <Image
-                                src="/inverted_logo.png"
+                                src="/inverted_honeylooms.png"
                                 alt="Honeylooms"
                                 width={40}
                                 height={40}

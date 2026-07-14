@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
   images: {
     localPatterns: [
       {
-        pathname: '/inverted_logo.png',
+        pathname: '/inverted_honeylooms.png',
       },
       {
         pathname: '/api/media/file/**',
