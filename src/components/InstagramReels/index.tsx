@@ -75,7 +75,10 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
                                 className="h-full w-full object-cover"
                               />
                             </div>
-                            <span className="truncate text-sm font-semibold">thehoneylooms</span>
+                            <div className="min-w-0">
+                              <span className="block truncate text-sm font-semibold">thehoneylooms</span>
+                              <span className="block truncate text-xs text-neutral-500">Watch this on Instagram &rarr;</span>
+                            </div>
                           </div>
 
                           <div className="relative aspect-[9/16] bg-black">
