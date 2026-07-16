@@ -11,6 +11,7 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import Script from 'next/script'
 import React from 'react'
+import { Analytics } from '@vercel/analytics/next'
 import { LottiePrefetcher } from '@/components/LottiePrefetcher'
 import './globals.css'
 
@@ -109,6 +110,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <main className="flex-1 bg-white text-black">{children}</main>
           <Footer />
         </Providers>
+        <Analytics />
       </body>
     </html>
   )
