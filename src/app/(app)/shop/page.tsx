@@ -23,7 +23,7 @@ export default async function ShopPage({ searchParams }: Props) {
     collection: 'products',
     draft: false,
     overrideAccess: false,
-    ...(sort ? { sort } : { sort: 'title' }),
+    ...(sort ? { sort } : { sort: '-updatedAt' }),
     ...(searchValue || category || collection
       ? {
           where: {
