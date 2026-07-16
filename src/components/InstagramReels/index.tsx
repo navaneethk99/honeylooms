@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Bookmark, Heart, MessageCircle, Send } from 'lucide-react'
 
 import {
   Carousel,
@@ -15,41 +16,10 @@ type InstagramReelsProps = {
   urls: string[]
 }
 
-const getInstagramEmbedUrl = (url: string) => {
-  try {
-    const parsedUrl = new URL(url.trim())
-    const isInstagramHost =
-      parsedUrl.hostname === 'instagram.com' || parsedUrl.hostname.endsWith('.instagram.com')
-
-    if (!isInstagramHost) {
-      return null
-    }
-
-    const segments = parsedUrl.pathname.split('/').filter(Boolean)
-    const contentTypeIndex = segments.findIndex((segment) => segment === 'reel')
-    const contentType = segments[contentTypeIndex]
-    const shortcode = segments[contentTypeIndex + 1]
-
-    if (!contentType || !shortcode) {
-      return null
-    }
-
-    return `https://www.instagram.com/${contentType}/${shortcode}/embed`
-  } catch {
-    return null
-  }
-}
-
 const CAROUSEL_OPTIONS = { align: 'center' as const, loop: true }
 
 export const InstagramReels = ({ urls }: InstagramReelsProps) => {
-  const reels = urls
-    .map((url) => ({
-      embedUrl: getInstagramEmbedUrl(url),
-      url,
-    }))
-    .filter((reel): reel is { embedUrl: string; url: string } => Boolean(reel.embedUrl))
-    .slice(0, 4)
+  const reels = urls.slice(0, 4)
 
   if (reels.length === 0) {
     return null
@@ -88,12 +58,12 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
               {reels.map((reel, index) => {
                 return (
                   <CarouselItem
-                    key={`${reel.embedUrl}-${index}`}
+                    key={`${reel}-${index}`}
                     className="basis-[88%] pl-0 md:basis-1/2 md:pl-2 xl:basis-1/3 2xl:basis-1/4"
                   >
                     <CarouselSlideMotion index={index}>
                       <div className="flex justify-center">
-                        <div className="relative w-full max-w-[400px] overflow-hidden bg-background shadow-[0_0_10px_rgba(0,0,0,0.1)] [container-type:inline-size]">
+                        <div className="relative w-full max-w-[400px] overflow-hidden bg-background shadow-[0_0_10px_rgba(0,0,0,0.1)]">
                           <div className="flex h-15 items-center gap-3 border-b border-neutral-200 bg-white px-4 text-neutral-950">
                             <div className="size-10 shrink-0 overflow-hidden rounded-full">
                               <Image
@@ -108,18 +78,24 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
                             <span className="truncate text-sm font-semibold">thehoneylooms</span>
                           </div>
 
-                          <div className="relative h-[calc(clamp(580px,164.5cqw,658px)-84px)] overflow-hidden">
-                            <iframe
-                              src={reel.embedUrl}
-                              title={`Honeylooms Instagram reel ${index + 1}`}
-                              className="absolute -top-16 left-0 h-[clamp(580px,164.5cqw,658px)] w-full"
+                          <div className="relative aspect-[9/16] bg-black">
+                            <img
+                              src={`/api/instagram/reel-preview?url=${encodeURIComponent(reel)}`}
+                              alt={`Preview of Honeylooms Instagram reel ${index + 1}`}
+                              className="size-full object-cover"
                               loading="lazy"
-                              scrolling="no"
-                              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                             />
                           </div>
+                          <div className="flex items-center justify-between border-t border-neutral-200 bg-white px-3 py-3 text-neutral-950">
+                            <div className="flex items-center gap-4">
+                              <Heart aria-hidden="true" className="size-6 stroke-[1.75]" />
+                              <MessageCircle aria-hidden="true" className="size-6 stroke-[1.75]" />
+                              <Send aria-hidden="true" className="size-6 stroke-[1.75]" />
+                            </div>
+                            <Bookmark aria-hidden="true" className="size-6 stroke-[1.75]" />
+                          </div>
                           <a
-                            href={reel.url}
+                            href={reel}
                             target="_blank"
                             rel="noreferrer"
                             className="absolute inset-0 z-10 block cursor-pointer"
