@@ -26,6 +26,8 @@ type Props = {
 }
 
 const MAX_FILES = 10
+const MAX_FILE_SIZE = 50 * 1024 * 1024
+const MAX_TOTAL_FILE_SIZE = 100 * 1024 * 1024
 
 export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
   const [open, setOpen] = useState(false)
@@ -50,17 +52,24 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
   }
 
   const handleFiles = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(event.target.files || []).filter((file) => /^(image|video)\//.test(file.type))
+    const selected = Array.from(event.target.files || []).filter(
+      (file) => /^(image|video)\//.test(file.type) && file.size <= MAX_FILE_SIZE,
+    )
     const nextFiles = [...files, ...selected].slice(0, MAX_FILES)
 
     if (selected.length !== event.target.files?.length) {
-      toast.error('Only image and video files can be added.')
+      toast.error('Only images and videos up to 50 MB each can be added.')
     }
     if (files.length + selected.length > MAX_FILES) {
       toast.error(`You can upload up to ${MAX_FILES} files at once.`)
     }
 
-    setFiles(nextFiles)
+    const totalFileSize = nextFiles.reduce((total, file) => total + file.size, 0)
+    if (totalFileSize > MAX_TOTAL_FILE_SIZE) {
+      toast.error('The combined upload size cannot exceed 100 MB.')
+    } else {
+      setFiles(nextFiles)
+    }
     event.target.value = ''
   }
 
@@ -83,8 +92,16 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
       files.forEach((file) => formData.append('files', file))
 
       const response = await fetch('/api/gallery/submit', { method: 'POST', body: formData })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Unable to send your submission.')
+      const contentType = response.headers.get('content-type') || ''
+      const data = contentType.includes('application/json') ? await response.json() : null
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+            (response.status === 413
+              ? 'Your upload is too large. Files can be up to 50 MB each and 100 MB combined.'
+              : 'Unable to send your submission.'),
+        )
+      }
 
       setIsSuccess(true)
     } catch (error) {
@@ -120,9 +137,12 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl font-semibold tracking-tight">Share your Honeylooms</DialogTitle>
+              <DialogTitle className="text-2xl font-semibold tracking-tight">
+                Share your Honeylooms
+              </DialogTitle>
               <DialogDescription className="leading-relaxed text-neutral-500 dark:text-neutral-400">
-                Show us how you wear your piece. Every submission is reviewed before it is published.
+                Show us how you wear your piece. Every submission is reviewed before it is
+                published.
               </DialogDescription>
             </DialogHeader>
             <form className="mt-2 space-y-5" onSubmit={handleSubmit}>
@@ -144,7 +164,9 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
                   id="gallery-products"
                   multiple
                   onChange={(event) =>
-                    setProductIDs(Array.from(event.currentTarget.selectedOptions, (option) => option.value))
+                    setProductIDs(
+                      Array.from(event.currentTarget.selectedOptions, (option) => option.value),
+                    )
                   }
                   required
                   value={productIDs}
@@ -182,12 +204,19 @@ export const GalleryUploadDialog: React.FC<Props> = ({ products }) => {
                 {files.length > 0 && (
                   <ul className="max-h-32 space-y-1 overflow-y-auto border border-neutral-200 p-2 text-sm dark:border-neutral-800">
                     {files.map((file, index) => (
-                      <li className="flex items-center justify-between gap-3" key={`${file.name}-${index}`}>
+                      <li
+                        className="flex items-center justify-between gap-3"
+                        key={`${file.name}-${index}`}
+                      >
                         <span className="truncate">{file.name}</span>
                         <button
                           aria-label={`Remove ${file.name}`}
                           className="shrink-0 p-1 text-neutral-500 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-neutral-50"
-                          onClick={() => setFiles((current) => current.filter((_, fileIndex) => fileIndex !== index))}
+                          onClick={() =>
+                            setFiles((current) =>
+                              current.filter((_, fileIndex) => fileIndex !== index),
+                            )
+                          }
                           type="button"
                         >
                           <X className="size-4" />

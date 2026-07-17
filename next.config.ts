@@ -22,6 +22,11 @@ const imageRemotePatterns = imageRemoteURLs.map((item) => {
 })
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Gallery submissions may contain multiple files. Leave room for multipart
+    // overhead while the application enforces its 100 MB total upload limit.
+    proxyClientMaxBodySize: '110mb',
+  },
   serverExternalPackages: ['pdfkit'],
   // Temporarily required on Windows until Next.js fixes Turbopack Sass resolution.
   // See: https://github.com/vercel/next.js/issues/86431

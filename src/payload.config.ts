@@ -116,6 +116,12 @@ export default buildConfig({
   plugins,
   secret: process.env.PAYLOAD_SECRET || '',
   sharp,
+  upload: {
+    abortOnLimit: true,
+    limits: {
+      fileSize: 50 * 1024 * 1024,
+    },
+  },
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
