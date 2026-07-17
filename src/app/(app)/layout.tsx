@@ -13,6 +13,7 @@ import Script from 'next/script'
 import React from 'react'
 import { Analytics } from '@vercel/analytics/next'
 import { LottiePrefetcher } from '@/components/LottiePrefetcher'
+import { SmoothScroll } from '@/components/SmoothScroll'
 import './globals.css'
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
@@ -102,6 +103,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body>
         <Providers>
+          <SmoothScroll />
           <AdminBar />
           <LivePreviewListener />
           <LottiePrefetcher />
