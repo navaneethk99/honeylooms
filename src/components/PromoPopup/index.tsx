@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 // ==========================================
 // CONFIGURATION: Set to false to disable this popup completely.
 // ==========================================
-export const ENABLE_PROMO_POPUP = true
+export const ENABLE_PROMO_POPUP = false
 
 export function PromoPopup() {
   const [open, setOpen] = useState(false)
