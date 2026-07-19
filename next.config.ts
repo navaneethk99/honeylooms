@@ -34,6 +34,7 @@ const nextConfig: NextConfig = {
     loadPaths: ['./node_modules/@payloadcms/ui/dist/scss/'],
   },
   images: {
+    unoptimized: true,
     localPatterns: [
       {
         pathname: '/inverted_honeylooms.png',

@@ -77,7 +77,7 @@ export const InstagramReels = ({ urls }: InstagramReelsProps) => {
                             </div>
                             <div className="min-w-0">
                               <span className="block truncate text-sm font-semibold">thehoneylooms</span>
-                              <span className="block truncate text-xs text-neutral-500">Watch this on Instagram &rarr;</span>
+                              <span className="block truncate text-xs text-neutral-500">Watch this reel on Instagram &rarr;</span>
                             </div>
                           </div>
 
