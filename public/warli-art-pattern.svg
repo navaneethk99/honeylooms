@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" fill="none">
+  <defs>
+    <g id="warli-person" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="0" cy="-25" r="6"/>
+      <path d="M0-19-12 1H12L0-19ZM0 23-12 1H12L0 23ZM0 23v22m0-9-14 17m14-17 14 17M-9-7l-17 13m35-13L26 6"/>
+    </g>
+    <g id="warli-tree" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 66V-12M0 19-31-13M0 6l31-32M0 35l-42-20M0 27l43-11"/>
+      <circle cx="-35" cy="-18" r="20"/>
+      <circle cx="-8" cy="-35" r="24"/>
+      <circle cx="25" cy="-35" r="21"/>
+      <circle cx="43" cy="-8" r="18"/>
+      <path d="M-49-13-35-27l13 14-13 14-14-14Zm27-21 14-14L6-34-8-20l-14-14Zm33 0 14-14 14 14-14 14-14-14Zm18 26L43-22 57-8 43 6 29-8Z"/>
+    </g>
+    <g id="warli-hut" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-54 4 0-40 54 4M-42 1h84v62h-84V1Zm27 62V25h30v38M-54 4h108M-33-1 0-28 33-1"/>
+      <path d="M-35 16h13m44 0h13M-35 29h13m44 0h13"/>
+    </g>
+  </defs>
+
+  <g color="#ffffff" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 22h960M0 338h960" stroke-width="3"/>
+    <path d="m0 8 16 14L32 8l16 14L64 8l16 14L96 8l16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14" stroke-width="2"/>
+    <path d="m0 352 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14 16-14 16 14" stroke-width="2"/>
+
+    <g transform="translate(102 184)">
+      <use href="#warli-hut"/>
+      <path d="M-70 68h142M-82 76h166" stroke-width="2"/>
+      <use href="#warli-person" transform="translate(-82 18) scale(.72)"/>
+      <path d="M-104 24h17m-14 4h12" stroke-width="2"/>
+    </g>
+
+    <g transform="translate(292 174)">
+      <use href="#warli-tree" transform="scale(.82)"/>
+      <use href="#warli-person" transform="translate(-66 60) scale(.68) rotate(-8)"/>
+      <use href="#warli-person" transform="translate(69 60) scale(.68) rotate(8)"/>
+      <path d="M-104 113q104 20 208 0" stroke-width="2"/>
+    </g>
+
+    <g transform="translate(570 183)">
+      <ellipse cx="0" cy="0" rx="143" ry="116" stroke-width="2" stroke-dasharray="3 8"/>
+      <use href="#warli-person" transform="translate(0 -93) scale(.7) rotate(180)"/>
+      <use href="#warli-person" transform="translate(69 -75) scale(.7) rotate(145)"/>
+      <use href="#warli-person" transform="translate(119 -30) scale(.7) rotate(110)"/>
+      <use href="#warli-person" transform="translate(123 35) scale(.7) rotate(72)"/>
+      <use href="#warli-person" transform="translate(73 83) scale(.7) rotate(35)"/>
+      <use href="#warli-person" transform="translate(0 101) scale(.7)"/>
+      <use href="#warli-person" transform="translate(-73 83) scale(.7) rotate(-35)"/>
+      <use href="#warli-person" transform="translate(-123 35) scale(.7) rotate(-72)"/>
+      <use href="#warli-person" transform="translate(-119 -30) scale(.7) rotate(-110)"/>
+      <use href="#warli-person" transform="translate(-69 -75) scale(.7) rotate(-145)"/>
+      <circle cx="0" cy="0" r="34" stroke-width="2"/>
+      <path d="m0-27 9 18 20 3-15 14 4 20L0 18l-18 10 4-20-15-14 20-3L0-27Z" stroke-width="2"/>
+    </g>
+
+    <g transform="translate(844 188)">
+      <use href="#warli-hut" transform="scale(.86)"/>
+      <use href="#warli-person" transform="translate(-67 47) scale(.65)"/>
+      <use href="#warli-person" transform="translate(68 47) scale(.65)"/>
+      <path d="M-110 105q110-17 220 0" stroke-width="2"/>
+      <path d="M-97-63q18-19 36 0-18-10-36 0Zm166-12q17-17 34 0-17-9-34 0Z" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

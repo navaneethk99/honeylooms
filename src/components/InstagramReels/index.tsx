@@ -1,118 +1,71 @@
-'use client'
-
-import Image from 'next/image'
-import { Bookmark, Heart, MessageCircle, Send } from 'lucide-react'
-
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselMobileNext,
-  CarouselMobilePrevious,
-  CarouselSlideMotion,
-} from '@/components/ui/carousel'
+import { ArrowUpRight, Instagram } from 'lucide-react'
 
 type InstagramReelsProps = {
   urls: string[]
 }
 
-const CAROUSEL_OPTIONS = { align: 'center' as const, loop: true }
-
 export const InstagramReels = ({ urls }: InstagramReelsProps) => {
   const reels = urls.slice(0, 4)
 
-  if (reels.length === 0) {
-    return null
-  }
+  if (reels.length === 0) return null
 
   return (
-    <section className="container mx-auto px-4 py-16 md:py-15">
-      <div className="mb-10 flex flex-col justify-between border-b border-neutral-100 pb-5 dark:border-neutral-900 md:flex-row md:items-end">
-        <div className="flex flex-col gap-1">
-          <h2 className="font-sans text-3xl font-semibold uppercase tracking-tight text-neutral-900 dark:text-neutral-100 md:text-4xl">
-            From Our Instagram
-          </h2>
-        </div>
-        <a
-          href="https://www.instagram.com/thehoneylooms/"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 font-mono text-xs uppercase tracking-widest text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 md:mt-0"
-        >
-          Follow @thehoneylooms &rarr;
-        </a>
-      </div>
-
-      <div>
-        <Carousel className="w-full" opts={CAROUSEL_OPTIONS}>
-          <div className="relative">
-            {/* Mobile arrow keys positioned on the sides */}
-            <div className="absolute inset-y-0 left-2 z-30 flex items-center md:hidden">
-              <CarouselMobilePrevious />
-            </div>
-            <div className="absolute inset-y-0 right-2 z-30 flex items-center md:hidden">
-              <CarouselMobileNext />
-            </div>
-
-            <CarouselContent className="ml-0 p-1 md:-ml-2">
-              {reels.map((reel, index) => {
-                return (
-                  <CarouselItem
-                    key={`${reel}-${index}`}
-                    className="basis-[88%] pl-0 md:basis-1/2 md:pl-2 xl:basis-1/3 2xl:basis-1/4"
-                  >
-                    <CarouselSlideMotion index={index}>
-                      <div className="flex justify-center">
-                        <div className="relative w-full max-w-[400px] overflow-hidden bg-background shadow-[0_0_10px_rgba(0,0,0,0.1)]">
-                          <div className="flex h-15 items-center gap-3 border-b border-neutral-200 bg-white px-4 text-neutral-950">
-                            <div className="size-10 shrink-0 overflow-hidden rounded-full">
-                              <Image
-                                src="/inverted_honeylooms.png"
-                                alt="Honeylooms"
-                                width={40}
-                                height={40}
-                                unoptimized
-                                className="h-full w-full object-cover"
-                              />
-                            </div>
-                            <div className="min-w-0">
-                              <span className="block truncate text-sm font-semibold">thehoneylooms</span>
-                              <span className="block truncate text-xs text-neutral-500">Watch this reel on Instagram &rarr;</span>
-                            </div>
-                          </div>
-
-                          <div className="relative aspect-[9/16] bg-black">
-                            <img
-                              src={`/api/instagram/reel-preview?url=${encodeURIComponent(reel)}`}
-                              alt={`Preview of Honeylooms Instagram reel ${index + 1}`}
-                              className="size-full object-cover"
-                              loading="lazy"
-                            />
-                          </div>
-                          <div className="flex items-center justify-between border-t border-neutral-200 bg-white px-3 py-3 text-neutral-950">
-                            <div className="flex items-center gap-4">
-                              <Heart aria-hidden="true" className="size-6 stroke-[1.75]" />
-                              <MessageCircle aria-hidden="true" className="size-6 stroke-[1.75]" />
-                              <Send aria-hidden="true" className="size-6 stroke-[1.75]" />
-                            </div>
-                            <Bookmark aria-hidden="true" className="size-6 stroke-[1.75]" />
-                          </div>
-                          <a
-                            href={reel}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="absolute inset-0 z-10 block cursor-pointer"
-                            aria-label={`Open Instagram reel ${index + 1} on Instagram`}
-                          />
-                        </div>
-                      </div>
-                    </CarouselSlideMotion>
-                  </CarouselItem>
-                )
-              })}
-            </CarouselContent>
+    <section className="bg-[#ded8cc] px-5 py-16 text-[#24231f] md:px-10 md:py-24 lg:px-14">
+      <div className="mx-auto max-w-[1500px]">
+        <div className="mb-9 flex items-end justify-between gap-5 md:mb-12">
+          <div>
+            <p className="mb-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-[#6d685f]">
+              <Instagram className="size-3.5" />
+              @thehoneylooms
+            </p>
+            <h2 className="font-editorial text-4xl leading-none tracking-[-0.03em] md:text-6xl">
+              From our Instagram
+            </h2>
           </div>
-        </Carousel>
+          <a
+            className="group hidden items-center gap-2 border-b border-[#24231f]/40 pb-1 text-[10px] uppercase tracking-[0.18em] transition-colors hover:border-[#24231f] sm:inline-flex"
+            href="https://www.instagram.com/thehoneylooms/"
+            rel="noreferrer"
+            target="_blank"
+          >
+            Follow along
+            <ArrowUpRight className="size-3.5" />
+          </a>
+        </div>
+
+        <div className="-mx-5 flex snap-x snap-mandatory gap-2 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+          {reels.map((reel, index) => (
+            <a
+              aria-label={`Watch Honeylooms reel ${index + 1} on Instagram`}
+              className="group relative aspect-[2/3] min-w-[78vw] snap-center overflow-hidden bg-[#c9c2b6] sm:min-w-[45vw] md:min-w-0"
+              href={reel}
+              key={`${reel}-${index}`}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <img
+                alt={`Honeylooms community reel ${index + 1}`}
+                className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]"
+                loading="lazy"
+                src={`/api/instagram/reel-preview?url=${encodeURIComponent(reel)}`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+              <span className="absolute bottom-4 right-4 flex size-9 items-center justify-center rounded-full border border-white/50 text-white backdrop-blur-sm transition-colors group-hover:bg-white group-hover:text-[#24231f]">
+                <ArrowUpRight className="size-4" />
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <a
+          className="mt-8 inline-flex items-center gap-2 border-b border-[#24231f]/40 pb-1 text-[10px] uppercase tracking-[0.18em] sm:hidden"
+          href="https://www.instagram.com/thehoneylooms/"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Follow along
+          <ArrowUpRight className="size-3.5" />
+        </a>
       </div>
     </section>
   )

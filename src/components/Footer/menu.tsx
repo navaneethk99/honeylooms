@@ -1,7 +1,6 @@
 import type { Footer } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
-import React from 'react'
 import type { ReactNode } from 'react'
 
 interface Props {
@@ -9,45 +8,36 @@ interface Props {
   menu: Footer['navItems']
 }
 
+const columnTitles = ['Information', 'Explore', 'Collections']
+
 export function FooterMenu({ children, menu }: Props) {
-  // Chunk items into columns of max 4 rows
   const items = menu ?? []
   const chunks = []
-  for (let i = 0; i < items.length; i += 4) {
-    chunks.push(items.slice(i, i + 4))
+
+  for (let index = 0; index < items.length; index += 4) {
+    chunks.push(items.slice(index, index + 4))
   }
 
   return (
-    <nav className="grid grid-cols-2 gap-x-8 gap-y-10 md:flex md:flex-wrap md:gap-16">
-      {chunks.map((chunk, chunkIndex) => {
-        let title = null
-        if (chunkIndex === 0) {
-          title = 'Policies'
-        } else if (chunkIndex === 1) {
-          title = 'Useful Links'
-        } else if (chunkIndex === 2) {
-          title = 'Collections'
-        }
-
-        return (
-          <div key={chunkIndex} className="flex flex-col gap-3">
-            {title && (
-              <h3 className="font-semibold text-[#D9A322] underline text-md tracking-wide">
-                {title}
-              </h3>
-            )}
-            <ul className="flex flex-col gap-0">
-              {chunk.map((item) => {
-                return (
-                  <li key={item.id}>
-                    <CMSLink appearance="link" {...item.link} />
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        )
-      })}
+    <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-7 gap-y-9 sm:grid-cols-4">
+      {chunks.map((chunk, chunkIndex) => (
+        <div className="min-w-0" key={chunkIndex}>
+          <h3 className="mb-4 text-[9px] uppercase tracking-[0.22em] text-[#8a6718]">
+            {columnTitles[chunkIndex] || `More ${chunkIndex + 1}`}
+          </h3>
+          <ul className="space-y-2">
+            {chunk.map((item) => (
+              <li key={item.id}>
+                <CMSLink
+                  appearance="link"
+                  {...item.link}
+                  className="h-auto justify-start p-0 text-left text-xs font-normal text-[#24231f]/60 no-underline transition-colors hover:text-[#24231f] hover:no-underline"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
       {children}
     </nav>
   )

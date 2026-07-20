@@ -89,6 +89,7 @@ export interface Config {
     categories: Category;
     media: Media;
     collections: Collection;
+    'homepage-banners': HomepageBanner;
     gallery: Gallery;
     'promo-codes': PromoCode;
     refunds: Refund;
@@ -126,6 +127,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     collections: CollectionsSelect<false> | CollectionsSelect<true>;
+    'homepage-banners': HomepageBannersSelect<false> | HomepageBannersSelect<true>;
     gallery: GallerySelect<false> | GallerySelect<true>;
     'promo-codes': PromoCodesSelect<false> | PromoCodesSelect<true>;
     refunds: RefundsSelect<false> | RefundsSelect<true>;
@@ -1083,6 +1085,33 @@ export interface Address {
   createdAt: string;
 }
 /**
+ * The most recently updated active banner is displayed on the homepage.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage-banners".
+ */
+export interface HomepageBanner {
+  id: number;
+  /**
+   * Used in the admin panel only.
+   */
+  title: string;
+  /**
+   * Only active banners are eligible to appear on the homepage.
+   */
+  active?: boolean | null;
+  /**
+   * Recommended for landscape desktop and tablet screens.
+   */
+  desktopImage: number | Media;
+  /**
+   * Recommended for portrait mobile screens.
+   */
+  mobileImage: number | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gallery".
  */
@@ -1207,6 +1236,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'collections';
         value: number | Collection;
+      } | null)
+    | ({
+        relationTo: 'homepage-banners';
+        value: number | HomepageBanner;
       } | null)
     | ({
         relationTo: 'gallery';
@@ -1545,6 +1578,18 @@ export interface CollectionsSelect<T extends boolean = true> {
   appleMusicPlaylistUrl?: T;
   generateSlug?: T;
   slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage-banners_select".
+ */
+export interface HomepageBannersSelect<T extends boolean = true> {
+  title?: T;
+  active?: T;
+  desktopImage?: T;
+  mobileImage?: T;
   updatedAt?: T;
   createdAt?: T;
 }

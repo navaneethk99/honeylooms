@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="honey" x1="60" y1="40" x2="1510" y2="850" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E2B43C"/>
+      <stop offset="0.55" stop-color="#D9A322"/>
+      <stop offset="1" stop-color="#BD7F16"/>
+    </linearGradient>
+    <linearGradient id="vermilion" x1="1120" y1="40" x2="1500" y2="880" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#CF342F"/>
+      <stop offset="1" stop-color="#A91F29"/>
+    </linearGradient>
+    <pattern id="stitch-stripe" width="44" height="64" patternUnits="userSpaceOnUse">
+      <path d="M8 0V64M36 0V64" stroke="#713A28" stroke-width="7"/>
+      <path d="M22 3C13 11 31 18 22 27C13 35 31 42 22 51C17 56 18 60 22 64" stroke="#F3E4C3" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M4 14H12M4 46H12M32 30H40M32 62H40" stroke="#F3E4C3" stroke-width="3" stroke-linecap="round"/>
+    </pattern>
+    <pattern id="small-circles" width="118" height="118" patternUnits="userSpaceOnUse">
+      <circle cx="59" cy="59" r="25" stroke="#F5E8CA" stroke-opacity=".13" stroke-width="3"/>
+      <circle cx="59" cy="59" r="14" stroke="#F5E8CA" stroke-opacity=".13" stroke-width="3"/>
+      <circle cx="59" cy="59" r="4" fill="#F5E8CA" fill-opacity=".16"/>
+    </pattern>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="3" seed="14" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono" result="faded">
+        <feFuncA type="table" tableValues="0 .1"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="faded" mode="soft-light"/>
+    </filter>
+    <clipPath id="red-panel">
+      <path d="M1190-80C1355-55 1515 23 1600 135V900H1096C1054 789 1112 690 1091 573C1066 431 983 335 1033 197C1066 106 1095-94 1190-80Z"/>
+    </clipPath>
+    <g id="paisley-leaf">
+      <path d="M0 0C33-22 61-4 62 26C62 58 29 78 0 91C15 64 4 34 0 0Z" fill="#F5E8CA"/>
+      <path d="M14 14C32 3 48 12 47 29C46 46 31 57 16 66C23 47 18 31 14 14Z" stroke="#493124" stroke-width="3"/>
+      <path d="M10 77C23 67 35 65 49 65" stroke="#493124" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="32" cy="31" r="3" fill="#493124"/>
+      <circle cx="24" cy="43" r="2.5" fill="#493124"/>
+    </g>
+    <g id="folk-cow">
+      <path d="M14 46C14 21 34 8 65 8H145C177 8 196 25 194 52L191 80C190 94 180 104 166 104H54C29 104 14 82 14 59V46Z" fill="#F5E8CA"/>
+      <path d="M145 18C155-1 181-6 201 5C218 15 222 34 214 50C206 65 186 69 171 61" fill="#F5E8CA"/>
+      <path d="M198 7C208-8 223-9 232-1C218 1 213 9 211 19M177 4C167-10 153-10 144-2C158 0 164 8 166 17" stroke="#F5E8CA" stroke-width="6" stroke-linecap="round"/>
+      <path d="M43 99V137M75 102V137M155 101V137M181 91V137" stroke="#F5E8CA" stroke-width="10" stroke-linecap="round"/>
+      <path d="M22 30C4 34-1 48 5 66" stroke="#F5E8CA" stroke-width="6" stroke-linecap="round"/>
+      <path d="M64 8C67 29 89 39 108 27C120 19 122 8 122 8" fill="#DDA12B"/>
+      <path d="M152 34C162 47 177 52 193 49" stroke="#493124" stroke-width="5" stroke-linecap="round"/>
+      <path d="M39 58C70 42 112 43 145 61" stroke="#493124" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="199" cy="26" r="3.5" fill="#493124"/>
+      <path d="M47 77H161" stroke="#CF342F" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <g filter="url(#grain)">
+    <rect width="1600" height="900" fill="url(#honey)"/>
+    <rect width="1600" height="900" fill="url(#small-circles)"/>
+
+    <path d="M-20 175C235 95 425 123 625 43C781-19 927-30 1081 22" stroke="#F5E8CA" stroke-opacity=".16" stroke-width="3"/>
+    <path d="M-45 190C228 108 425 144 631 62C784 1 922-9 1074 40" stroke="#713A28" stroke-opacity=".45" stroke-width="4" stroke-dasharray="3 18" stroke-linecap="round"/>
+
+    <path d="M397 951C392 777 420 621 502 478C579 344 698 268 806 157" stroke="#F5E8CA" stroke-width="14" stroke-linecap="round"/>
+    <path d="M493 495C383 456 302 378 251 278M568 374C542 269 558 173 606 86M634 303C740 306 831 263 905 185M475 555C582 576 671 648 717 746" stroke="#F5E8CA" stroke-width="10" stroke-linecap="round"/>
+
+    <use href="#paisley-leaf" transform="translate(217 228) rotate(-31) scale(.95)"/>
+    <use href="#paisley-leaf" transform="translate(320 367) rotate(-49) scale(.8)"/>
+    <use href="#paisley-leaf" transform="translate(526 95) rotate(-3) scale(.82)"/>
+    <use href="#paisley-leaf" transform="translate(681 262) rotate(36) scale(.92)"/>
+    <use href="#paisley-leaf" transform="translate(822 163) rotate(47) scale(.72)"/>
+    <use href="#paisley-leaf" transform="translate(553 577) rotate(119) scale(.9)"/>
+    <use href="#paisley-leaf" transform="translate(674 687) rotate(139) scale(.72)"/>
+
+    <g fill="#F5E8CA">
+      <circle cx="427" cy="664" r="5"/><circle cx="449" cy="622" r="4"/><circle cx="468" cy="583" r="3.5"/>
+      <circle cx="521" cy="436" r="4"/><circle cx="548" cy="397" r="3.5"/><circle cx="583" cy="352" r="4"/>
+    </g>
+
+    <path d="M936-40C911 172 933 389 918 589C906 749 876 847 838 945" stroke="#F5E8CA" stroke-opacity=".82" stroke-width="4" stroke-dasharray="8 13"/>
+    <path d="M965-40C941 174 963 390 948 591C936 752 905 851 868 945" stroke="#713A28" stroke-opacity=".72" stroke-width="7"/>
+    <rect x="957" y="0" width="70" height="900" fill="url(#stitch-stripe)" opacity=".92"/>
+
+    <g clip-path="url(#red-panel)">
+      <rect x="1010" y="-80" width="590" height="980" fill="url(#vermilion)"/>
+      <path d="M1060 64C1248 121 1412 100 1602 26M1033 782C1215 712 1414 730 1602 836" stroke="#F5E8CA" stroke-opacity=".16" stroke-width="28"/>
+      <use href="#folk-cow" transform="translate(1141 118) scale(1.25)"/>
+      <use href="#folk-cow" transform="translate(1328 410) rotate(7) scale(.9)"/>
+      <use href="#folk-cow" transform="translate(1106 641) rotate(-5) scale(.76)"/>
+      <path d="M1110 332H1530M1128 349H1548" stroke="#E5A72B" stroke-width="3" stroke-dasharray="3 14" stroke-linecap="round"/>
+      <circle cx="1510" cy="196" r="44" stroke="#F5E8CA" stroke-opacity=".42" stroke-width="4"/>
+      <circle cx="1510" cy="196" r="26" stroke="#F5E8CA" stroke-opacity=".42" stroke-width="4"/>
+      <circle cx="1510" cy="196" r="8" fill="#F5E8CA" fill-opacity=".5"/>
+    </g>
+
+    <path d="M1044-10C1062 183 1032 364 1061 537C1084 674 1134 796 1195 921" stroke="#F5E8CA" stroke-opacity=".7" stroke-width="5" stroke-dasharray="8 12"/>
+  </g>
+</svg>

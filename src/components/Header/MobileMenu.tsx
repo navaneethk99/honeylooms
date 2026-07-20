@@ -39,7 +39,7 @@ export function MobileMenu({ menu }: Props) {
     }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [isOpen])
+  }, [])
 
   useEffect(() => {
     setIsOpen(false)
@@ -47,23 +47,31 @@ export function MobileMenu({ menu }: Props) {
 
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
-      <SheetTrigger className="relative flex h-11 w-11 items-center justify-center rounded-md border border-neutral-200 text-black transition-colors dark:border-neutral-700 dark:bg-black dark:text-white">
+      <SheetTrigger aria-label="Open navigation menu" className="header-menu-trigger">
         <MenuIcon className="h-4" />
       </SheetTrigger>
 
-      <SheetContent side="left" className="px-4">
-        <SheetHeader className="px-0 pt-4 pb-0">
-          <SheetTitle>Honeylooms</SheetTitle>
+      <SheetContent side="left" className="mobile-menu-panel px-6">
+        <SheetHeader className="border-b border-[#24231f]/20 px-0 pb-6 pt-8">
+          <SheetTitle className="font-editorial text-4xl font-normal tracking-[-0.04em] text-[#24231f]">
+            Menu
+          </SheetTitle>
 
           <SheetDescription />
         </SheetHeader>
 
-        <div className="py-4">
+        <div className="py-5">
           {menu?.length ? (
             <ul className="flex w-full flex-col">
               {menu.map((item) => (
-                <li className="py-2" key={item.id}>
-                  <CMSLink {...item.link} appearance="link" />
+                <li className="border-b border-[#24231f]/15" key={item.id}>
+                  <div className="py-4">
+                    <CMSLink
+                      {...item.link}
+                      appearance="inline"
+                      className="font-editorial text-2xl text-[#24231f]"
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -71,9 +79,10 @@ export function MobileMenu({ menu }: Props) {
         </div>
 
         {user ? (
-          <div className="mt-4">
-            <h2 className="text-xl mb-4">My account</h2>
-            <hr className="my-2" />
+          <div className="mt-4 border-t border-[#24231f]/20 pt-6">
+            <h2 className="mb-4 text-[10px] uppercase tracking-[0.2em] text-[#6d685f]">
+              My account
+            </h2>
             <ul className="flex flex-col gap-2">
               <li>
                 <Link href="/orders">Orders</Link>
@@ -92,8 +101,10 @@ export function MobileMenu({ menu }: Props) {
             </ul>
           </div>
         ) : (
-          <div>
-            <h2 className="text-xl mb-4">My account</h2>
+          <div className="mt-4 border-t border-[#24231f]/20 pt-6">
+            <h2 className="mb-4 text-[10px] uppercase tracking-[0.2em] text-[#6d685f]">
+              My account
+            </h2>
             <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button asChild className="w-full sm:flex-1" variant="outline">
                 <Link href="/login">Log in</Link>

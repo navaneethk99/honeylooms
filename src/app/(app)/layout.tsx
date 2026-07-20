@@ -9,12 +9,21 @@ import { Providers } from '@/providers'
 import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/shared'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import { Fraunces } from 'next/font/google'
 import Script from 'next/script'
 import React from 'react'
 import { Analytics } from '@vercel/analytics/next'
 import { LottiePrefetcher } from '@/components/LottiePrefetcher'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import './globals.css'
+
+const editorialFont = Fraunces({
+  axes: ['opsz', 'SOFT', 'WONK'],
+  display: 'swap',
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  weight: 'variable',
+})
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -81,7 +90,9 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
+      className={[GeistSans.variable, GeistMono.variable, editorialFont.variable]
+        .filter(Boolean)
+        .join(' ')}
       lang="en"
       suppressHydrationWarning
     >
@@ -109,7 +120,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <LottiePrefetcher />
 
           <Header />
-          <main className="flex-1 bg-white text-black">{children}</main>
+          <main className="flex-1 bg-[#f5f1e8] text-black">{children}</main>
           <Footer />
         </Providers>
         <Analytics />
