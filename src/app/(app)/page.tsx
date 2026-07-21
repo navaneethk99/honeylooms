@@ -1,5 +1,5 @@
 import configPromise from '@payload-config'
-import { ArrowDown, ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import Link from 'next/link'
@@ -7,6 +7,7 @@ import { getPayload } from 'payload'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
 import { HomepageBannerMedia, HomepageFallbackBanner } from '@/components/HomepageBannerMedia'
+import { HomepageScrollControl } from '@/components/HomepageScrollControl'
 import { InstagramReels } from '@/components/InstagramReels'
 import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
@@ -23,6 +24,8 @@ import type {
 import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getMediaUrl } from '@/utilities/getMediaUrl'
+import { bannerImagePresets, type BannerImagePresetName } from '@/utilities/bannerImagePresets'
 
 const ENABLE_SVG_HOMEPAGE_BANNER = process.env.ENABLE_SVG_HOMEPAGE_BANNER !== 'false'
 
@@ -55,6 +58,17 @@ const getHomepageData = async (): Promise<PageType | null> => {
 const getProductMedia = (product?: Product | null): MediaType | null => {
   const image = product?.gallery?.[0]?.image
   return image && typeof image === 'object' ? image : null
+}
+
+const getBannerStageUrl = (image: MediaType, presetName: BannerImagePresetName) => {
+  const generatedPreview = getMediaUrl(
+    image.sizes?.[presetName]?.url || (presetName === 'bannerPreview' ? image.thumbnailURL : null),
+  )
+
+  return (
+    generatedPreview ||
+    `/api/banner-preview/${image.id}?size=${presetName}&v=${encodeURIComponent(image.updatedAt)}`
+  )
 }
 
 const productHasCategory = (product: Product, categoryID: Category['id']) =>
@@ -104,7 +118,7 @@ export default async function HomePage() {
       payload.find({
         collection: 'homepage-banners',
         depth: 1,
-        limit: 1,
+        limit: 12,
         overrideAccess: false,
         sort: '-updatedAt',
         where: { active: { equals: true } },
@@ -129,15 +143,40 @@ export default async function HomePage() {
     homepageCollections.length > 0 ? homepageCollections : collectionsResult.docs
   ).slice(0, 3) as Collection[]
 
-  const homepageBanner = bannerResult.docs[0]
-  const desktopBannerImage =
-    homepageBanner?.desktopImage && typeof homepageBanner.desktopImage === 'object'
-      ? homepageBanner.desktopImage
-      : null
-  const mobileBannerImage =
-    homepageBanner?.mobileImage && typeof homepageBanner.mobileImage === 'object'
-      ? homepageBanner.mobileImage
-      : null
+  const homepageBanners = bannerResult.docs.flatMap((banner) => {
+    const desktopImage =
+      banner.desktopImage && typeof banner.desktopImage === 'object' ? banner.desktopImage : null
+    const mobileImage =
+      banner.mobileImage && typeof banner.mobileImage === 'object' ? banner.mobileImage : null
+    const desktopSrc = getMediaUrl(desktopImage?.url)
+    const mobileSrc = getMediaUrl(mobileImage?.url)
+
+    if (!desktopImage || !mobileImage || !desktopSrc || !mobileSrc) return []
+
+    const sources = [
+      ...bannerImagePresets
+        .filter(({ name }) => name !== 'bannerPreview')
+        .map(({ dimension, name }) => ({
+          desktopSrc: getBannerStageUrl(desktopImage, name),
+          dimension,
+          mobileSrc: getBannerStageUrl(mobileImage, name),
+        })),
+      {
+        desktopSrc,
+        dimension: 4000,
+        mobileSrc,
+      },
+    ]
+
+    return [
+      {
+        alt: desktopImage.alt || mobileImage.alt || '',
+        id: String(banner.id),
+        rotationDelay: banner.rotationDelay ?? 5,
+        sources,
+      },
+    ]
+  })
 
   const instagramReelUrls =
     instagramReelsGlobal?.reels
@@ -147,14 +186,15 @@ export default async function HomePage() {
 
   return (
     <article className="home-page overflow-hidden bg-[#f5f1e8] text-[#24231f]">
-      <section className="relative min-h-[78svh] bg-[#24231f] text-white md:min-h-[calc(100svh-6rem)]">
-        {desktopBannerImage && mobileBannerImage ? (
-          <HomepageBannerMedia desktopImage={desktopBannerImage} mobileImage={mobileBannerImage} />
+      <HomepageScrollControl />
+      <section className="relative aspect-[1/1.7] bg-[#24231f] text-white md:aspect-[1.7/1]">
+        {homepageBanners.length > 0 ? (
+          <HomepageBannerMedia banners={homepageBanners} />
         ) : ENABLE_SVG_HOMEPAGE_BANNER ? (
           <HomepageFallbackBanner />
         ) : null}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,19,16,0.08)_20%,rgba(20,19,16,0.74)_100%)]" />
-        <div className="relative z-10 flex min-h-[78svh] flex-col justify-between px-5 pb-8 pt-7 md:min-h-[calc(100svh-6rem)] md:px-10 md:pb-12 lg:px-14">
+        <div className="relative z-10 flex h-full flex-col justify-between px-5 pb-8 pt-7 md:px-10 md:pb-12 lg:px-14">
           <div className="home-reveal flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-white/80">
             {/*<span>Honeylooms / India</span>
             <span className="hidden sm:inline">Contemporary Indian clothing</span>*/}
@@ -201,14 +241,6 @@ export default async function HomePage() {
               )}
             </div>
           </div>
-
-          <a
-            aria-label="Scroll to latest arrivals"
-            className="home-reveal absolute bottom-9 right-5 flex size-10 items-center justify-center rounded-full border border-white/40 transition-colors hover:bg-white hover:text-[#24231f] md:bottom-12 md:right-10 lg:right-14"
-            href="#latest-arrivals"
-          >
-            <ArrowDown className="size-4" />
-          </a>
         </div>
       </section>
 

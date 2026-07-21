@@ -387,6 +387,32 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    bannerPreview?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    bannerMedium?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    bannerLarge?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1085,7 +1111,7 @@ export interface Address {
   createdAt: string;
 }
 /**
- * The most recently updated active banner is displayed on the homepage.
+ * Active banners rotate on the homepage, with the most recently updated first.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage-banners".
@@ -1100,6 +1126,10 @@ export interface HomepageBanner {
    * Only active banners are eligible to appear on the homepage.
    */
   active?: boolean | null;
+  /**
+   * How long this banner remains visible before advancing to the next one.
+   */
+  rotationDelay: number;
   /**
    * Recommended for landscape desktop and tablet screens.
    */
@@ -1564,6 +1594,40 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        bannerPreview?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        bannerMedium?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        bannerLarge?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1588,6 +1652,7 @@ export interface CollectionsSelect<T extends boolean = true> {
 export interface HomepageBannersSelect<T extends boolean = true> {
   title?: T;
   active?: T;
+  rotationDelay?: T;
   desktopImage?: T;
   mobileImage?: T;
   updatedAt?: T;

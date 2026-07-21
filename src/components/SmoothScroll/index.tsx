@@ -1,9 +1,14 @@
 'use client'
 
 import Lenis from 'lenis'
-import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 
 export const SmoothScroll = () => {
+  const pathname = usePathname()
+  const lenisRef = useRef<Lenis | null>(null)
+  const previousPathnameRef = useRef(pathname)
+
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const touchPrimary = window.matchMedia('(pointer: coarse)')
@@ -20,8 +25,22 @@ export const SmoothScroll = () => {
       wheelMultiplier: 0.9,
     })
 
-    return () => lenis.destroy()
+    lenisRef.current = lenis
+
+    return () => {
+      lenis.destroy()
+      lenisRef.current = null
+    }
   }, [])
+
+  useEffect(() => {
+    const previousPathname = previousPathnameRef.current
+    previousPathnameRef.current = pathname
+
+    if (previousPathname === pathname) return
+
+    lenisRef.current?.scrollTo(0, { force: true, immediate: true })
+  }, [pathname])
 
   return null
 }

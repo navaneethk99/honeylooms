@@ -19,7 +19,7 @@ export const HomepageBanners: CollectionConfig = {
     group: 'Content',
     useAsTitle: 'title',
     defaultColumns: ['title', 'active', 'updatedAt'],
-    description: 'The most recently updated active banner is displayed on the homepage.',
+    description: 'Active banners rotate on the homepage, with the most recently updated first.',
   },
   fields: [
     {
@@ -39,6 +39,19 @@ export const HomepageBanners: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Only active banners are eligible to appear on the homepage.',
+      },
+    },
+    {
+      name: 'rotationDelay',
+      type: 'number',
+      label: 'Display Duration (seconds)',
+      defaultValue: 5,
+      min: 2,
+      max: 30,
+      required: true,
+      admin: {
+        position: 'sidebar',
+        description: 'How long this banner remains visible before advancing to the next one.',
       },
     },
     {

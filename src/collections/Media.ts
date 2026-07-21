@@ -9,6 +9,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 import { adminOnly } from '@/access/adminOnly'
+import { bannerImagePresets } from '@/utilities/bannerImagePresets'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -41,6 +42,19 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
+    imageSizes: bannerImagePresets.map(({ dimension, name, quality }) => ({
+      name,
+      width: dimension,
+      height: dimension,
+      fit: 'inside',
+      withoutEnlargement: true,
+      formatOptions: {
+        format: 'webp',
+        options: {
+          quality,
+        },
+      },
+    })),
     staticDir: path.resolve(dirname, '../../public/media'),
   },
 }
