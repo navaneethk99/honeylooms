@@ -52,7 +52,7 @@ function PromoBannerClient({
   const currentMessage = messages[currentIdx]?.text || ''
 
   return (
-    <div className="w-full bg-neutral-950 dark:bg-neutral-900 border-b border-neutral-850 dark:border-neutral-800 text-neutral-200 dark:text-neutral-300 text-xs py-2 px-4 transition-all duration-300 select-none">
+    <div className="w-full select-none border-b border-[#d9a321]/40 bg-[#24231f] px-4 py-2 text-xs text-[#f5f1e8] transition-all duration-300">
       <div className="container mx-auto flex items-center justify-center text-center font-medium tracking-wider uppercase text-[10px] sm:text-xs">
         <div
           className={`transition-all duration-300 ease-out transform ${

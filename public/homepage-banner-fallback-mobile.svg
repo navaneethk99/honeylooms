@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1100" fill="none">
+  <defs>
+    <linearGradient id="honey-mobile" x1="20" y1="20" x2="700" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E2B43C"/>
+      <stop offset=".58" stop-color="#D9A322"/>
+      <stop offset="1" stop-color="#B97718"/>
+    </linearGradient>
+    <linearGradient id="vermilion-mobile" x1="430" y1="0" x2="710" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D13A31"/>
+      <stop offset="1" stop-color="#991F29"/>
+    </linearGradient>
+    <pattern id="mobile-circles" width="104" height="104" patternUnits="userSpaceOnUse">
+      <circle cx="52" cy="52" r="22" stroke="#F5E8CA" stroke-opacity=".13" stroke-width="3"/>
+      <circle cx="52" cy="52" r="11" stroke="#F5E8CA" stroke-opacity=".13" stroke-width="3"/>
+      <circle cx="52" cy="52" r="3" fill="#F5E8CA" fill-opacity=".16"/>
+    </pattern>
+    <pattern id="mobile-stitch" width="42" height="62" patternUnits="userSpaceOnUse">
+      <path d="M7 0V62M35 0V62" stroke="#713A28" stroke-width="7"/>
+      <path d="M21 2C12 10 30 17 21 26C12 34 30 41 21 50C16 55 17 59 21 62" stroke="#F3E4C3" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M3 14h8M3 45h8M31 29h8M31 59h8" stroke="#F3E4C3" stroke-width="3" stroke-linecap="round"/>
+    </pattern>
+    <filter id="mobile-grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="3" seed="18" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono" result="faded">
+        <feFuncA type="table" tableValues="0 .1"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="faded" mode="soft-light"/>
+    </filter>
+    <clipPath id="mobile-red-panel">
+      <path d="M431-40C542-30 649 14 720 83V820C642 775 563 763 493 782C433 798 397 756 407 687C427 548 374 447 393 310C409 198 368-23 431-40Z"/>
+    </clipPath>
+    <g id="mobile-paisley">
+      <path d="M0 0C33-22 61-4 62 26C62 58 29 78 0 91C15 64 4 34 0 0Z" fill="#F5E8CA"/>
+      <path d="M14 14C32 3 48 12 47 29C46 46 31 57 16 66C23 47 18 31 14 14Z" stroke="#493124" stroke-width="3"/>
+      <path d="M10 77C23 67 35 65 49 65" stroke="#493124" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="32" cy="31" r="3" fill="#493124"/>
+      <circle cx="24" cy="43" r="2.5" fill="#493124"/>
+    </g>
+    <g id="mobile-cow">
+      <path d="M14 46C14 21 34 8 65 8H145C177 8 196 25 194 52L191 80C190 94 180 104 166 104H54C29 104 14 82 14 59V46Z" fill="#F5E8CA"/>
+      <path d="M145 18C155-1 181-6 201 5C218 15 222 34 214 50C206 65 186 69 171 61" fill="#F5E8CA"/>
+      <path d="M198 7C208-8 223-9 232-1C218 1 213 9 211 19M177 4C167-10 153-10 144-2C158 0 164 8 166 17" stroke="#F5E8CA" stroke-width="6" stroke-linecap="round"/>
+      <path d="M43 99V137M75 102V137M155 101V137M181 91V137" stroke="#F5E8CA" stroke-width="10" stroke-linecap="round"/>
+      <path d="M22 30C4 34-1 48 5 66" stroke="#F5E8CA" stroke-width="6" stroke-linecap="round"/>
+      <path d="M64 8C67 29 89 39 108 27C120 19 122 8 122 8" fill="#DDA12B"/>
+      <path d="M152 34C162 47 177 52 193 49M39 58C70 42 112 43 145 61" stroke="#493124" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="199" cy="26" r="3.5" fill="#493124"/>
+      <path d="M47 77H161" stroke="#CF342F" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <g filter="url(#mobile-grain)">
+    <rect width="720" height="1100" fill="url(#honey-mobile)"/>
+    <rect width="720" height="1100" fill="url(#mobile-circles)"/>
+
+    <path d="M-38 187C116 134 242 149 389 80C476 39 548 21 627 35" stroke="#F5E8CA" stroke-opacity=".18" stroke-width="3"/>
+    <path d="M-47 202C112 147 246 168 394 97C481 56 548 39 633 53" stroke="#713A28" stroke-opacity=".46" stroke-width="4" stroke-dasharray="3 17" stroke-linecap="round"/>
+
+    <path d="M112 1150C108 966 133 806 210 652C263 545 334 459 395 353" stroke="#F5E8CA" stroke-width="13" stroke-linecap="round"/>
+    <path d="M168 752C92 709 48 650 20 576M224 628C198 540 208 450 249 370M276 544C346 534 403 499 449 447M149 825C235 851 295 912 327 1002" stroke="#F5E8CA" stroke-width="9" stroke-linecap="round"/>
+
+    <use href="#mobile-paisley" transform="translate(5 534) rotate(-31) scale(.72)"/>
+    <use href="#mobile-paisley" transform="translate(82 672) rotate(-50) scale(.76)"/>
+    <use href="#mobile-paisley" transform="translate(211 365) rotate(-3) scale(.75)"/>
+    <use href="#mobile-paisley" transform="translate(356 433) rotate(39) scale(.72)"/>
+    <use href="#mobile-paisley" transform="translate(212 845) rotate(122) scale(.8)"/>
+    <use href="#mobile-paisley" transform="translate(310 971) rotate(140) scale(.62)"/>
+
+    <path d="M374-30C360 195 378 399 363 610C353 770 326 925 289 1135" stroke="#F5E8CA" stroke-opacity=".82" stroke-width="4" stroke-dasharray="8 13"/>
+    <path d="M399-30C384 196 404 402 389 612C378 777 352 932 315 1135" stroke="#713A28" stroke-opacity=".74" stroke-width="7"/>
+    <rect x="390" width="68" height="1100" fill="url(#mobile-stitch)" opacity=".94"/>
+
+    <g clip-path="url(#mobile-red-panel)">
+      <rect x="380" y="-40" width="340" height="870" fill="url(#vermilion-mobile)"/>
+      <path d="M389 91C505 135 611 123 732 62M398 701C504 659 622 670 733 743" stroke="#F5E8CA" stroke-opacity=".16" stroke-width="24"/>
+      <use href="#mobile-cow" transform="translate(452 112) scale(.91)"/>
+      <use href="#mobile-cow" transform="translate(490 381) rotate(5) scale(.72)"/>
+      <use href="#mobile-cow" transform="translate(430 602) rotate(-4) scale(.6)"/>
+      <path d="M429 320H687M444 337H702" stroke="#E5A72B" stroke-width="3" stroke-dasharray="3 13" stroke-linecap="round"/>
+      <circle cx="672" cy="208" r="32" stroke="#F5E8CA" stroke-opacity=".42" stroke-width="4"/>
+      <circle cx="672" cy="208" r="18" stroke="#F5E8CA" stroke-opacity=".42" stroke-width="4"/>
+      <circle cx="672" cy="208" r="6" fill="#F5E8CA" fill-opacity=".5"/>
+    </g>
+
+    <path d="M466-15C476 171 450 350 471 521C488 655 526 767 579 862" stroke="#F5E8CA" stroke-opacity=".72" stroke-width="5" stroke-dasharray="8 12"/>
+  </g>
+</svg>

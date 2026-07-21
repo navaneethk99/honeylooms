@@ -6,15 +6,23 @@ import { Header } from '@/components/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ensureStartsWith } from '@/utilities/ensureStartsWith'
 import { Providers } from '@/providers'
-import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/shared'
+import { defaultTheme } from '@/providers/Theme/shared'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
-import Script from 'next/script'
+import { Fraunces } from 'next/font/google'
 import React from 'react'
 import { Analytics } from '@vercel/analytics/next'
 import { LottiePrefetcher } from '@/components/LottiePrefetcher'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import './globals.css'
+
+const editorialFont = Fraunces({
+  axes: ['opsz', 'SOFT', 'WONK'],
+  display: 'swap',
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  weight: 'variable',
+})
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -81,22 +89,15 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
+      className={[GeistSans.variable, GeistMono.variable, editorialFont.variable]
+        .filter(Boolean)
+        .join(' ')}
+      data-scroll-behavior="smooth"
+      data-theme={defaultTheme}
       lang="en"
       suppressHydrationWarning
     >
       <head>
-        <Script
-          dangerouslySetInnerHTML={{
-            __html: `(function () {
-              var theme = '${defaultTheme}'
-              window.localStorage.setItem('${themeLocalStorageKey}', theme)
-              document.documentElement.setAttribute('data-theme', theme)
-            })();`,
-          }}
-          id="theme-script"
-          strategy="beforeInteractive"
-        />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         <link rel="preload" href="/Cat.lottie" as="fetch" crossOrigin="anonymous" />
@@ -109,7 +110,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <LottiePrefetcher />
 
           <Header />
-          <main className="flex-1 bg-white text-black">{children}</main>
+          <main className="flex-1 bg-[#f5f1e8] text-black">{children}</main>
           <Footer />
         </Providers>
         <Analytics />

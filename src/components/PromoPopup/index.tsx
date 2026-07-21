@@ -58,19 +58,15 @@ export function PromoPopup() {
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      {/* Editorial dark backdrop overlay */}
       <div
         className="absolute inset-0 bg-neutral-950/40 backdrop-blur-xs cursor-pointer transition-opacity duration-300"
         onClick={handleClose}
       />
-
-      {/* Modal Container: Sharp, Minimalist, High-Fashion Design */}
       <div
         className={`relative w-full max-w-md bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-none p-8 md:p-10 shadow-2xl z-10 transition-all duration-300 transform ${
           isVisible ? 'translate-y-0 scale-100' : 'translate-y-4 scale-95'
         }`}
       >
-        {/* Close Button */}
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 p-1 text-neutral-400 hover:text-neutral-950 dark:hover:text-white transition-colors duration-200 cursor-pointer"
@@ -79,7 +75,6 @@ export function PromoPopup() {
           <X className="w-5 h-5" />
         </button>
 
-        {/* Modal Content */}
         <div className="flex flex-col items-start text-left space-y-6">
           {/* Category/Type header */}
           {/*<span className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-semibold">
