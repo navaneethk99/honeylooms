@@ -282,20 +282,23 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <section className="relative overflow-hidden border-b border-[#24231f]/20 bg-[#29483b] px-5 py-16 text-[#f5f1e8] md:px-10 md:py-24 lg:px-14">
+      <section className="relative h-64 overflow-hidden border-b border-[#24231f]/20 bg-[#D9A322] text-[#24231f] md:h-96">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-repeat-x opacity-[0.34] [mask-image:linear-gradient(90deg,transparent,black_5%,black_95%,transparent)]"
+          className="pointer-events-none absolute inset-0 bg-right bg-repeat-x opacity-[0.52] md:bg-center md:opacity-[0.82]"
           style={{
-            backgroundImage: "url('/gond-art-pattern.svg')",
-            backgroundPosition: 'center',
-            backgroundSize: '960px 360px',
+            backgroundImage: "url('/madhubani-art-pattern.svg')",
+            backgroundSize: 'auto 100%',
           }}
         />
-        <div className="relative z-10 mx-auto grid max-w-[1500px] gap-8 md:grid-cols-12 md:items-end">
-          <p className="font-editorial text-3xl leading-[1.05] tracking-[-0.02em] sm:text-4xl md:col-span-8 md:text-5xl lg:text-6xl">
-            Stories carried in every line. Bold in rhythm, alive in colour, and shaped by
-            generations of imagination.
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[#D9A322]/45 md:bg-[linear-gradient(90deg,rgba(217,163,34,0.96)_0%,rgba(217,163,34,0.88)_43%,rgba(217,163,34,0.38)_66%,rgba(217,163,34,0.08)_100%)]"
+        />
+        <div className="relative z-10 mx-auto flex h-full max-w-[1500px] items-center px-5 py-10 md:px-10 md:py-14 lg:px-14">
+          <p className="max-w-[100rem] font-editorial text-[1.75rem] leading-[1.03] tracking-[-0.025em] sm:text-4xl md:w-[70%] md:text-5xl xl:text-6xl">
+            Tradition doesn’t have to stay traditional. India’s rich heritage of handcrafted
+            textiles deserves to evolve with every generation.
           </p>
         </div>
       </section>
@@ -359,7 +362,7 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <section className="relative overflow-hidden border-b border-[#24231f]/20 bg-[#8f3f32] px-5 py-16 text-[#f5f1e8] md:px-10 md:py-24 lg:px-14">
+      <section className="relative h-64 overflow-hidden border-b border-[#24231f]/20 bg-[#8f3f32] px-5 py-16 text-[#f5f1e8] md:h-96 md:px-10 md:py-24 lg:px-14">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-repeat-x opacity-[0.18] [mask-image:linear-gradient(90deg,transparent,black_5%,black_95%,transparent)]"
