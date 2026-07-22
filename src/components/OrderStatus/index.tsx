@@ -9,19 +9,13 @@ type Props = {
 export const OrderStatus: React.FC<Props> = ({ status, className }) => {
   return (
     <div
-      className={cn(
-        'text-xs tracking-widest font-mono uppercase py-0.5 px-2 rounded w-fit',
-        className,
-        {
-          'bg-primary/10': status === 'processing',
-          'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300':
-            status === 'confirmed' || status === 'refund_requested',
-          'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300': status === 'shipped',
-          'bg-success': status === 'completed' || status === 'refund_approved',
-          'bg-destructive/10 text-destructive':
-            status === 'cancelled' || status === 'refunded' || status === 'refund_rejected',
-        },
-      )}
+      className={cn('w-fit text-xs capitalize text-[#6c675d]', className, {
+        'text-[#8a682f]': status === 'confirmed' || status === 'refund_requested',
+        'text-[#456275]': status === 'shipped',
+        'text-[#38624a]': status === 'completed' || status === 'refund_approved',
+        'text-[#8a4b3c]':
+          status === 'cancelled' || status === 'refunded' || status === 'refund_rejected',
+      })}
     >
       {status?.replace('_', ' ')}
     </div>

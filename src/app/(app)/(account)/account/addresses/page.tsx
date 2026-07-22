@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
-import { Order } from '@/payload-types'
 import { getPayload } from 'payload'
 import { redirect } from 'next/navigation'
 import { AddressListing } from '@/components/addresses/AddressListing'
@@ -14,46 +13,20 @@ export default async function AddressesPage() {
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers })
 
-  let orders: Order[] | null = null
-
   if (!user) {
     redirect(
       `/login?warning=${encodeURIComponent('Please login to access your account settings.')}`,
     )
   }
 
-  try {
-    const ordersResult = await payload.find({
-      collection: 'orders',
-      limit: 5,
-      user,
-      overrideAccess: false,
-      pagination: false,
-      where: {
-        customer: {
-          equals: user?.id,
-        },
-      },
-    })
-
-    orders = ordersResult?.docs || []
-  } catch (error) {
-    // when deploying this template on Payload Cloud, this page needs to build before the APIs are live
-    // so swallow the error here and simply render the page with fallback data where necessary
-    // in production you may want to redirect to a 404  page or at least log the error somewhere
-    // console.error(error)
-  }
-
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-neutral-100 dark:border-neutral-900">
-        <h1 className="text-2xl font-semibold">Addresses</h1>
+      <div className="mb-8 flex items-center justify-between border-b border-[#24231f]/20 pb-4">
+        <h1 className="font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">Addresses</h1>
         <CreateAddressModal />
       </div>
 
-      <div className="mb-8">
-        <AddressListing />
-      </div>
+      <AddressListing />
     </div>
   )
 }

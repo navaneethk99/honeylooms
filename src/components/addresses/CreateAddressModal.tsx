@@ -52,11 +52,19 @@ export const CreateAddressModal: React.FC<Props> = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild disabled={disabled}>
-        <Button variant={'outline'}>{buttonText}</Button>
+        <Button
+          className="h-auto rounded-none border-0 bg-transparent p-0 text-sm font-normal text-[#24231f] underline underline-offset-4 shadow-none hover:bg-transparent"
+          variant="link"
+        >
+          {buttonText}
+        </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent
+        className="max-h-[calc(100dvh-2rem)] touch-pan-y overscroll-contain rounded-none border-[#24231f]/20 bg-[#f5f1e8] shadow-none"
+        data-lenis-prevent
+      >
         <DialogHeader>
-          <DialogTitle>{modalTitle}</DialogTitle>
+          <DialogTitle className="font-editorial text-3xl font-normal">{modalTitle}</DialogTitle>
           <DialogDescription>This address will be connected to your account.</DialogDescription>
         </DialogHeader>
 

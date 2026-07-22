@@ -19,34 +19,33 @@ export const AccountNav: React.FC<Props> = ({ className }) => {
   ]
 
   return (
-    <div className={clsx(className)}>
-      <nav>
-        <h3 className="text-xs mb-3 text-neutral-500 dark:text-neutral-400">Account</h3>
-        <ul className="flex flex-col gap-2">
+    <div className={clsx('w-full', className)}>
+      <nav aria-label="Account navigation">
+        <ul className="flex gap-5 overflow-x-auto border-b border-[#24231f]/20 pb-4 md:flex-col md:gap-3 md:overflow-visible md:border-0 md:pb-0">
           {links.map((link) => {
             const active =
               pathname === link.href || (link.href !== '/account' && pathname.startsWith(link.href))
-            const DynamicTag = active ? 'p' : Link
             return (
-              <li key={link.href} className="flex text-sm text-black dark:text-white">
-                <DynamicTag
+              <li key={link.href} className="flex shrink-0 text-sm">
+                <Link
+                  aria-current={active ? 'page' : undefined}
                   href={link.href}
                   className={clsx(
-                    'w-full hover:underline hover:underline-offset-4 transition-all duration-200',
+                    'w-full whitespace-nowrap text-[#6c675d] transition-colors hover:text-[#24231f]',
                     {
-                      'underline underline-offset-4 font-medium': active,
+                      'font-medium text-[#24231f]': active,
                     },
                   )}
                 >
                   {link.label}
-                </DynamicTag>
+                </Link>
               </li>
             )
           })}
-          <li className="mt-4 border-t border-neutral-100 dark:border-neutral-900 pt-4 flex text-sm text-neutral-500 dark:text-neutral-400">
+          <li className="flex shrink-0 text-sm md:mt-3">
             <Link
               href="/logout"
-              className="w-full hover:underline hover:underline-offset-4 transition-all duration-200"
+              className="w-full whitespace-nowrap text-[#6c675d] transition-colors hover:text-[#24231f]"
             >
               Log out
             </Link>

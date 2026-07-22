@@ -35,11 +35,11 @@ const DeleteAddressButton: React.FC<{ addressID: DefaultDocumentIDType }> = ({ a
 
   return (
     <Button
-      variant="destructive"
-      size="sm"
+      className="h-auto rounded-none p-0 text-sm font-normal text-[#8a4b3c] underline underline-offset-4"
       disabled={isDeleting}
       onClick={handleDelete}
-      className="w-full"
+      size="sm"
+      variant="link"
     >
       {isDeleting ? 'Deleting...' : 'Delete'}
     </Button>
@@ -50,14 +50,14 @@ export const AddressListing: React.FC = () => {
   const { addresses } = useAddresses()
 
   if (!addresses || addresses.length === 0) {
-    return <p>No addresses found.</p>
+    return <p className="py-6 text-sm text-[#6c675d]">No addresses found.</p>
   }
 
   return (
     <div>
-      <ul className="flex flex-col gap-8">
+      <ul className="border-t border-[#24231f]/20">
         {addresses.map((address) => (
-          <li key={address.id} className="border-b pb-8 last:border-none">
+          <li key={address.id} className="border-b border-[#24231f]/20 py-5">
             <AddressItem
               address={address}
               afterActions={address.id ? <DeleteAddressButton addressID={address.id} /> : null}

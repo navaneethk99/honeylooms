@@ -45,12 +45,16 @@ export const LoginForm: React.FC = () => {
   )
 
   return (
-    <form className="" onSubmit={handleSubmit(onSubmit)}>
-      <Message className="classes.message" error={error} />
-      <div className="flex flex-col gap-8">
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Message className="mb-6 mt-0 rounded-none text-sm" error={error} />
+      <div className="flex flex-col gap-5">
         <FormItem>
-          <Label htmlFor="email">Email</Label>
+          <Label className="text-sm text-[#5d594f]" htmlFor="email">
+            Email
+          </Label>
           <Input
+            autoComplete="email"
+            className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
             id="email"
             type="email"
             {...register('email', { required: 'Email is required.' })}
@@ -59,32 +63,39 @@ export const LoginForm: React.FC = () => {
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="password">Password</Label>
+          <Label className="text-sm text-[#5d594f]" htmlFor="password">
+            Password
+          </Label>
           <Input
+            autoComplete="current-password"
+            className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
             id="password"
             type="password"
             {...register('password', { required: 'Please provide a password.' })}
           />
           {errors.password && <FormError message={errors.password.message} />}
         </FormItem>
-
-        <div className="text-primary/70 mb-6 prose prose-a:hover:text-primary dark:prose-invert">
-          {/*<p>
-            Forgot your password?{' '}
-            <Link href={`/forgot-password${allParams}`}>Click here to reset it</Link>
-          </p>*/}
-        </div>
       </div>
 
-      <div className="flex gap-4 justify-between">
-        <Button asChild variant="outline" size="lg">
-          <Link href={`/create-account${allParams}`} className="grow max-w-[50%]">
-            Create an account
-          </Link>
-        </Button>
-        <Button className="grow" disabled={isLoading} size="lg" type="submit" variant="default">
+      <div className="mt-7">
+        <Button
+          className="h-11 w-full rounded-none bg-[#24231f] text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+          disabled={isLoading}
+          size="lg"
+          type="submit"
+          variant="default"
+        >
           {isLoading ? 'Processing' : 'Continue'}
         </Button>
+        <p className="mt-5 text-sm text-[#6c675d]">
+          Don&apos;t have an account?{' '}
+          <Link
+            className="text-[#24231f] underline underline-offset-4"
+            href={`/create-account${allParams}`}
+          >
+            Create an account
+          </Link>
+        </p>
       </div>
     </form>
   )

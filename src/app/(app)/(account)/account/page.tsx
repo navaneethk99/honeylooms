@@ -47,33 +47,26 @@ export default async function AccountPage() {
   }
 
   return (
-    <div className="flex flex-col gap-16 w-full">
-      <div className="pb-12 border-b border-neutral-100 dark:border-neutral-900">
-        <h1 className="text-2xl font-semibold mb-6">Account Settings</h1>
+    <div className="flex w-full flex-col gap-12">
+      <section className="border-b border-[#24231f]/20 pb-10">
+        <h1 className="mb-8 font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">Account</h1>
         <AccountForm />
-      </div>
+      </section>
 
-      <div>
-        <div className="flex items-center justify-between mb-6 pb-2 border-b border-neutral-100 dark:border-neutral-900">
-          <h2 className="text-xl font-semibold">Recent Orders</h2>
+      <section>
+        <div className="mb-5 flex items-center justify-between border-b border-[#24231f]/20 pb-4">
+          <h2 className="font-editorial text-2xl text-[#24231f]">Recent orders</h2>
           <Button
             asChild
             variant="link"
-            className="px-0 text-sm hover:underline hover:no-underline underline-offset-4 text-neutral-500 hover:text-neutral-950 dark:hover:text-neutral-50 font-mono uppercase tracking-wider text-xs"
+            className="h-auto rounded-none px-0 text-sm text-[#5d594f] underline underline-offset-4"
           >
             <Link href="/orders">View all orders</Link>
           </Button>
         </div>
 
-        <div className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
-          {/*<p>
-            These are the most recent orders you have placed. Each order is associated with a
-            payment. As you place more orders, they will appear in your orders list.
-          </p>*/}
-        </div>
-
         {(!orders || !Array.isArray(orders) || orders?.length === 0) && (
-          <p className="text-sm text-neutral-500 py-6">You have no orders.</p>
+          <p className="py-7 text-sm text-[#6c675d]">You have no orders yet.</p>
         )}
 
         {orders && orders.length > 0 && (
@@ -85,7 +78,7 @@ export default async function AccountPage() {
             ))}
           </ul>
         )}
-      </div>
+      </section>
     </div>
   )
 }

@@ -90,10 +90,9 @@ export const AccountForm: React.FC = () => {
   }, [user, router, reset, changePassword])
 
   return (
-    <form className="max-w-xl" onSubmit={handleSubmit(onSubmit)}>
+    <form className="max-w-2xl" onSubmit={handleSubmit(onSubmit)}>
       {!changePassword ? (
         <Fragment>
-          <p className='mb-8'>Change your account details below</p>
           {/*<div className="prose dark:prose-invert mb-8">
             <p className="">
               {'Change your account details below, or '}
@@ -109,12 +108,14 @@ export const AccountForm: React.FC = () => {
             </p>
           </div>*/}
 
-          <div className="flex flex-col gap-8 mb-8">
+          <div className="mb-7 grid gap-5 sm:grid-cols-2">
             <FormItem>
-              <Label htmlFor="email" className="mb-2">
+              <Label htmlFor="email" className="text-sm text-[#5d594f]">
                 Email Address
               </Label>
               <Input
+                autoComplete="email"
+                className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
                 id="email"
                 {...register('email', { required: 'Please provide an email.' })}
                 type="email"
@@ -123,10 +124,12 @@ export const AccountForm: React.FC = () => {
             </FormItem>
 
             <FormItem>
-              <Label htmlFor="name" className="mb-2">
+              <Label htmlFor="name" className="text-sm text-[#5d594f]">
                 Name
               </Label>
               <Input
+                autoComplete="name"
+                className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
                 id="name"
                 {...register('name', { required: 'Please provide a name.' })}
                 type="text"
@@ -152,12 +155,14 @@ export const AccountForm: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col gap-8 mb-8">
+          <div className="mb-8 flex flex-col gap-6">
             <FormItem>
               <Label htmlFor="password" className="mb-2">
                 New password
               </Label>
               <Input
+                autoComplete="new-password"
+                className="h-12 rounded-none border-[#24231f]/25 bg-transparent px-4 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
                 id="password"
                 {...register('password', { required: 'Please provide a new password.' })}
                 type="password"
@@ -170,6 +175,8 @@ export const AccountForm: React.FC = () => {
                 Confirm password
               </Label>
               <Input
+                autoComplete="new-password"
+                className="h-12 rounded-none border-[#24231f]/25 bg-transparent px-4 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
                 id="passwordConfirm"
                 {...register('passwordConfirm', {
                   required: 'Please confirm your new password.',
@@ -182,7 +189,12 @@ export const AccountForm: React.FC = () => {
           </div>
         </Fragment>
       )}
-      <Button disabled={isLoading || isSubmitting || !isDirty} type="submit" variant="default">
+      <Button
+        className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+        disabled={isLoading || isSubmitting || !isDirty}
+        type="submit"
+        variant="default"
+      >
         {isLoading || isSubmitting
           ? 'Processing'
           : changePassword

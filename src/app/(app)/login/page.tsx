@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
 import { RenderParams } from '@/components/RenderParams'
-import Link from 'next/link'
 import React from 'react'
 
 import { headers as getHeaders } from 'next/headers'
@@ -20,18 +19,13 @@ export default async function Login() {
   }
 
   return (
-    <div className="container">
-      <div className="max-w-xl mx-auto my-12">
+    <section className="container py-16 sm:py-24">
+      <div className="mx-auto max-w-md">
         <RenderParams />
-
-        <h1 className="mb-4 text-[1.8rem]">Log in</h1>
-        {/*<p className="mb-8">
-          {`This is where your customers will login to manage their account, review their order history, and more. To manage all users, `}
-          <Link href="/admin/collections/users">login to the admin dashboard</Link>.
-        </p>*/}
+        <h1 className="mb-10 font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">Log in</h1>
         <LoginForm />
       </div>
-    </div>
+    </section>
   )
 }
 

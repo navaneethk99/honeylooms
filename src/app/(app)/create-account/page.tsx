@@ -20,19 +20,23 @@ export default async function CreateAccount() {
   }
 
   return (
-    <div className="container py-16">
-      <h1 className="text-xl mb-4">Create Account</h1>
-      <RenderParams />
-      <CreateAccountForm />
-    </div>
+    <section className="container py-16 sm:py-24">
+      <div className="mx-auto max-w-md">
+        <RenderParams />
+        <h1 className="mb-10 font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">
+          Create account
+        </h1>
+        <CreateAccountForm />
+      </div>
+    </section>
   )
 }
 
 export const metadata: Metadata = {
   description: 'Create an account or log in to your existing account.',
   openGraph: mergeOpenGraph({
-    title: 'Account',
-    url: '/account',
+    title: 'Create Account',
+    url: '/create-account',
   }),
-  title: 'Account',
+  title: 'Create Account',
 }

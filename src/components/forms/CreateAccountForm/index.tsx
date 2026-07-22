@@ -72,22 +72,16 @@ export const CreateAccountForm: React.FC = () => {
   )
 
   return (
-    <form className="max-w-lg py-4" onSubmit={handleSubmit(onSubmit)}>
-      <div className="prose dark:prose-invert mb-6">
-        {/*<p>
-          {`This is where new customers can signup and create a new account. To manage all users, `}
-          <Link href="/admin/collections/users">login to the admin dashboard</Link>.
-        </p>*/}
-      </div>
-
-      <Message error={error} />
-
-      <div className="flex flex-col gap-8 mb-8">
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Message className="mb-6 mt-0" error={error} />
+      <div className="flex flex-col gap-5">
         <FormItem>
-          <Label htmlFor="email" className="mb-2">
-            Email Address
+          <Label className="text-sm text-[#5d594f]" htmlFor="email">
+            Email
           </Label>
           <Input
+            autoComplete="email"
+            className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
             id="email"
             {...register('email', { required: 'Email is required.' })}
             type="email"
@@ -96,10 +90,12 @@ export const CreateAccountForm: React.FC = () => {
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="password" className="mb-2">
-            New password
+          <Label className="text-sm text-[#5d594f]" htmlFor="password">
+            Password
           </Label>
           <Input
+            autoComplete="new-password"
+            className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
             id="password"
             {...register('password', { required: 'Password is required.' })}
             type="password"
@@ -108,10 +104,12 @@ export const CreateAccountForm: React.FC = () => {
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="passwordConfirm" className="mb-2">
-            Confirm Password
+          <Label className="text-sm text-[#5d594f]" htmlFor="passwordConfirm">
+            Confirm password
           </Label>
           <Input
+            autoComplete="new-password"
+            className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
             id="passwordConfirm"
             {...register('passwordConfirm', {
               required: 'Please confirm your password.',
@@ -122,14 +120,21 @@ export const CreateAccountForm: React.FC = () => {
           {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
         </FormItem>
       </div>
-      <Button disabled={loading} type="submit" variant="default">
-        {loading ? 'Processing' : 'Create Account'}
-      </Button>
 
-      <div className="prose dark:prose-invert mt-8">
-        <p>
-          {'Already have an account? '}
-          <Link href={`/login${allParams}`}>Login</Link>
+      <div className="mt-7">
+        <Button
+          className="h-11 w-full rounded-none bg-[#24231f] text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+          disabled={loading}
+          type="submit"
+          variant="default"
+        >
+          {loading ? 'Processing' : 'Create account'}
+        </Button>
+        <p className="mt-5 text-sm text-[#6c675d]">
+          Already have an account?{' '}
+          <Link className="text-[#24231f] underline underline-offset-4" href={`/login${allParams}`}>
+            Log in
+          </Link>
         </p>
       </div>
     </form>
