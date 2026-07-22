@@ -9,6 +9,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 import { adminOnly } from '@/access/adminOnly'
+import { convertImageUploadToWebP } from '@/hooks/convertImageUploadToWebP'
 import { bannerImagePresets } from '@/utilities/bannerImagePresets'
 
 const filename = fileURLToPath(import.meta.url)
@@ -41,6 +42,9 @@ export const Media: CollectionConfig = {
       }),
     },
   ],
+  hooks: {
+    beforeOperation: [convertImageUploadToWebP],
+  },
   upload: {
     imageSizes: bannerImagePresets.map(({ dimension, name, quality }) => ({
       name,

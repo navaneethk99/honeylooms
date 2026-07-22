@@ -3,6 +3,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 import { adminOnly } from '@/access/adminOnly'
+import { convertImageUploadToWebP } from '@/hooks/convertImageUploadToWebP'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -69,6 +70,7 @@ export const Gallery: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeOperation: [convertImageUploadToWebP],
     afterChange: [
       ({ doc, req: { payload } }) => {
         try {
