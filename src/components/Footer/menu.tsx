@@ -1,6 +1,7 @@
 import type { Footer } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
+import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 interface Props {
@@ -13,10 +14,13 @@ const columnTitles = ['Information', 'Explore', 'Collections']
 export function FooterMenu({ children, menu }: Props) {
   const items = menu ?? []
   const chunks = []
+  const hasCareersLink = items.some((item) => item.link?.url === '/careers')
 
   for (let index = 0; index < items.length; index += 4) {
     chunks.push(items.slice(index, index + 4))
   }
+
+  if (chunks.length === 0) chunks.push([])
 
   return (
     <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-7 gap-y-9 sm:grid-cols-4">
@@ -35,6 +39,16 @@ export function FooterMenu({ children, menu }: Props) {
                 />
               </li>
             ))}
+            {chunkIndex === 0 && !hasCareersLink && (
+              <li>
+                <Link
+                  className="text-xs font-normal text-[#24231f]/60 transition-colors hover:text-[#24231f]"
+                  href="/careers"
+                >
+                  Careers
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       ))}
