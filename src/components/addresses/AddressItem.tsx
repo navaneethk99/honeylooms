@@ -36,13 +36,13 @@ export const AddressItem: React.FC<Props> = ({
   }
 
   return (
-    <div className="flex items-center">
-      <div className="grow">
-        <p className="font-medium">
+    <div className="flex items-start justify-between gap-6">
+      <div className="grow text-sm leading-6 text-[#6c675d]">
+        <p className="text-[#24231f]">
           {address.title && <span>{address.title} </span>}
           {address.firstName} {address.lastName}
         </p>
-        <p>{address.company && <span>{address.company} </span>}</p>
+        {address.company ? <p>{address.company}</p> : null}
         <p>{address.phone && <span>{address.phone}</span>}</p>
         <p>
           {address.addressLine1}
@@ -55,7 +55,7 @@ export const AddressItem: React.FC<Props> = ({
       </div>
 
       {!hideActions && address.id && (
-        <div className="shrink flex flex-col gap-2">
+        <div className="flex shrink-0 flex-col items-end gap-2 sm:flex-row">
           {actions ? (
             actions
           ) : (

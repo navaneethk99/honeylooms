@@ -39,14 +39,16 @@ export default async function Orders() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-semibold mb-8 pb-4 border-b border-neutral-100 dark:border-neutral-900">Orders</h1>
-      
+      <h1 className="mb-8 border-b border-[#24231f]/20 pb-4 font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">
+        Orders
+      </h1>
+
       {(!orders || !Array.isArray(orders) || orders?.length === 0) && (
-        <p className="text-sm text-neutral-500 py-6">You have no orders.</p>
+        <p className="py-6 text-sm text-[#6c675d]">You have no orders.</p>
       )}
 
       {orders && orders.length > 0 && (
-        <ul className="flex flex-col gap-4">
+        <ul className="border-t border-[#24231f]/20">
           {orders?.map((order) => (
             <li key={order.id}>
               <OrderItem order={order} />

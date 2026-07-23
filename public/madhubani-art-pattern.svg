@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" fill="none">
+  <defs>
+    <pattern id="paper-grain" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="5" r="1" fill="#F5E6C7" opacity=".7"/>
+      <circle cx="16" cy="15" r=".8" fill="#7A491B" opacity=".35"/>
+      <path d="m8 17 3-2m5-9 2-1" stroke="#F5E6C7" stroke-width="1" opacity=".45"/>
+    </pattern>
+    <pattern id="kachni-lines" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <path d="M0 2h10M0 7h10" stroke="#25211B" stroke-width="1.4"/>
+    </pattern>
+    <pattern id="kachni-cross" width="12" height="12" patternUnits="userSpaceOnUse">
+      <path d="m0 0 12 12M12 0 0 12" stroke="#F5E6C7" stroke-width="1.5" opacity=".9"/>
+    </pattern>
+    <pattern id="scale-fill" width="14" height="12" patternUnits="userSpaceOnUse">
+      <path d="M0 0c0 6 7 6 7 12M14 0c0 6-7 6-7 12" stroke="#25211B" stroke-width="1.5"/>
+      <circle cx="7" cy="3" r="1.4" fill="#F5E6C7"/>
+    </pattern>
+    <g id="lotus" stroke="#25211B" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 0C-3-16 4-27 12-31c6 12 2 24-12 31Z" fill="#F5E6C7" stroke-width="2.4"/>
+      <path d="M0 0c8-18 22-24 35-18-2 16-14 23-35 18Z" fill="#C64E37" stroke-width="2.4"/>
+      <path d="M0 0c-8-18-22-24-35-18 2 16 14 23 35 18Z" fill="#C64E37" stroke-width="2.4"/>
+      <path d="M0 0c16-8 29-5 36 7-12 8-24 6-36-7Zm0 0c-16-8-29-5-36 7 12 8 24 6 36-7Z" fill="#2D7A71" stroke-width="2.4"/>
+      <circle r="4.5" fill="#294E73" stroke-width="2"/>
+    </g>
+    <g id="leaf" stroke="#25211B" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 0c12-15 29-15 40-2C28 11 13 12 0 0Z" fill="#66883D" stroke-width="2.4"/>
+      <path d="M5 0h29M13-4l5 8m7-10 5 9" stroke-width="1.5"/>
+    </g>
+    <g id="fish" stroke="#25211B" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-82 0C-46-39 21-41 68 0 21 41-46 39-82 0Z" fill="#C64E37" stroke-width="4"/>
+      <path d="M-74 0c33-29 84-30 132 0-48 30-99 29-132 0Z" fill="url(#scale-fill)" stroke-width="2"/>
+      <path d="M-82 0c-29-28-56-29-78-4 19 4 34 13 43 27-17 7-28 19-33 37 31-8 54-28 68-60Z" fill="#294E73" stroke-width="4"/>
+      <path d="M-145 1c19 4 34 12 45 25m-32-12-4 24m17-19 8 17" stroke="#F5E6C7" stroke-width="2"/>
+      <circle cx="47" cy="-7" r="9" fill="#F5E6C7" stroke-width="2.5"/>
+      <circle cx="49" cy="-7" r="3" fill="#25211B" stroke="none"/>
+      <path d="M62 8c8 4 15 4 21 0M-71 0H57" stroke-width="2"/>
+    </g>
+    <g id="rosette" stroke="#25211B" stroke-linejoin="round">
+      <path d="m0-18 6 10 11-4-5 11 9 8-12 1-1 12-8-9-9 9-1-12-12-1 9-8-5-11 11 4Z" fill="#C64E37" stroke-width="2"/>
+      <circle r="7" fill="#F5E6C7" stroke-width="2"/>
+      <circle r="2.5" fill="#294E73" stroke="none"/>
+    </g>
+  </defs>
+
+  <rect width="960" height="360" fill="#D9A322"/>
+  <rect width="960" height="360" fill="url(#paper-grain)"/>
+
+  <g stroke="#25211B" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 17h960M0 45h960M0 315h960M0 343h960" stroke-width="2.5"/>
+    <path d="m0 18 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 8 8" fill="none" stroke-width="2"/>
+    <path d="m0 342 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 14 13 14-13 8-8" fill="none" stroke-width="2"/>
+    <path d="M7 39h946M7 321h946" stroke="#F5E6C7" stroke-width="2" stroke-dasharray="2 8"/>
+
+    <g transform="translate(154 180)">
+      <use href="#fish" transform="translate(0 -38) scale(.66)"/>
+      <use href="#fish" transform="translate(0 39) scale(-.66 .66)"/>
+      <use href="#lotus" transform="translate(4 5) scale(.58)"/>
+      <path d="M-121-93c30-18 59-19 87-5m-87 191c30 18 59 19 87 5" fill="none" stroke-width="2" stroke-dasharray="2 7"/>
+      <use href="#rosette" transform="translate(-112 -79) scale(.62)"/>
+      <use href="#rosette" transform="translate(-112 79) scale(.62)"/>
+    </g>
+
+    <g transform="translate(468 181)">
+      <path d="M0 126V-73M0-22c-41-29-75-30-102-4 25 29 59 37 102 24M0 33c43-29 79-29 106-2-28 29-63 36-106 24M0 79c-36-24-66-23-90 1 23 25 53 31 90 19" fill="none" stroke-width="4"/>
+      <path d="M-95-28c29 4 60 13 91 29m103 28C70 35 39 44 4 57m-87 22c25 4 51 11 78 22" fill="none" stroke-width="1.7"/>
+      <use href="#leaf" transform="translate(-99 -26) rotate(8) scale(.78)"/>
+      <use href="#leaf" transform="translate(102 29) rotate(172) scale(.82)"/>
+      <use href="#leaf" transform="translate(-87 79) rotate(8) scale(.7)"/>
+      <circle cy="-93" r="43" fill="#C64E37" stroke-width="4"/>
+      <circle cy="-93" r="31" fill="#F5E6C7" stroke-width="3"/>
+      <circle cy="-93" r="17" fill="#294E73" stroke-width="2.5"/>
+      <path d="M0-136v-15m27 23 11-12m-65 12-11-12m81 47h15m-101 0h-15" stroke-width="3"/>
+      <path d="M-6-98c3-3 9-3 12 0m-14 11c5 5 11 5 16 0" fill="none" stroke-width="2"/>
+      <use href="#lotus" transform="translate(0 124) scale(.74)"/>
+      <path d="M-126 128c37-15 75-17 113-5m26 0c38-12 76-10 113 5" fill="none" stroke-width="2" stroke-dasharray="2 8"/>
+    </g>
+
+    <g transform="translate(762 179)">
+      <path d="M-37 70c-17-57 3-103 49-110 39-6 70 26 62 62-8 35-56 63-111 48Z" fill="#2D7A71" stroke-width="4"/>
+      <path d="M-29 63c-8-41 7-77 40-88 27-8 50 12 50 38 0 30-39 56-90 50Z" fill="url(#kachni-cross)" stroke-width="2"/>
+      <path d="M60-3c17-48 43-76 78-75 29 1 39 26 22 44-15 16-42 10-56-6" fill="#2D7A71" stroke-width="4"/>
+      <path d="m152-65 28-8-20 20" fill="#C64E37" stroke-width="3"/>
+      <circle cx="143" cy="-58" r="4" fill="#F5E6C7" stroke-width="1.5"/>
+      <path d="M124-76c-6-21-2-38 12-52m-2 53c7-23 20-38 40-44m-29 47c18-16 38-22 58-16" fill="none" stroke-width="3"/>
+      <circle cx="135" cy="-129" r="6" fill="#C64E37" stroke-width="2"/>
+      <circle cx="176" cy="-119" r="6" fill="#294E73" stroke-width="2"/>
+      <circle cx="205" cy="-87" r="6" fill="#C64E37" stroke-width="2"/>
+      <path d="M-38 55c-62-35-112-27-148 23 55-4 94 12 119 48-1-34 9-57 29-71Z" fill="#294E73" stroke-width="4"/>
+      <path d="M-48 48c-59-10-108 5-147 44m134-27c-47-5-83 7-109 35m97-19c-34-1-59 8-76 27" fill="none" stroke="#F5E6C7" stroke-width="2.5"/>
+      <path d="M-140 78c15-15 30-15 45 0-15 12-30 12-45 0Zm28 25c13-13 26-13 39 0-13 11-26 11-39 0Zm-58 2c12-12 24-12 36 0-12 10-24 10-36 0Z" fill="#C64E37" stroke-width="2"/>
+      <path d="M-30 69c-1 24 5 44 18 60m47-70c6 24 17 44 35 60" fill="none" stroke-width="3"/>
+      <use href="#lotus" transform="translate(82 129) scale(.58)"/>
+      <use href="#rosette" transform="translate(-169 -116) scale(.68)"/>
+      <use href="#rosette" transform="translate(183 116) scale(.68)"/>
+    </g>
+
+    <g fill="#F5E6C7" stroke="none">
+      <circle cx="288" cy="74" r="2.5"/><circle cx="306" cy="63" r="2"/><circle cx="318" cy="82" r="2.5"/>
+      <circle cx="597" cy="83" r="2.5"/><circle cx="615" cy="70" r="2"/><circle cx="626" cy="91" r="2.5"/>
+      <circle cx="291" cy="285" r="2.5"/><circle cx="310" cy="297" r="2"/><circle cx="326" cy="280" r="2.5"/>
+    </g>
+  </g>
+</svg>

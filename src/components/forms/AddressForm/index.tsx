@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { titles } from './constants'
 import { Button } from '@/components/ui/button'
 import { deepMergeSimple } from 'payload/shared'
 import { FormError } from '@/components/forms/FormError'
@@ -62,9 +61,7 @@ export const AddressForm: React.FC<Props> = ({
 
   const countryValue = watch('country')
   const isNotIndia = Boolean(
-    countryValue &&
-      countryValue.toLowerCase() !== 'in' &&
-      countryValue.toLowerCase() !== 'india',
+    countryValue && countryValue.toLowerCase() !== 'in' && countryValue.toLowerCase() !== 'india',
   )
 
   const { createAddress, updateAddress } = useAddresses()
@@ -89,34 +86,13 @@ export const AddressForm: React.FC<Props> = ({
   )
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      className="[&_input]:h-11 [&_input]:rounded-none [&_input]:border-[#24231f]/25 [&_input]:bg-transparent [&_input]:shadow-none [&_label]:font-sans [&_label]:text-sm [&_label]:text-[#5d594f] [&_[data-slot=select-trigger]]:h-11 [&_[data-slot=select-trigger]]:rounded-none [&_[data-slot=select-trigger]]:border-[#24231f]/25 [&_[data-slot=select-trigger]]:shadow-none"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <div className="flex flex-col gap-4 mb-8">
         <div className="flex flex-col md:flex-row gap-4">
-          <FormItem className="shrink">
-            <Label htmlFor="title">Title</Label>
-
-            <Select
-              {...register('title')}
-              onValueChange={(value) => {
-                setValue('title', value, { shouldValidate: true })
-              }}
-              defaultValue={initialData?.title || ''}
-            >
-              <SelectTrigger id="title">
-                <SelectValue placeholder="Title" />
-              </SelectTrigger>
-              <SelectContent>
-                {titles.map((title) => (
-                  <SelectItem key={title} value={title}>
-                    {title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.title && <FormError message={errors.title.message} />}
-          </FormItem>
-
-          <FormItem>
+          <FormItem className="flex-1">
             <Label htmlFor="firstName">First name*</Label>
             <Input
               id="firstName"
@@ -126,7 +102,7 @@ export const AddressForm: React.FC<Props> = ({
             {errors.firstName && <FormError message={errors.firstName.message} />}
           </FormItem>
 
-          <FormItem>
+          <FormItem className="flex-1">
             <Label htmlFor="lastName">Last name*</Label>
             <Input
               autoComplete="family-name"
@@ -148,12 +124,6 @@ export const AddressForm: React.FC<Props> = ({
             })}
           />
           {errors.phone && <FormError message={errors.phone.message} />}
-        </FormItem>
-
-        <FormItem>
-          <Label htmlFor="company">Company</Label>
-          <Input id="company" autoComplete="organization" {...register('company')} />
-          {errors.company && <FormError message={errors.company.message} />}
         </FormItem>
 
         <FormItem>
@@ -236,7 +206,13 @@ export const AddressForm: React.FC<Props> = ({
         </FormItem>
       </div>
 
-      <Button type="submit" disabled={isNotIndia}>Submit</Button>
+      <Button
+        className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+        disabled={isNotIndia}
+        type="submit"
+      >
+        Submit
+      </Button>
     </form>
   )
 }
