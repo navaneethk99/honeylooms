@@ -42,6 +42,7 @@ export const CheckoutAddresses: React.FC<Props> = ({
 }) => {
   const { addresses } = useAddresses()
   const defaultAddress = showNewAddressForm ? undefined : addresses?.[0]
+  const availableAddresses = addresses || []
 
   useEffect(() => {
     if (defaultAddress) {
@@ -49,7 +50,7 @@ export const CheckoutAddresses: React.FC<Props> = ({
     }
   }, [defaultAddress, setAddress])
 
-  if (!addresses) {
+  if (!addresses && !skipSubmission) {
     return null
   }
 
@@ -78,7 +79,7 @@ export const CheckoutAddresses: React.FC<Props> = ({
         </>
       ) : (
         <>
-          {addresses.length > 0 ? (
+          {availableAddresses.length > 0 ? (
             <AddressSelectionModal
               disabled={disabled}
               setAddress={setAddress}
