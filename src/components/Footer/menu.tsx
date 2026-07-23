@@ -39,7 +39,7 @@ export function FooterMenu({ children, menu }: Props) {
                 />
               </li>
             ))}
-            {chunkIndex === 0 && !hasCareersLink && (
+            {/*{chunkIndex === 0 && !hasCareersLink && (
               <li>
                 <Link
                   className="text-xs font-normal text-[#24231f]/60 transition-colors hover:text-[#24231f]"
@@ -48,7 +48,7 @@ export function FooterMenu({ children, menu }: Props) {
                   Careers
                 </Link>
               </li>
-            )}
+            )}*/}
           </ul>
         </div>
       ))}
