@@ -3,7 +3,7 @@ import type { PaymentAdapter, PaymentAdapterArgs } from '@payloadcms/plugin-ecom
 
 import type { Order, Transaction } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
-import { calculateCartSubtotalFromStoredItems } from '@/utilities/pricing'
+import { calculateCartSubtotalFromStoredItems, calculatePromoDiscount } from '@/utilities/pricing'
 
 type CashfreeEnvironment = 'production' | 'sandbox'
 
@@ -228,14 +228,12 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
         if (promo) {
           const minOrder = (promo.minOrderValue || 0) * 100
           if (subtotal >= minOrder) {
-            let discount = Math.round(subtotal * (promo.discountPercentage / 100))
-            if (promo.maxDiscount) {
-              const maxD = promo.maxDiscount * 100
-              if (discount > maxD) {
-                discount = maxD
-              }
-            }
-            discountAmount = discount
+            discountAmount = calculatePromoDiscount({
+              discountPercentage: promo.discountPercentage,
+              maxDiscountAmount:
+                typeof promo.maxDiscount === 'number' ? promo.maxDiscount * 100 : null,
+              subtotal,
+            })
           }
         }
       }

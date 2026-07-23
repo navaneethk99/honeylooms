@@ -5,10 +5,29 @@ import type { Product, Variant } from '@/payload-types'
 type MaybeProduct = Partial<Product> | null | undefined
 type MaybeVariant = Partial<Variant> | null | undefined
 
-export const getEffectiveProductPrice = (
-  product: MaybeProduct,
-  variant?: MaybeVariant,
-): number => {
+export const calculatePromoDiscount = ({
+  discountPercentage,
+  maxDiscountAmount,
+  subtotal,
+}: {
+  discountPercentage: number
+  maxDiscountAmount?: number | null
+  subtotal: number
+}): number => {
+  const safeSubtotal = Number.isFinite(subtotal) ? Math.max(0, subtotal) : 0
+  const safePercentage = Number.isFinite(discountPercentage)
+    ? Math.min(100, Math.max(0, discountPercentage))
+    : 0
+  const percentageDiscount = Math.round(safeSubtotal * (safePercentage / 100))
+  const safeMaximum =
+    typeof maxDiscountAmount === 'number' && Number.isFinite(maxDiscountAmount)
+      ? Math.max(0, maxDiscountAmount)
+      : safeSubtotal
+
+  return Math.min(safeSubtotal, percentageDiscount, safeMaximum)
+}
+
+export const getEffectiveProductPrice = (product: MaybeProduct, variant?: MaybeVariant): number => {
   if (product?.onSale && typeof product.salePrice === 'number') {
     return product.salePrice
   }
@@ -24,10 +43,7 @@ export const getEffectiveProductPrice = (
   return 0
 }
 
-export const getOriginalProductPrice = (
-  product: MaybeProduct,
-  variant?: MaybeVariant,
-): number => {
+export const getOriginalProductPrice = (product: MaybeProduct, variant?: MaybeVariant): number => {
   if (variant && typeof variant.priceInUSD === 'number') {
     return variant.priceInUSD
   }

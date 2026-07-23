@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { adminOnly } from '@/access/adminOnly'
+import { calculatePromoDiscount } from '@/utilities/pricing'
 
 export const PromoCodes: CollectionConfig = {
   slug: 'promo-codes',
@@ -23,7 +24,10 @@ export const PromoCodes: CollectionConfig = {
         const subtotalStr = url.searchParams.get('subtotal')
 
         if (!code) {
-          return Response.json({ valid: false, message: 'Promo code is required.' }, { status: 400 })
+          return Response.json(
+            { valid: false, message: 'Promo code is required.' },
+            { status: 400 },
+          )
         }
 
         const subtotal = parseInt(subtotalStr || '0')
@@ -32,10 +36,7 @@ export const PromoCodes: CollectionConfig = {
           const promoCodes = await req.payload.find({
             collection: 'promo-codes',
             where: {
-              and: [
-                { code: { equals: code } },
-                { active: { equals: true } },
-              ],
+              and: [{ code: { equals: code } }, { active: { equals: true } }],
             },
             req,
           })
@@ -53,25 +54,29 @@ export const PromoCodes: CollectionConfig = {
             })
           }
 
-          // Calculate discount in paise
-          let discount = Math.round(subtotal * (promo.discountPercentage / 100))
-          if (promo.maxDiscount) {
-            const maxD = promo.maxDiscount * 100
-            if (discount > maxD) {
-              discount = maxD
-            }
-          }
+          const maxDiscountAmount =
+            typeof promo.maxDiscount === 'number' ? promo.maxDiscount * 100 : null
+          const discount = calculatePromoDiscount({
+            discountPercentage: promo.discountPercentage,
+            maxDiscountAmount,
+            subtotal,
+          })
 
           return Response.json({
             valid: true,
             code: promo.code,
             discountPercentage: promo.discountPercentage,
             discountAmount: discount, // in paise
+            maxDiscountAmount,
+            minimumSubtotal: minOrder,
             message: `Coupon "${promo.code}" applied!`,
           })
         } catch (error) {
           req.payload.logger.error(`Error validating promo code "${code}": ${error}`)
-          return Response.json({ valid: false, message: 'Internal server error validating code.' }, { status: 500 })
+          return Response.json(
+            { valid: false, message: 'Internal server error validating code.' },
+            { status: 500 },
+          )
         }
       },
     },

@@ -73,6 +73,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { LottieLoader } from '@/components/LottieLoader'
 import {
   calculateCartSubtotalFromItems,
+  calculatePromoDiscount,
   getEffectiveProductPrice,
   getOriginalProductPrice,
   isProductOnSale,
@@ -104,8 +105,10 @@ export const CheckoutPage: React.FC = () => {
   const [couponCode, setCouponCode] = useState('')
   const [appliedDiscount, setAppliedDiscount] = useState<{
     code: string
-    amount: number
+    discountPercentage: number
+    maxDiscountAmount: number | null
     message: string
+    minimumSubtotal: number
   } | null>(null)
   const [couponError, setCouponError] = useState<string | null>(null)
   const [validatingCoupon, setValidatingCoupon] = useState(false)
@@ -122,13 +125,31 @@ export const CheckoutPage: React.FC = () => {
     })),
   )
   const checkoutSubtotal = resolvedSubtotal || cart?.subtotal || 0
-  const checkoutTotal =
-    checkoutSubtotal - (appliedDiscount?.amount || 0) + (selectedPaymentMethod === 'cod' ? 2500 : 0)
+  const appliedDiscountAmount = appliedDiscount
+    ? calculatePromoDiscount({
+        discountPercentage: appliedDiscount.discountPercentage,
+        maxDiscountAmount: appliedDiscount.maxDiscountAmount,
+        subtotal: checkoutSubtotal,
+      })
+    : 0
+  const checkoutTotal = Math.max(
+    0,
+    checkoutSubtotal - appliedDiscountAmount + (selectedPaymentMethod === 'cod' ? 2500 : 0),
+  )
 
   const canGoToPayment = Boolean(
     (email || user) && billingAddress && (billingAddressSameAsShipping || shippingAddress),
   )
   const canEnterAddress = Boolean(user || (email && !emailEditable))
+
+  useEffect(() => {
+    if (appliedDiscount && checkoutSubtotal < appliedDiscount.minimumSubtotal) {
+      const message = `Minimum order value of Rs. ${appliedDiscount.minimumSubtotal / 100} is required to use this coupon.`
+      setAppliedDiscount(null)
+      setCouponError(message)
+      toast.error(message)
+    }
+  }, [appliedDiscount, checkoutSubtotal])
 
   useEffect(() => {
     return () => {
@@ -306,8 +327,10 @@ export const CheckoutPage: React.FC = () => {
         if (data.valid) {
           setAppliedDiscount({
             code: data.code,
-            amount: data.discountAmount,
+            discountPercentage: data.discountPercentage,
+            maxDiscountAmount: data.maxDiscountAmount,
             message: data.message,
+            minimumSubtotal: data.minimumSubtotal,
           })
           toast.success(data.message)
         } else {
@@ -698,7 +721,7 @@ export const CheckoutPage: React.FC = () => {
                     {appliedDiscount.code} applied
                   </span>
                   <span className="text-xs text-emerald-500">
-                    Saved <Price amount={appliedDiscount.amount} as="span" />
+                    Saved <Price amount={appliedDiscountAmount} as="span" />
                   </span>
                 </div>
                 <Button
@@ -741,7 +764,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="flex justify-between items-center text-sm text-emerald-600 dark:text-emerald-400">
                 <span>Discount ({appliedDiscount.code})</span>
                 <span className="flex items-center gap-1">
-                  - <Price amount={appliedDiscount.amount} as="span" />
+                  - <Price amount={appliedDiscountAmount} as="span" />
                 </span>
               </div>
             )}
