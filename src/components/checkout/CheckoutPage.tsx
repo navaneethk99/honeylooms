@@ -78,6 +78,8 @@ import {
   isProductOnSale,
 } from '@/utilities/pricing'
 
+const MOBILE_NUMBER_PATTERN = /^[0-9]{10}$/
+
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
   const router = useRouter()
@@ -147,16 +149,21 @@ export const CheckoutPage: React.FC = () => {
         ? billingAddress
         : shippingAddress
 
-      if (!billingAddress?.phone?.trim()) {
-        const errorMessage = 'A phone number is required on the billing address.'
+      const billingMobileNumber = billingAddress?.phone?.trim() || ''
+      const shippingMobileNumber = selectedShippingAddress?.phone?.trim() || ''
+
+      if (!MOBILE_NUMBER_PATTERN.test(billingMobileNumber)) {
+        const errorMessage =
+          'The billing mobile number must be exactly 10 digits using numbers from 0-9.'
 
         setError(errorMessage)
         toast.error(errorMessage)
         return
       }
 
-      if (!selectedShippingAddress?.phone?.trim()) {
-        const errorMessage = 'A phone number is required on the shipping address.'
+      if (!MOBILE_NUMBER_PATTERN.test(shippingMobileNumber)) {
+        const errorMessage =
+          'The shipping mobile number must be exactly 10 digits using numbers from 0-9.'
 
         setError(errorMessage)
         toast.error(errorMessage)
@@ -440,9 +447,9 @@ export const CheckoutPage: React.FC = () => {
                     />
                   </div>
                 ) : null}
-                {!billingPhone && (
+                {!MOBILE_NUMBER_PATTERN.test(billingPhone || '') && (
                   <p className="mt-3 text-sm text-destructive">
-                    Add a phone number to this address to use UPI checkout.
+                    Add a valid 10-digit mobile number using only digits from 0-9.
                   </p>
                 )}
               </div>
@@ -487,9 +494,9 @@ export const CheckoutPage: React.FC = () => {
                         />
                       </div>
                     ) : null}
-                    {!shippingPhone && (
+                    {!MOBILE_NUMBER_PATTERN.test(shippingPhone || '') && (
                       <p className="mt-3 text-sm text-destructive">
-                        Add a phone number to this address to use UPI checkout.
+                        Add a valid 10-digit mobile number using only digits from 0-9.
                       </p>
                     )}
                   </div>

@@ -33,6 +33,8 @@ type AddressFormValues = {
   phone?: string | null
 }
 
+const MOBILE_NUMBER_PATTERN = /^[0-9]{10}$/
+
 type Props = {
   addressID?: Config['db']['defaultIDType']
   initialData?: Omit<Address, 'country' | 'id' | 'updatedAt' | 'createdAt'> & { country?: string }
@@ -126,9 +128,16 @@ export const AddressForm: React.FC<Props> = ({
             <Input
               type="tel"
               id={fieldID('phone')}
-              autoComplete="mobile tel"
+              autoComplete="tel"
+              inputMode="numeric"
+              maxLength={10}
+              pattern="[0-9]{10}"
               {...register('phone', {
                 required: 'Phone is required for UPI payments.',
+                pattern: {
+                  value: MOBILE_NUMBER_PATTERN,
+                  message: 'Phone must be exactly 10 digits using numbers from 0-9.',
+                },
               })}
             />
             {errors.phone && <FormError message={errors.phone.message} />}
