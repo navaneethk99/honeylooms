@@ -7,45 +7,47 @@ import { ThemeProvider } from './Theme'
 import { SonnerProvider } from '@/providers/Sonner'
 import { cashfreeAdapterClient } from '@/payments/cashfree/client'
 import { codAdapterClient } from '@/payments/cod/client'
+import { EcommerceAuthSync } from './EcommerceAuthSync'
 
 export const Providers: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <HeaderThemeProvider>
-          <SonnerProvider />
-          <EcommerceProvider
-            enableVariants={true}
-            api={{
-              cartsFetchQuery: {
-                depth: 2,
-                populate: {
-                  products: {
-                    slug: true,
-                    title: true,
-                    gallery: true,
-                    inventory: true,
-                    onSale: true,
-                    salePrice: true,
-                    discountPercentage: true,
-                  },
-                  variants: {
-                    title: true,
-                    inventory: true,
-                    priceInUSD: true,
-                    options: true,
-                  },
-                },
+      <EcommerceProvider
+        enableVariants={true}
+        api={{
+          cartsFetchQuery: {
+            depth: 2,
+            populate: {
+              products: {
+                slug: true,
+                title: true,
+                gallery: true,
+                inventory: true,
+                onSale: true,
+                salePrice: true,
+                discountPercentage: true,
               },
-            }}
-            paymentMethods={[cashfreeAdapterClient(), codAdapterClient()]}
-          >
+              variants: {
+                title: true,
+                inventory: true,
+                priceInUSD: true,
+                options: true,
+              },
+            },
+          },
+        }}
+        paymentMethods={[cashfreeAdapterClient(), codAdapterClient()]}
+      >
+        <AuthProvider>
+          <EcommerceAuthSync />
+          <HeaderThemeProvider>
+            <SonnerProvider />
             {children}
-          </EcommerceProvider>
-        </HeaderThemeProvider>
-      </AuthProvider>
+          </HeaderThemeProvider>
+        </AuthProvider>
+      </EcommerceProvider>
     </ThemeProvider>
   )
 }
