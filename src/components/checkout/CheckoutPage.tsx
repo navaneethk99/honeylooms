@@ -62,8 +62,8 @@ const loadCashfreeScript = async () => {
 
   await cashfreeScriptPromise
 }
-import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
-import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
+import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
+import { AddressSelectionModal, CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
 import { Address } from '@/payload-types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AddressItem } from '@/components/addresses/AddressItem'
@@ -89,8 +89,11 @@ export const CheckoutPage: React.FC = () => {
   const [email, setEmail] = useState('')
   const [emailEditable, setEmailEditable] = useState(true)
   const { initiatePayment, confirmOrder } = usePayments()
+  const { addresses } = useAddresses()
   const [shippingAddress, setShippingAddress] = useState<Partial<Address>>()
   const [billingAddress, setBillingAddress] = useState<Partial<Address>>()
+  const [showNewBillingAddressForm, setShowNewBillingAddressForm] = useState(false)
+  const [showNewShippingAddressForm, setShowNewShippingAddressForm] = useState(false)
   const [billingAddressSameAsShipping, setBillingAddressSameAsShipping] = useState(true)
   const [isProcessingPayment, setProcessingPayment] = useState(false)
   const [isInitiatingPayment, setIsInitiatingPayment] = useState(false)
@@ -129,6 +132,8 @@ export const CheckoutPage: React.FC = () => {
     return () => {
       setShippingAddress(undefined)
       setBillingAddress(undefined)
+      setShowNewBillingAddressForm(false)
+      setShowNewShippingAddressForm(false)
       setBillingAddressSameAsShipping(true)
       setEmail('')
       setEmailEditable(true)
@@ -340,9 +345,9 @@ export const CheckoutPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
+    <div className="my-8 flex grow flex-col items-stretch justify-stretch gap-10 md:flex-row md:gap-6 lg:gap-8">
       {(isInitiatingPayment || isProcessingPayment) && <LottieLoader size="full" />}
-      <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
+      <div className="flex basis-full flex-col justify-stretch gap-8 lg:basis-2/3">
         <h2 className="font-editorial text-4xl font-normal tracking-[-0.03em] text-[#24231f]">
           Contact
         </h2>
@@ -421,21 +426,20 @@ export const CheckoutPage: React.FC = () => {
 
             {billingAddress ? (
               <div>
-                <AddressItem
-                  actions={
-                    <Button
-                      variant={'outline'}
+                <AddressItem address={billingAddress} hideActions />
+                {user && addresses?.length ? (
+                  <div className="mt-4">
+                    <AddressSelectionModal
                       disabled={isProcessingPayment || isInitiatingPayment}
-                      onClick={(e) => {
-                        e.preventDefault()
+                      onUseNewAddress={() => {
+                        setShowNewBillingAddressForm(true)
                         setBillingAddress(undefined)
                       }}
-                    >
-                      Remove
-                    </Button>
-                  }
-                  address={billingAddress}
-                />
+                      setAddress={setBillingAddress}
+                      triggerLabel="Select different address"
+                    />
+                  </div>
+                ) : null}
                 {!billingPhone && (
                   <p className="mt-3 text-sm text-destructive">
                     Add a phone number to this address to use UPI checkout.
@@ -446,7 +450,9 @@ export const CheckoutPage: React.FC = () => {
               <CheckoutAddresses
                 heading="Billing address"
                 idPrefix="billing"
+                onShowNewAddressForm={() => setShowNewBillingAddressForm(true)}
                 setAddress={setBillingAddress}
+                showNewAddressForm={showNewBillingAddressForm}
                 skipSubmission={!user}
               />
             )}
@@ -467,21 +473,20 @@ export const CheckoutPage: React.FC = () => {
               <>
                 {shippingAddress ? (
                   <div>
-                    <AddressItem
-                      actions={
-                        <Button
-                          variant={'outline'}
+                    <AddressItem address={shippingAddress} hideActions />
+                    {user && addresses?.length ? (
+                      <div className="mt-4">
+                        <AddressSelectionModal
                           disabled={isProcessingPayment || isInitiatingPayment}
-                          onClick={(e) => {
-                            e.preventDefault()
+                          onUseNewAddress={() => {
+                            setShowNewShippingAddressForm(true)
                             setShippingAddress(undefined)
                           }}
-                        >
-                          Remove
-                        </Button>
-                      }
-                      address={shippingAddress}
-                    />
+                          setAddress={setShippingAddress}
+                          triggerLabel="Select different address"
+                        />
+                      </div>
+                    ) : null}
                     {!shippingPhone && (
                       <p className="mt-3 text-sm text-destructive">
                         Add a phone number to this address to use UPI checkout.
@@ -492,7 +497,9 @@ export const CheckoutPage: React.FC = () => {
                   <CheckoutAddresses
                     heading="Shipping address"
                     idPrefix="shipping"
+                    onShowNewAddressForm={() => setShowNewShippingAddressForm(true)}
                     setAddress={setShippingAddress}
+                    showNewAddressForm={showNewShippingAddressForm}
                     skipSubmission={!user}
                   />
                 )}
@@ -506,7 +513,7 @@ export const CheckoutPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* UPI Option */}
             <div
-              className={`p-4 border rounded-lg cursor-pointer transition-all flex flex-col gap-1 ${
+              className={`p-4 border cursor-pointer transition-all flex flex-col gap-1 ${
                 selectedPaymentMethod === 'cashfree'
                   ? 'border-[#D9A321] bg-[#D9A321]/5 ring-1 ring-[#D9A321]'
                   : 'border-border hover:border-foreground/50'
@@ -526,7 +533,7 @@ export const CheckoutPage: React.FC = () => {
 
             {/* COD Option */}
             <div
-              className={`p-4 border rounded-lg cursor-pointer transition-all flex flex-col gap-1 ${
+              className={`p-4 border cursor-pointer transition-all flex flex-col gap-1 ${
                 selectedPaymentMethod === 'cod'
                   ? 'border-[#D9A321] bg-[#D9A321]/5 ring-1 ring-[#D9A321]'
                   : 'border-border hover:border-foreground/50'
@@ -546,7 +553,7 @@ export const CheckoutPage: React.FC = () => {
           </div>
 
           <Button
-            className="self-start min-w-[200px] mt-4"
+            className="self-start min-w-[200px] mt-4 rounded-none h-12 bg-[#24231F]"
             disabled={!canGoToPayment || isInitiatingPayment || isProcessingPayment}
             onClick={(e) => {
               e.preventDefault()
@@ -579,7 +586,7 @@ export const CheckoutPage: React.FC = () => {
       </div>
 
       {!cartIsEmpty && (
-        <div className="basis-full lg:basis-1/3 lg:pl-8 p-8 border-none bg-primary/5 flex flex-col gap-8 rounded-lg">
+        <div className="flex h-fit basis-full flex-col gap-8 border-none bg-primary/5 p-8 lg:basis-1/3 lg:pl-8">
           <h2 className="text-3xl font-medium">Your cart</h2>
           {cart?.items?.map((item, index) => {
             if (typeof item.product === 'object' && item.product) {
@@ -626,12 +633,10 @@ export const CheckoutPage: React.FC = () => {
 
               return (
                 <div className="flex items-start gap-4" key={index}>
-                  <div className="flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border">
-                    <div className="relative w-full h-full">
-                      {image && typeof image !== 'string' && (
-                        <Media className="" fill imgClassName="rounded-lg" resource={image} />
-                      )}
-                    </div>
+                  <div className="relative aspect-[1/1] w-20 shrink-0 overflow-hidden border border-[#24231f]/20 bg-[#ebe5da]">
+                    {image && typeof image !== 'string' && (
+                      <Media fill imgClassName="object-cover" resource={image} size="80px" />
+                    )}
                   </div>
                   <div className="flex grow justify-between items-center">
                     <div className="flex flex-col gap-1">
@@ -705,13 +710,13 @@ export const CheckoutPage: React.FC = () => {
                   placeholder="Enter code"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  className="h-9 grow"
+                  className="bg-[#F6F1E8] rounded-none h-12"
                 />
                 <Button
                   type="submit"
                   size="sm"
                   disabled={validatingCoupon || !couponCode.trim()}
-                  className="h-9 hover:cursor-pointer"
+                  className="h-12 hover:cursor-pointer bg-[#24231F] rounded-none"
                 >
                   {validatingCoupon ? 'Applying...' : 'Apply'}
                 </Button>
