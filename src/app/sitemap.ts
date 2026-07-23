@@ -11,6 +11,7 @@ export const revalidate = 3600
 const staticRoutes = [
   '',
   '/about-us',
+  '/careers',
   '/collections',
   '/deliveries-and-returns',
   '/disclaimer',

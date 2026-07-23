@@ -17,9 +17,11 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { Categories } from '@/collections/Categories'
+import { CareerApplications } from '@/collections/CareerApplications'
 import { Collections } from '@/collections/Collections'
 import { Gallery } from '@/collections/Gallery'
 import { HomepageBanners } from '@/collections/HomepageBanners'
+import { JobPostings } from '@/collections/JobPostings'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
@@ -58,6 +60,8 @@ export default buildConfig({
     Gallery,
     PromoCodes,
     Refunds,
+    JobPostings,
+    CareerApplications,
   ],
   db: postgresAdapter({
     pool: {

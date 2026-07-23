@@ -93,6 +93,8 @@ export interface Config {
     gallery: Gallery;
     'promo-codes': PromoCode;
     refunds: Refund;
+    'job-postings': JobPosting;
+    'career-applications': CareerApplication;
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
@@ -131,6 +133,8 @@ export interface Config {
     gallery: GallerySelect<false> | GallerySelect<true>;
     'promo-codes': PromoCodesSelect<false> | PromoCodesSelect<true>;
     refunds: RefundsSelect<false> | RefundsSelect<true>;
+    'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
+    'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
@@ -1208,6 +1212,88 @@ export interface Refund {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-postings".
+ */
+export interface JobPosting {
+  id: number;
+  title: string;
+  department: string;
+  location?: string | null;
+  employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Questions are shown in this position’s application form in this order.
+   */
+  questions?:
+    | {
+        question: string;
+        fieldType: 'shortText' | 'longText' | 'email' | 'phone' | 'url' | 'select';
+        required?: boolean | null;
+        placeholder?: string | null;
+        options?:
+          | {
+              label: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. The role is hidden from the careers page after this date.
+   */
+  closingDate?: string | null;
+  active?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  sortOrder?: number | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "career-applications".
+ */
+export interface CareerApplication {
+  id: number;
+  job: number | JobPosting;
+  responses?:
+    | {
+        question: string;
+        answer?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  status: 'new' | 'reviewing' | 'shortlisted' | 'rejected' | 'hired';
+  /**
+   * Visible only to administrators.
+   */
+  internalNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1282,6 +1368,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'refunds';
         value: number | Refund;
+      } | null)
+    | ({
+        relationTo: 'job-postings';
+        value: number | JobPosting;
+      } | null)
+    | ({
+        relationTo: 'career-applications';
+        value: number | CareerApplication;
       } | null)
     | ({
         relationTo: 'forms';
@@ -1721,6 +1815,57 @@ export interface RefundsSelect<T extends boolean = true> {
   resolution?: T;
   images?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-postings_select".
+ */
+export interface JobPostingsSelect<T extends boolean = true> {
+  title?: T;
+  department?: T;
+  location?: T;
+  employmentType?: T;
+  description?: T;
+  questions?:
+    | T
+    | {
+        question?: T;
+        fieldType?: T;
+        required?: T;
+        placeholder?: T;
+        options?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  closingDate?: T;
+  active?: T;
+  sortOrder?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "career-applications_select".
+ */
+export interface CareerApplicationsSelect<T extends boolean = true> {
+  job?: T;
+  responses?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  status?: T;
+  internalNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
