@@ -260,6 +260,7 @@ export interface User {
  */
 export interface Order {
   id: number;
+  orderCode: string;
   items?:
     | {
         product?: (number | null) | Product;
@@ -2153,6 +2154,7 @@ export interface CartsSelect<T extends boolean = true> {
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
+  orderCode?: T;
   items?:
     | T
     | {

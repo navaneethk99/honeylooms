@@ -15,9 +15,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <section className="container py-12 sm:py-16">
       <div className="mx-auto max-w-5xl">
         <RenderParams className="mb-8" />
-        <div className="grid items-start gap-10 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-12">
+        <div
+          className={
+            user ? 'grid items-start gap-10 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-12' : 'w-full'
+          }
+        >
           {user ? <AccountNav /> : null}
-          <div className="min-w-0 w-full">{children}</div>
+          <div className="w-full min-w-0">{children}</div>
         </div>
       </div>
     </section>

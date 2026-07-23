@@ -1,5 +1,6 @@
 import type { CollectionAfterChangeHook } from 'payload'
 import { getServerSideURL } from '@/utilities/getURL'
+import { formatOrderReference } from '@/utilities/orderReference'
 import { getOrCreateOrderInvoice } from '@/utilities/getOrCreateOrderInvoice'
 
 export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, operation }) => {
@@ -53,7 +54,8 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, op
 
       // 7. Construct Order URL
       const serverURL = getServerSideURL()
-      const orderURL = `${serverURL}/orders/${doc.id}?email=${encodeURIComponent(toEmail)}&accessToken=${doc.accessToken}`
+      const orderCode = formatOrderReference(doc)
+      const orderURL = `${serverURL}/orders/${orderCode}?email=${encodeURIComponent(toEmail)}&accessToken=${doc.accessToken}`
 
       // 8. Compose HTML Email with Premium Website Theme (Cream & Gold Aesthetics)
       const emailHtml = `
@@ -246,7 +248,7 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, op
                 <div class="order-card-title">Order Overview</div>
                 <div class="order-meta-item">
                   <span class="order-meta-label">Order ID:</span>
-                  <span>#${doc.id}</span>
+                  <span>${orderCode}</span>
                 </div>
                 <div class="order-meta-item">
                   <span class="order-meta-label">Order Date:</span>
@@ -319,11 +321,11 @@ export const sendInvoiceEmail: CollectionAfterChangeHook = async ({ doc, req, op
       // 10. Send Email with PDF Attachment
       await payload.sendEmail({
         to: toEmail,
-        subject: `Honeylooms Invoice for Order #${doc.id}`,
+        subject: `Honeylooms Invoice for Order ${orderCode}`,
         html: emailHtml,
         attachments: [
           {
-            filename: `invoice-${doc.id}.pdf`,
+            filename: `invoice-${orderCode}.pdf`,
             content: pdfBuffer,
             contentType: 'application/pdf',
           },

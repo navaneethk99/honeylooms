@@ -33,6 +33,7 @@ describe('Inventory Reduction on Purchase', () => {
     const order = await payload.create({
       collection: 'orders',
       data: {
+        orderCode: '',
         items: [
           {
             product: product.id,
@@ -118,6 +119,7 @@ describe('Inventory Reduction on Purchase', () => {
     const order = await payload.create({
       collection: 'orders',
       data: {
+        orderCode: '',
         items: [
           {
             product: product.id,

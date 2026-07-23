@@ -53,17 +53,14 @@ export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
       // Cash on Delivery adds Rs. 25 charge (2500 paise)
       const codFee = 2500
       const subtotal = await calculateCartSubtotalFromStoredItems(req, cart.items)
-      
+
       let discountAmount = 0
       const promoCode = (data as any).promoCode || (req.data as any)?.promoCode
       if (promoCode) {
         const promoCodes = await payload.find({
           collection: 'promo-codes',
           where: {
-            and: [
-              { code: { equals: promoCode } },
-              { active: { equals: true } },
-            ],
+            and: [{ code: { equals: promoCode } }, { active: { equals: true } }],
           },
           req,
         })
@@ -126,6 +123,7 @@ export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
           amount,
           currency,
           items: flattenedCart,
+          orderCode: '',
           paymentMethod: 'cod',
           shippingAddress,
           status: 'processing',
@@ -157,6 +155,7 @@ export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
       return {
         message: 'COD order accepted successfully',
         orderID: order.id,
+        orderCode: order.orderCode,
         accessToken: order.accessToken,
       }
     },
@@ -175,12 +174,15 @@ export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
       })
 
       const transactionID = order.transactions?.[0]
-        ? (typeof order.transactions[0] === 'object' ? order.transactions[0].id : order.transactions[0])
+        ? typeof order.transactions[0] === 'object'
+          ? order.transactions[0].id
+          : order.transactions[0]
         : 0
 
       return {
         message: 'COD order already confirmed',
         orderID: order.id as any,
+        orderCode: order.orderCode,
         transactionID: transactionID as any,
       }
     },

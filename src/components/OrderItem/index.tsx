@@ -3,6 +3,7 @@ import { Price } from '@/components/Price'
 import { Button } from '@/components/ui/button'
 import { Order } from '@/payload-types'
 import { formatDateTime } from '@/utilities/formatDateTime'
+import { formatOrderReference } from '@/utilities/orderReference'
 import Link from 'next/link'
 
 type Props = {
@@ -16,7 +17,7 @@ export const OrderItem: React.FC<Props> = ({ order }) => {
     <div className="flex flex-col gap-5 border-b border-[#24231f]/20 py-5 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 grow flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs text-[#6c675d]">{`#${order.id}`}</span>
+          <span className="text-xs text-[#6c675d]">{formatOrderReference(order)}</span>
           {order.status && <OrderStatus status={order.status} />}
         </div>
 
@@ -46,7 +47,7 @@ export const OrderItem: React.FC<Props> = ({ order }) => {
         className="h-auto self-start rounded-none border-0 bg-transparent p-0 text-sm font-normal text-[#24231f] underline underline-offset-4 shadow-none hover:bg-transparent sm:self-auto"
         variant="link"
       >
-        <Link href={`/orders/${order.id}`}>View order</Link>
+        <Link href={`/orders/${formatOrderReference(order)}`}>View order</Link>
       </Button>
     </div>
   )

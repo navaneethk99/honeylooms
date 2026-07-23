@@ -27,6 +27,7 @@ import { CosmeticPriceInput as CosmeticPriceInput_ab96640bde486b18a35dadd51717a8
 import { DiscountPreviewField as DiscountPreviewField_09a67080614904cb9e60c6dac10d9fa7 } from '@/components/admin/DiscountPreviewField'
 import { PriceCell as PriceCell_e27bf7b8cc50640dcdd584767b8eac3c } from '@payloadcms/plugin-ecommerce/client'
 import { PrintInvoiceButton as PrintInvoiceButton_5b0d4b730d4593912a64603f6d3a8185 } from '@/components/admin/PrintInvoiceButton'
+import { Logo as Logo_a0bd5f2fa532ef2166f77171a2b9828a } from '@/components/Logo/Logo'
 import { BeforeDashboard as BeforeDashboard_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
 import { BeforeLogin as BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -63,6 +64,7 @@ export const importMap = {
   "@/components/admin/DiscountPreviewField#DiscountPreviewField": DiscountPreviewField_09a67080614904cb9e60c6dac10d9fa7,
   "@payloadcms/plugin-ecommerce/client#PriceCell": PriceCell_e27bf7b8cc50640dcdd584767b8eac3c,
   "@/components/admin/PrintInvoiceButton#PrintInvoiceButton": PrintInvoiceButton_5b0d4b730d4593912a64603f6d3a8185,
+  "@/components/Logo/Logo#Logo": Logo_a0bd5f2fa532ef2166f77171a2b9828a,
   "@/components/BeforeDashboard#BeforeDashboard": BeforeDashboard_1a7510af427896d367a49dbf838d2de6,
   "@/components/BeforeLogin#BeforeLogin": BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,

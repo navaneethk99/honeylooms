@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeftIcon } from 'lucide-react'
 import { RefundForm } from '@/components/forms/RefundForm'
+import { formatOrderReference } from '@/utilities/orderReference'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,13 +28,18 @@ export default async function RefundsPage({ searchParams }: PageProps) {
   let order: any = null
 
   try {
-    const orderResult = await payload.findByID({
+    const { docs } = await payload.find({
       collection: 'orders',
-      id: orderId,
       depth: 0,
+      limit: 1,
+      where: {
+        or: [{ orderCode: { equals: orderId } }, { id: { equals: orderId } }],
+      },
     })
+    const orderResult = docs[0]
 
-    const orderCustomer = typeof orderResult.customer === 'object' ? orderResult.customer?.id : orderResult.customer
+    const orderCustomer =
+      typeof orderResult.customer === 'object' ? orderResult.customer?.id : orderResult.customer
     const userCustomerId = user ? user.id : null
 
     const canAccessAsGuest =
@@ -46,7 +52,11 @@ export default async function RefundsPage({ searchParams }: PageProps) {
 
     const canAccessAsUser = user && orderResult && orderCustomer && orderCustomer === userCustomerId
 
-    if (orderResult && (canAccessAsGuest || canAccessAsUser) && orderResult.status === 'completed') {
+    if (
+      orderResult &&
+      (canAccessAsGuest || canAccessAsUser) &&
+      orderResult.status === 'completed'
+    ) {
       order = orderResult
     }
   } catch (error) {
@@ -57,11 +67,13 @@ export default async function RefundsPage({ searchParams }: PageProps) {
     notFound()
   }
 
+  const orderReference = formatOrderReference(order)
+
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="flex items-center gap-1.5 mb-8 pb-4 border-b border-neutral-100 dark:border-neutral-900">
         <Link
-          href={`/orders/${order.id}${email ? `?email=${encodeURIComponent(email)}&accessToken=${encodeURIComponent(accessToken)}` : ''}`}
+          href={`/orders/${orderReference}${email ? `?email=${encodeURIComponent(email)}&accessToken=${encodeURIComponent(accessToken)}` : ''}`}
           className="group flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-neutral-500 hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors duration-300"
         >
           <ChevronLeftIcon className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
@@ -71,7 +83,7 @@ export default async function RefundsPage({ searchParams }: PageProps) {
 
       <h1 className="text-2xl font-semibold mb-2">Request Return or Refund</h1>
       <p className="text-sm text-neutral-500 mb-8">
-        Please fill out the form below to request a return or refund for Order #{order.id}.
+        Please fill out the form below to request a return or refund for {orderReference}.
       </p>
 
       <RefundForm

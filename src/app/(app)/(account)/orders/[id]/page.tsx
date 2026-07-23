@@ -14,6 +14,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { OrderStatus } from '@/components/OrderStatus'
 import { AddressItem } from '@/components/addresses/AddressItem'
+import { formatOrderReference } from '@/utilities/orderReference'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,9 +44,18 @@ export default async function Order({ params, searchParams }: PageProps) {
       where: {
         and: [
           {
-            id: {
-              equals: id,
-            },
+            or: [
+              {
+                orderCode: {
+                  equals: id,
+                },
+              },
+              {
+                id: {
+                  equals: id,
+                },
+              },
+            ],
           },
           ...(user
             ? [
@@ -79,6 +89,7 @@ export default async function Order({ params, searchParams }: PageProps) {
         items: true,
         customerEmail: true,
         customer: true,
+        orderCode: true,
         status: true,
         createdAt: true,
         updatedAt: true,
@@ -113,88 +124,90 @@ export default async function Order({ params, searchParams }: PageProps) {
     notFound()
   }
 
+  const orderReference = formatOrderReference(order)
+
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-neutral-100 dark:border-neutral-900">
-        {user ? (
+      {user ? (
+        <div className="mb-8">
           <Link
             href="/orders"
-            className="group flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-neutral-500 hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors duration-300"
+            className="group inline-flex items-center gap-1.5 text-xs text-[#6c675d] transition-colors hover:text-[#24231f]"
           >
-            <ChevronLeftIcon className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
+            <ChevronLeftIcon className="size-3.5 transition-transform group-hover:-translate-x-1" />
             <span>Back to orders</span>
           </Link>
-        ) : (
-          <div></div>
-        )}
+        </div>
+      ) : null}
 
-        <span className="text-xs uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500">
-          {`Order #${order.id}`}
-        </span>
-      </div>
+      <header className="border-b border-[#24231f]/20 pb-8">
+        <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-[#8a682f]">Order details</p>
+        <h1 className="font-editorial text-[clamp(2rem,8vw,3.75rem)] leading-none font-normal tracking-[-0.04em] whitespace-nowrap text-[#24231f]">
+          {orderReference}
+        </h1>
+      </header>
 
-      <div className="flex flex-col gap-12">
-        {/* Info Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 border-b border-neutral-100 dark:border-neutral-900">
-          <div>
-            <p className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">
-              Order Date
-            </p>
-            <p className="text-base font-semibold text-neutral-900 dark:text-neutral-50">
-              <time dateTime={order.createdAt}>
-                {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
-              </time>
-            </p>
-          </div>
-
-          <div>
-            <p className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">
-              Total
-            </p>
-            {order.amount && (
-              <Price className="text-base font-semibold font-mono" amount={order.amount} />
-            )}
-          </div>
-
-          {order.status && (
-            <div>
-              <p className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">
-                Status
-              </p>
-              <div className="flex flex-col gap-2">
-                <OrderStatus status={order.status} />
-                {order.status === 'shipped' && order.shippingLink && (
-                  <a
-                    href={order.shippingLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-[#D9A321] hover:underline font-mono"
-                  >
-                    Track Shipment →
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
+      <dl className="grid border-b border-[#24231f]/20 sm:grid-cols-3">
+        <div className="border-b border-[#24231f]/15 py-6 sm:border-r sm:border-b-0 sm:px-6 sm:first:pl-0">
+          <dt className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[#8c877d]">
+            Order date
+          </dt>
+          <dd className="text-base text-[#24231f]">
+            <time dateTime={order.createdAt}>
+              {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
+            </time>
+          </dd>
         </div>
 
-        {/* Order Items */}
-        {order.items && (
-          <div className="pb-8 border-b border-neutral-100 dark:border-neutral-900">
-            <h2 className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-6">
-              Items
-            </h2>
-            <ul className="flex flex-col gap-6">
-              {order.items?.map((item, index) => {
+        <div className="border-b border-[#24231f]/15 py-6 sm:border-r sm:border-b-0 sm:px-6">
+          <dt className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[#8c877d]">Total</dt>
+          <dd>
+            {order.amount ? (
+              <Price
+                className="text-base text-[#24231f]"
+                amount={order.amount}
+                currencyCode={order.currency ?? undefined}
+              />
+            ) : null}
+          </dd>
+        </div>
+
+        <div className="py-6 sm:pl-6">
+          <dt className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[#8c877d]">Status</dt>
+          <dd className="flex flex-col items-start gap-2">
+            {order.status ? <OrderStatus className="text-sm" status={order.status} /> : null}
+            {order.status === 'shipped' && order.shippingLink ? (
+              <a
+                href={order.shippingLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#8a682f] underline underline-offset-4"
+              >
+                Track shipment
+              </a>
+            ) : null}
+          </dd>
+        </div>
+      </dl>
+
+      <div className="grid gap-12 py-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
+        {order.items ? (
+          <section>
+            <h2 className="mb-5 font-editorial text-3xl font-normal text-[#24231f]">Items</h2>
+            <ul className="border-t border-[#24231f]/20">
+              {order.items.map((item, index) => {
                 if (typeof item.product === 'string') {
                   return null
                 }
 
                 if (!item.product || typeof item.product !== 'object') {
                   return (
-                    <div key={index} className="text-sm text-neutral-500">
+                    <li
+                      key={item.id ?? index}
+                      className="border-b border-[#24231f]/20 py-6 text-sm text-[#6c675d]"
+                    >
                       This item is no longer available.
-                    </div>
+                    </li>
                   )
                 }
 
@@ -202,11 +215,9 @@ export default async function Order({ params, searchParams }: PageProps) {
                   item.variant && typeof item.variant === 'object' ? item.variant : undefined
 
                 return (
-                  <li
-                    key={item.id}
-                    className="pb-6 border-b border-neutral-50 dark:border-neutral-950 last:pb-0 last:border-0"
-                  >
+                  <li key={item.id} className="border-b border-[#24231f]/20 py-6">
                     <ProductItem
+                      currencyCode={order.currency ?? undefined}
                       product={item.product}
                       quantity={item.quantity}
                       variant={variant}
@@ -215,34 +226,32 @@ export default async function Order({ params, searchParams }: PageProps) {
                 )
               })}
             </ul>
-          </div>
-        )}
+          </section>
+        ) : null}
 
-        {/* Shipping Address */}
-        {order.shippingAddress && (
-          <div>
-            <h2 className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 dark:text-neutral-500 mb-4">
-              Shipping Address
+        {order.shippingAddress ? (
+          <aside>
+            <h2 className="mb-5 font-editorial text-3xl font-normal text-[#24231f]">
+              Shipping address
             </h2>
-            <div className="text-sm text-neutral-700 dark:text-neutral-300">
-              {/* @ts-expect-error - some kind of type hell */}
+            <div className="border-y border-[#24231f]/20 py-5">
+              {/* @ts-expect-error - Payload's generated order address type differs from Address */}
               <AddressItem address={order.shippingAddress} hideActions />
             </div>
-          </div>
-        )}
-
-        {/* Request Return/Refund Link */}
-        {order.status === 'completed' && (
-          <div className="mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-900 flex justify-end">
-            <Link
-              href={`/account/refunds?orderId=${order.id}${email ? `&email=${encodeURIComponent(email)}` : ''}${accessToken ? `&accessToken=${encodeURIComponent(accessToken)}` : ''}`}
-              className="text-[11px] text-neutral-400 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline font-mono uppercase tracking-widest transition-colors duration-300"
-            >
-              Request a Return or Refund
-            </Link>
-          </div>
-        )}
+          </aside>
+        ) : null}
       </div>
+
+      {order.status === 'completed' ? (
+        <div className="flex justify-end border-t border-[#24231f]/20 pt-6">
+          <Link
+            href={`/account/refunds?orderId=${orderReference}${email ? `&email=${encodeURIComponent(email)}` : ''}${accessToken ? `&accessToken=${encodeURIComponent(accessToken)}` : ''}`}
+            className="text-sm text-[#6c675d] underline underline-offset-4 transition-colors hover:text-[#24231f]"
+          >
+            Request a return or refund
+          </Link>
+        </div>
+      ) : null}
     </div>
   )
 }

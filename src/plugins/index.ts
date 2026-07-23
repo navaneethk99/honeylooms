@@ -23,6 +23,7 @@ import { sendOrderStatusEmail } from '@/hooks/sendOrderStatusEmail'
 import { sendAdminNotificationEmail } from '@/hooks/sendAdminNotificationEmail'
 import { getOrCreateOrderInvoice } from '@/utilities/getOrCreateOrderInvoice'
 import { calculateCartSubtotalFromStoredItems } from '@/utilities/pricing'
+import { generateOrderCode } from '@/hooks/generateOrderCode'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Honeylooms` : 'Honeylooms'
@@ -141,7 +142,7 @@ export const plugins: Plugin[] = [
         ...defaultCollection,
         admin: {
           ...defaultCollection.admin,
-          defaultColumns: ['id', 'createdAt', 'paymentMethod', 'amount', 'status'],
+          defaultColumns: ['orderCode', 'createdAt', 'paymentMethod', 'amount', 'status'],
         },
         hooks: {
           ...defaultCollection?.hooks,
@@ -166,7 +167,9 @@ export const plugins: Plugin[] = [
                   req,
                 })
               } catch (err) {
-                req.payload.logger.error(`Error deleting associated refunds for order #${id}: ${err}`)
+                req.payload.logger.error(
+                  `Error deleting associated refunds for order #${id}: ${err}`,
+                )
               }
             },
           ],
@@ -185,14 +188,14 @@ export const plugins: Plugin[] = [
                   id,
                   req,
                 })
-                
+
                 if (!order) {
                   return new Response('Order not found', { status: 404 })
                 }
-                
+
                 // Generate and upload the invoice PDF using the helper
                 const { pdfBuffer } = await getOrCreateOrderInvoice(order, req)
-                
+
                 return new Response(pdfBuffer, {
                   headers: {
                     'Content-Type': 'application/pdf',
@@ -200,13 +203,37 @@ export const plugins: Plugin[] = [
                   },
                 })
               } catch (error) {
-                req.payload.logger.error(`Error generating invoice via custom endpoint for order #${id}: ${error}`)
+                req.payload.logger.error(
+                  `Error generating invoice via custom endpoint for order #${id}: ${error}`,
+                )
                 return new Response('Internal Server Error', { status: 500 })
               }
             },
           },
         ],
         fields: applyCosmeticCurrencyAdminOverrides([
+          {
+            name: 'orderCode',
+            type: 'text',
+            required: true,
+            unique: true,
+            index: true,
+            label: 'Order Code',
+            access: {
+              update: () => false,
+            },
+            admin: {
+              position: 'sidebar',
+              readOnly: true,
+            },
+            hooks: {
+              beforeValidate: [generateOrderCode],
+            },
+            validate: (value: unknown) =>
+              typeof value === 'string' && /^\d{8}$/.test(value)
+                ? true
+                : 'Order code must contain exactly 8 digits.',
+          },
           ...defaultCollection.fields.map((field) => {
             if ('name' in field && field.name === 'status' && field.type === 'select') {
               return {
@@ -350,13 +377,17 @@ export const plugins: Plugin[] = [
                   })
                   if (product && product.slug) {
                     const { revalidateTag, revalidatePath } = require('next/cache')
-                    payload.logger.info(`Revalidating product cache from deleted variant: ${product.slug}`)
+                    payload.logger.info(
+                      `Revalidating product cache from deleted variant: ${product.slug}`,
+                    )
                     revalidateTag('products', 'max')
                     revalidatePath(`/products/${product.slug}`)
                     revalidatePath('/shop')
                   }
                 } catch (err) {
-                  payload.logger.error(`Error revalidating product cache from deleted variant: ${err}`)
+                  payload.logger.error(
+                    `Error revalidating product cache from deleted variant: ${err}`,
+                  )
                 }
                 return doc
               },

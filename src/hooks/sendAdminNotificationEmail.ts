@@ -1,5 +1,6 @@
 import type { CollectionAfterChangeHook } from 'payload'
 import { getServerSideURL } from '@/utilities/getURL'
+import { formatOrderReference } from '@/utilities/orderReference'
 import { getOrCreateOrderInvoice } from '@/utilities/getOrCreateOrderInvoice'
 
 export const sendAdminNotificationEmail: CollectionAfterChangeHook = async ({
@@ -15,7 +16,10 @@ export const sendAdminNotificationEmail: CollectionAfterChangeHook = async ({
   // 2. Updated to status "cancelled" (Order Cancelled)
   const isPlaced = operation === 'create'
   const isCancelled =
-    operation === 'update' && previousDoc && previousDoc.status !== 'cancelled' && doc.status === 'cancelled'
+    operation === 'update' &&
+    previousDoc &&
+    previousDoc.status !== 'cancelled' &&
+    doc.status === 'cancelled'
 
   if (!isPlaced && !isCancelled) {
     return
@@ -27,27 +31,29 @@ export const sendAdminNotificationEmail: CollectionAfterChangeHook = async ({
     return
   }
 
-  const adminEmails = adminEmailsEnv.split(',').map((e) => e.trim()).filter(Boolean)
+  const adminEmails = adminEmailsEnv
+    .split(',')
+    .map((e) => e.trim())
+    .filter(Boolean)
   if (adminEmails.length === 0) {
     return
   }
 
   try {
-    const {
-      pdfBuffer,
-      toEmail,
-      customerName,
-      paymentMethodLabel,
-    } = await getOrCreateOrderInvoice(doc, req)
+    const { pdfBuffer, toEmail, customerName, paymentMethodLabel } = await getOrCreateOrderInvoice(
+      doc,
+      req,
+    )
 
     // 8. Construct Dashboard Order URL
     const serverURL = getServerSideURL()
     const dashboardURL = `${serverURL}/admin/collections/orders/${doc.id}`
+    const orderCode = formatOrderReference(doc)
 
     // 9. Compose Email Content
     const actionText = isPlaced ? 'placed' : 'cancelled'
-    const emailSubject = `[Honeylooms Admin] Order #${doc.id} has been ${actionText.toUpperCase()}`
-    
+    const emailSubject = `[Honeylooms Admin] Order ${orderCode} has been ${actionText.toUpperCase()}`
+
     const emailHtml = `
       <!DOCTYPE html>
       <html>
@@ -111,12 +117,12 @@ export const sendAdminNotificationEmail: CollectionAfterChangeHook = async ({
         <div class="container">
           <h1>Order Notification</h1>
           <p class="detail-row">
-            This is to notify you that Order <strong>#${doc.id}</strong> has been <strong>${actionText}</strong>.
+            This is to notify you that Order <strong>${orderCode}</strong> has been <strong>${actionText}</strong>.
           </p>
           
           <div class="detail-row" style="margin-top: 20px;">
             <span class="detail-label">Order ID:</span>
-            <span>#${doc.id}</span>
+            <span>${orderCode}</span>
           </div>
           <div class="detail-row">
             <span class="detail-label">Status:</span>
@@ -154,7 +160,7 @@ export const sendAdminNotificationEmail: CollectionAfterChangeHook = async ({
       html: emailHtml,
       attachments: [
         {
-          filename: `invoice-${doc.id}.pdf`,
+          filename: `invoice-${orderCode}.pdf`,
           content: pdfBuffer,
           contentType: 'application/pdf',
         },

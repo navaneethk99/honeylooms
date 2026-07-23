@@ -175,8 +175,16 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
       const payload = req.payload
 
       console.log('=== Cashfree API Auth Debug ===')
-      console.log('appID:', appID ? `${appID.substring(0, 6)}...${appID.substring(appID.length - 6)}` : 'undefined')
-      console.log('secretKey:', secretKey ? `${secretKey.substring(0, 10)}...${secretKey.substring(secretKey.length - 10)}` : 'undefined')
+      console.log(
+        'appID:',
+        appID ? `${appID.substring(0, 6)}...${appID.substring(appID.length - 6)}` : 'undefined',
+      )
+      console.log(
+        'secretKey:',
+        secretKey
+          ? `${secretKey.substring(0, 10)}...${secretKey.substring(secretKey.length - 10)}`
+          : 'undefined',
+      )
       console.log('apiVersion:', apiVersion)
       console.log('environment:', environment)
       console.log('===============================')
@@ -187,7 +195,9 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
           appIDExists: Boolean(appID),
           secretKeyExists: Boolean(secretKey),
         })
-        throw new Error('Cashfree authentication configuration is missing or empty. Please check your environment variables and restart your server.')
+        throw new Error(
+          'Cashfree authentication configuration is missing or empty. Please check your environment variables and restart your server.',
+        )
       }
       const billingAddress = data.billingAddress as CashfreeAddress | undefined
       const cart = data.cart
@@ -210,10 +220,7 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
         const promoCodes = await payload.find({
           collection: 'promo-codes',
           where: {
-            and: [
-              { code: { equals: promoCode } },
-              { active: { equals: true } },
-            ],
+            and: [{ code: { equals: promoCode } }, { active: { equals: true } }],
           },
           req,
         })
@@ -352,7 +359,9 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
           appIDExists: Boolean(appID),
           secretKeyExists: Boolean(secretKey),
         })
-        throw new Error('Cashfree authentication configuration is missing or empty. Please check your environment variables and restart your server.')
+        throw new Error(
+          'Cashfree authentication configuration is missing or empty. Please check your environment variables and restart your server.',
+        )
       }
 
       const customerEmail = data.customerEmail
@@ -393,6 +402,7 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
             accessToken: existingOrder?.accessToken,
             message: 'Order already confirmed successfully',
             orderID: existingOrderID,
+            orderCode: existingOrder.orderCode,
             transactionID: transaction.id,
           }
         }
@@ -425,6 +435,7 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
               amount: transaction.amount,
               currency: transaction.currency,
               items: transaction.items,
+              orderCode: '',
               paymentMethod: 'cashfree',
               shippingAddress,
               status: 'processing',
@@ -478,6 +489,7 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
           ...(order.accessToken ? { accessToken: order.accessToken } : {}),
           message: 'Payment confirmed successfully',
           orderID: order.id,
+          orderCode: order.orderCode,
           transactionID: transaction.id,
         }
       } catch (error) {

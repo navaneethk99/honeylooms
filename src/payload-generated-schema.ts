@@ -39,6 +39,14 @@ export const enum__pages_v_blocks_carousel_relation_to = pgEnum('enum__pages_v_b
 export const enum__pages_v_blocks_banner_style = pgEnum('enum__pages_v_blocks_banner_style', ['info', 'warning', 'error', 'success'])
 export const enum__pages_v_version_hero_type = pgEnum('enum__pages_v_version_hero_type', ['none', 'highImpact', 'mediumImpact', 'lowImpact'])
 export const enum__pages_v_version_status = pgEnum('enum__pages_v_version_status', ['draft', 'published'])
+export const enum_gallery_source = pgEnum('enum_gallery_source', ['admin', 'community'])
+export const enum_gallery_status = pgEnum('enum_gallery_status', ['pending', 'approved', 'rejected'])
+export const enum_refunds_reason = pgEnum('enum_refunds_reason', ['size_issue', 'manufacturing_defect'])
+export const enum_refunds_resolution = pgEnum('enum_refunds_resolution', ['original_payment', 'replacement'])
+export const enum_refunds_status = pgEnum('enum_refunds_status', ['pending', 'approved', 'rejected'])
+export const enum_job_postings_questions_field_type = pgEnum('enum_job_postings_questions_field_type', ['shortText', 'longText', 'email', 'phone', 'url', 'select'])
+export const enum_job_postings_employment_type = pgEnum('enum_job_postings_employment_type', ['full-time', 'part-time', 'contract', 'internship'])
+export const enum_career_applications_status = pgEnum('enum_career_applications_status', ['new', 'reviewing', 'shortlisted', 'rejected', 'hired'])
 export const enum_forms_confirmation_type = pgEnum('enum_forms_confirmation_type', ['message', 'redirect'])
 export const enum_addresses_country = pgEnum('enum_addresses_country', ['US', 'GB', 'CA', 'AU', 'AT', 'BE', 'BR', 'BG', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HK', 'HU', 'IN', 'IE', 'IT', 'JP', 'LV', 'LT', 'LU', 'MY', 'MT', 'MX', 'NL', 'NZ', 'NO', 'PL', 'PT', 'RO', 'SG', 'SK', 'SI', 'ES', 'SE', 'CH'])
 export const enum_variants_status = pgEnum('enum_variants_status', ['draft', 'published'])
@@ -56,9 +64,10 @@ export const enum__products_v_blocks_content_columns_link_type = pgEnum('enum__p
 export const enum__products_v_blocks_content_columns_link_appearance = pgEnum('enum__products_v_blocks_content_columns_link_appearance', ['default', 'outline'])
 export const enum__products_v_version_status = pgEnum('enum__products_v_version_status', ['draft', 'published'])
 export const enum_carts_currency = pgEnum('enum_carts_currency', ['USD'])
-export const enum_orders_status = pgEnum('enum_orders_status', ['processing', 'completed', 'cancelled', 'refunded'])
+export const enum_orders_status = pgEnum('enum_orders_status', ['processing', 'confirmed', 'shipped', 'completed', 'refund_requested', 'refund_approved', 'refund_rejected', 'cancelled', 'refunded'])
 export const enum_orders_currency = pgEnum('enum_orders_currency', ['USD'])
-export const enum_transactions_payment_method = pgEnum('enum_transactions_payment_method', ['cashfree'])
+export const enum_orders_payment_method = pgEnum('enum_orders_payment_method', ['cashfree', 'cod'])
+export const enum_transactions_payment_method = pgEnum('enum_transactions_payment_method', ['cashfree', 'cod'])
 export const enum_transactions_status = pgEnum('enum_transactions_status', ['pending', 'succeeded', 'failed', 'cancelled', 'expired', 'refunded'])
 export const enum_transactions_currency = pgEnum('enum_transactions_currency', ['USD'])
 export const enum_header_nav_items_link_type = pgEnum('enum_header_nav_items_link_type', ['reference', 'custom'])
@@ -351,10 +360,10 @@ export const pages_rels = pgTable('pages_rels', {
   parent: integer('parent_id').notNull(),
   path: varchar('path').notNull(),
   pagesID: integer('pages_id'),
-  categoriesID: integer('categories_id'),
   productsID: integer('products_id'),
+  categoriesID: integer('categories_id'),
 }, (columns) => [
-    index('pages_rels_order_idx').on(columns.order), index('pages_rels_parent_idx').on(columns.parent), index('pages_rels_path_idx').on(columns.path), index('pages_rels_pages_id_idx').on(columns.pagesID), index('pages_rels_categories_id_idx').on(columns.categoriesID), index('pages_rels_products_id_idx').on(columns.productsID), foreignKey({
+    index('pages_rels_order_idx').on(columns.order), index('pages_rels_parent_idx').on(columns.parent), index('pages_rels_path_idx').on(columns.path), index('pages_rels_pages_id_idx').on(columns.pagesID), index('pages_rels_products_id_idx').on(columns.productsID), index('pages_rels_categories_id_idx').on(columns.categoriesID), foreignKey({
       columns: [columns['parent']],
       foreignColumns: [pages.id],
       name: 'pages_rels_parent_fk'
@@ -363,13 +372,13 @@ export const pages_rels = pgTable('pages_rels', {
       foreignColumns: [pages.id],
       name: 'pages_rels_pages_fk'
     }).onDelete('cascade'), foreignKey({
-      columns: [columns['categoriesID']],
-      foreignColumns: [categories.id],
-      name: 'pages_rels_categories_fk'
-    }).onDelete('cascade'), foreignKey({
       columns: [columns['productsID']],
       foreignColumns: [products.id],
       name: 'pages_rels_products_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['categoriesID']],
+      foreignColumns: [categories.id],
+      name: 'pages_rels_categories_fk'
     }).onDelete('cascade'),
 ]
 )
@@ -631,10 +640,10 @@ export const _pages_v_rels = pgTable('_pages_v_rels', {
   parent: integer('parent_id').notNull(),
   path: varchar('path').notNull(),
   pagesID: integer('pages_id'),
-  categoriesID: integer('categories_id'),
   productsID: integer('products_id'),
+  categoriesID: integer('categories_id'),
 }, (columns) => [
-    index('_pages_v_rels_order_idx').on(columns.order), index('_pages_v_rels_parent_idx').on(columns.parent), index('_pages_v_rels_path_idx').on(columns.path), index('_pages_v_rels_pages_id_idx').on(columns.pagesID), index('_pages_v_rels_categories_id_idx').on(columns.categoriesID), index('_pages_v_rels_products_id_idx').on(columns.productsID), foreignKey({
+    index('_pages_v_rels_order_idx').on(columns.order), index('_pages_v_rels_parent_idx').on(columns.parent), index('_pages_v_rels_path_idx').on(columns.path), index('_pages_v_rels_pages_id_idx').on(columns.pagesID), index('_pages_v_rels_products_id_idx').on(columns.productsID), index('_pages_v_rels_categories_id_idx').on(columns.categoriesID), foreignKey({
       columns: [columns['parent']],
       foreignColumns: [_pages_v.id],
       name: '_pages_v_rels_parent_fk'
@@ -643,13 +652,13 @@ export const _pages_v_rels = pgTable('_pages_v_rels', {
       foreignColumns: [pages.id],
       name: '_pages_v_rels_pages_fk'
     }).onDelete('cascade'), foreignKey({
-      columns: [columns['categoriesID']],
-      foreignColumns: [categories.id],
-      name: '_pages_v_rels_categories_fk'
-    }).onDelete('cascade'), foreignKey({
       columns: [columns['productsID']],
       foreignColumns: [products.id],
       name: '_pages_v_rels_products_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['categoriesID']],
+      foreignColumns: [categories.id],
+      name: '_pages_v_rels_categories_fk'
     }).onDelete('cascade'),
 ]
 )
@@ -683,8 +692,26 @@ export const media = pgTable('media', {
   height: numeric('height', {mode: 'number'}),
   focalX: numeric('focal_x', {mode: 'number'}),
   focalY: numeric('focal_y', {mode: 'number'}),
+  sizes_bannerPreview_url: varchar('sizes_banner_preview_url'),
+  sizes_bannerPreview_width: numeric('sizes_banner_preview_width', {mode: 'number'}),
+  sizes_bannerPreview_height: numeric('sizes_banner_preview_height', {mode: 'number'}),
+  sizes_bannerPreview_mimeType: varchar('sizes_banner_preview_mime_type'),
+  sizes_bannerPreview_filesize: numeric('sizes_banner_preview_filesize', {mode: 'number'}),
+  sizes_bannerPreview_filename: varchar('sizes_banner_preview_filename'),
+  sizes_bannerMedium_url: varchar('sizes_banner_medium_url'),
+  sizes_bannerMedium_width: numeric('sizes_banner_medium_width', {mode: 'number'}),
+  sizes_bannerMedium_height: numeric('sizes_banner_medium_height', {mode: 'number'}),
+  sizes_bannerMedium_mimeType: varchar('sizes_banner_medium_mime_type'),
+  sizes_bannerMedium_filesize: numeric('sizes_banner_medium_filesize', {mode: 'number'}),
+  sizes_bannerMedium_filename: varchar('sizes_banner_medium_filename'),
+  sizes_bannerLarge_url: varchar('sizes_banner_large_url'),
+  sizes_bannerLarge_width: numeric('sizes_banner_large_width', {mode: 'number'}),
+  sizes_bannerLarge_height: numeric('sizes_banner_large_height', {mode: 'number'}),
+  sizes_bannerLarge_mimeType: varchar('sizes_banner_large_mime_type'),
+  sizes_bannerLarge_filesize: numeric('sizes_banner_large_filesize', {mode: 'number'}),
+  sizes_bannerLarge_filename: varchar('sizes_banner_large_filename'),
 }, (columns) => [
-    index('media_updated_at_idx').on(columns.updatedAt), index('media_created_at_idx').on(columns.createdAt), uniqueIndex('media_filename_idx').on(columns.filename),
+    index('media_updated_at_idx').on(columns.updatedAt), index('media_created_at_idx').on(columns.createdAt), uniqueIndex('media_filename_idx').on(columns.filename), index('media_sizes_banner_preview_sizes_banner_preview_filename_idx').on(columns.sizes_bannerPreview_filename), index('media_sizes_banner_medium_sizes_banner_medium_filename_idx').on(columns.sizes_bannerMedium_filename), index('media_sizes_banner_large_sizes_banner_large_filename_idx').on(columns.sizes_bannerLarge_filename),
 ]
 )
 
@@ -692,18 +719,228 @@ export const media = pgTable('media', {
 export const collections = pgTable('collections', {
   id: serial('id').primaryKey(),
   title: varchar('title').notNull(),
+  showOnHomePage: boolean('show_on_home_page').default(false),
   poster: integer('poster_id').notNull().references(() => media.id, {
       onDelete: 'set null'
   }),
   banner: integer('banner_id').notNull().references(() => media.id, {
       onDelete: 'set null'
   }),
+  spotifyPlaylistUrl: varchar('spotify_playlist_url'),
+  appleMusicPlaylistUrl: varchar('apple_music_playlist_url'),
   generateSlug: boolean('generate_slug').default(true),
   slug: varchar('slug').notNull(),
   updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
   createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
 }, (columns) => [
     index('collections_poster_idx').on(columns.poster), index('collections_banner_idx').on(columns.banner), uniqueIndex('collections_slug_idx').on(columns.slug), index('collections_updated_at_idx').on(columns.updatedAt), index('collections_created_at_idx').on(columns.createdAt),
+]
+)
+
+
+export const homepage_banners = pgTable('homepage_banners', {
+  id: serial('id').primaryKey(),
+  title: varchar('title').notNull(),
+  active: boolean('active').default(true),
+  rotationDelay: numeric('rotation_delay', {mode: 'number'}).notNull().default(5),
+  desktopImage: integer('desktop_image_id').notNull().references(() => media.id, {
+      onDelete: 'set null'
+  }),
+  mobileImage: integer('mobile_image_id').notNull().references(() => media.id, {
+      onDelete: 'set null'
+  }),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+}, (columns) => [
+    index('homepage_banners_active_idx').on(columns.active), index('homepage_banners_desktop_image_idx').on(columns.desktopImage), index('homepage_banners_mobile_image_idx').on(columns.mobileImage), index('homepage_banners_updated_at_idx').on(columns.updatedAt), index('homepage_banners_created_at_idx').on(columns.createdAt),
+]
+)
+
+
+export const gallery = pgTable('gallery', {
+  id: serial('id').primaryKey(),
+  alt: varchar('alt'),
+  submittedBy: varchar('submitted_by'),
+  source: enum_gallery_source('source').default("admin"),
+  status: enum_gallery_status('status').default("approved"),
+  prefix: varchar('prefix').default("gallery"),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+  url: varchar('url'),
+  thumbnailURL: varchar('thumbnail_u_r_l'),
+  filename: varchar('filename'),
+  mimeType: varchar('mime_type'),
+  filesize: numeric('filesize', {mode: 'number'}),
+  width: numeric('width', {mode: 'number'}),
+  height: numeric('height', {mode: 'number'}),
+  focalX: numeric('focal_x', {mode: 'number'}),
+  focalY: numeric('focal_y', {mode: 'number'}),
+  sizes_preview_url: varchar('sizes_preview_url'),
+  sizes_preview_width: numeric('sizes_preview_width', {mode: 'number'}),
+  sizes_preview_height: numeric('sizes_preview_height', {mode: 'number'}),
+  sizes_preview_mimeType: varchar('sizes_preview_mime_type'),
+  sizes_preview_filesize: numeric('sizes_preview_filesize', {mode: 'number'}),
+  sizes_preview_filename: varchar('sizes_preview_filename'),
+}, (columns) => [
+    index('gallery_updated_at_idx').on(columns.updatedAt), index('gallery_created_at_idx').on(columns.createdAt), uniqueIndex('gallery_filename_idx').on(columns.filename), index('gallery_sizes_preview_sizes_preview_filename_idx').on(columns.sizes_preview_filename),
+]
+)
+
+
+export const gallery_rels = pgTable('gallery_rels', {
+  id: serial('id').primaryKey(),
+  order: integer('order'),
+  parent: integer('parent_id').notNull(),
+  path: varchar('path').notNull(),
+  productsID: integer('products_id'),
+}, (columns) => [
+    index('gallery_rels_order_idx').on(columns.order), index('gallery_rels_parent_idx').on(columns.parent), index('gallery_rels_path_idx').on(columns.path), index('gallery_rels_products_id_idx').on(columns.productsID), foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [gallery.id],
+      name: 'gallery_rels_parent_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['productsID']],
+      foreignColumns: [products.id],
+      name: 'gallery_rels_products_fk'
+    }).onDelete('cascade'),
+]
+)
+
+
+export const promo_codes = pgTable('promo_codes', {
+  id: serial('id').primaryKey(),
+  code: varchar('code').notNull(),
+  discountPercentage: numeric('discount_percentage', {mode: 'number'}).notNull(),
+  maxDiscount: numeric('max_discount', {mode: 'number'}),
+  minOrderValue: numeric('min_order_value', {mode: 'number'}),
+  active: boolean('active').default(true),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+}, (columns) => [
+    uniqueIndex('promo_codes_code_idx').on(columns.code), index('promo_codes_updated_at_idx').on(columns.updatedAt), index('promo_codes_created_at_idx').on(columns.createdAt),
+]
+)
+
+
+export const refunds = pgTable('refunds', {
+  id: serial('id').primaryKey(),
+  order: integer('order_id').notNull().references(() => orders.id, {
+      onDelete: 'set null'
+  }),
+  reason: enum_refunds_reason('reason').notNull(),
+  explanation: varchar('explanation').notNull(),
+  contactEmail: varchar('contact_email').notNull(),
+  contactPhone: varchar('contact_phone').notNull(),
+  resolution: enum_refunds_resolution('resolution').notNull(),
+  status: enum_refunds_status('status').default("pending"),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+}, (columns) => [
+    index('refunds_order_idx').on(columns.order), index('refunds_updated_at_idx').on(columns.updatedAt), index('refunds_created_at_idx').on(columns.createdAt),
+]
+)
+
+
+export const refunds_rels = pgTable('refunds_rels', {
+  id: serial('id').primaryKey(),
+  order: integer('order'),
+  parent: integer('parent_id').notNull(),
+  path: varchar('path').notNull(),
+  mediaID: integer('media_id'),
+}, (columns) => [
+    index('refunds_rels_order_idx').on(columns.order), index('refunds_rels_parent_idx').on(columns.parent), index('refunds_rels_path_idx').on(columns.path), index('refunds_rels_media_id_idx').on(columns.mediaID), foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [refunds.id],
+      name: 'refunds_rels_parent_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['mediaID']],
+      foreignColumns: [media.id],
+      name: 'refunds_rels_media_fk'
+    }).onDelete('cascade'),
+]
+)
+
+
+export const job_postings_questions_options = pgTable('job_postings_questions_options', {
+  _order: integer('_order').notNull(),
+  _parentID: varchar('_parent_id').notNull(),
+  id: varchar('id').primaryKey(),
+  label: varchar('label'),
+}, (columns) => [
+    index('job_postings_questions_options_order_idx').on(columns._order), index('job_postings_questions_options_parent_id_idx').on(columns._parentID), foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [job_postings_questions.id],
+      name: 'job_postings_questions_options_parent_id_fk'
+    }).onDelete('cascade'),
+]
+)
+
+
+export const job_postings_questions = pgTable('job_postings_questions', {
+  _order: integer('_order').notNull(),
+  _parentID: integer('_parent_id').notNull(),
+  id: varchar('id').primaryKey(),
+  question: varchar('question').notNull(),
+  fieldType: enum_job_postings_questions_field_type('field_type').notNull().default("shortText"),
+  required: boolean('required').default(false),
+  placeholder: varchar('placeholder'),
+}, (columns) => [
+    index('job_postings_questions_order_idx').on(columns._order), index('job_postings_questions_parent_id_idx').on(columns._parentID), foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [job_postings.id],
+      name: 'job_postings_questions_parent_id_fk'
+    }).onDelete('cascade'),
+]
+)
+
+
+export const job_postings = pgTable('job_postings', {
+  id: serial('id').primaryKey(),
+  title: varchar('title').notNull(),
+  department: varchar('department').notNull(),
+  location: varchar('location'),
+  employmentType: enum_job_postings_employment_type('employment_type'),
+  description: jsonb('description').notNull(),
+  closingDate: timestamp('closing_date', {mode: 'string',withTimezone: true,precision: 3}),
+  active: boolean('active').default(true),
+  sortOrder: numeric('sort_order', {mode: 'number'}).default(0),
+  generateSlug: boolean('generate_slug').default(true),
+  slug: varchar('slug'),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+}, (columns) => [
+    uniqueIndex('job_postings_slug_idx').on(columns.slug), index('job_postings_updated_at_idx').on(columns.updatedAt), index('job_postings_created_at_idx').on(columns.createdAt),
+]
+)
+
+
+export const career_applications_responses = pgTable('career_applications_responses', {
+  _order: integer('_order').notNull(),
+  _parentID: integer('_parent_id').notNull(),
+  id: varchar('id').primaryKey(),
+  question: varchar('question').notNull(),
+  answer: varchar('answer'),
+}, (columns) => [
+    index('career_applications_responses_order_idx').on(columns._order), index('career_applications_responses_parent_id_idx').on(columns._parentID), foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [career_applications.id],
+      name: 'career_applications_responses_parent_id_fk'
+    }).onDelete('cascade'),
+]
+)
+
+
+export const career_applications = pgTable('career_applications', {
+  id: serial('id').primaryKey(),
+  job: integer('job_id').notNull().references(() => job_postings.id, {
+      onDelete: 'set null'
+  }),
+  status: enum_career_applications_status('status').notNull().default("new"),
+  internalNotes: varchar('internal_notes'),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
+}, (columns) => [
+    index('career_applications_job_idx').on(columns.job), index('career_applications_updated_at_idx').on(columns.updatedAt), index('career_applications_created_at_idx').on(columns.createdAt),
 ]
 )
 
@@ -1232,6 +1469,9 @@ export const products = pgTable('products', {
   enableVariants: boolean('enable_variants'),
   priceInUSDEnabled: boolean('price_in_u_s_d_enabled'),
   priceInUSD: numeric('price_in_u_s_d', {mode: 'number'}),
+  onSale: boolean('on_sale').default(false),
+  salePrice: numeric('sale_price', {mode: 'number'}),
+  discountPercentage: numeric('discount_percentage', {mode: 'number'}),
   meta_title: varchar('meta_title'),
   meta_image: integer('meta_image_id').references(() => media.id, {
       onDelete: 'set null'
@@ -1419,6 +1659,9 @@ export const _products_v = pgTable('_products_v', {
   version_enableVariants: boolean('version_enable_variants'),
   version_priceInUSDEnabled: boolean('version_price_in_u_s_d_enabled'),
   version_priceInUSD: numeric('version_price_in_u_s_d', {mode: 'number'}),
+  version_onSale: boolean('version_on_sale').default(false),
+  version_salePrice: numeric('version_sale_price', {mode: 'number'}),
+  version_discountPercentage: numeric('version_discount_percentage', {mode: 'number'}),
   version_meta_title: varchar('version_meta_title'),
   version_meta_image: integer('version_meta_image_id').references(() => media.id, {
       onDelete: 'set null'
@@ -1541,6 +1784,7 @@ export const orders_items = pgTable('orders_items', {
 
 export const orders = pgTable('orders', {
   id: serial('id').primaryKey(),
+  orderCode: varchar('order_code').notNull(),
   shippingAddress_title: varchar('shipping_address_title'),
   shippingAddress_firstName: varchar('shipping_address_first_name'),
   shippingAddress_lastName: varchar('shipping_address_last_name'),
@@ -1559,11 +1803,14 @@ export const orders = pgTable('orders', {
   status: enum_orders_status('status').default("processing"),
   amount: numeric('amount', {mode: 'number'}),
   currency: enum_orders_currency('currency').default("USD"),
+  paymentMethod: enum_orders_payment_method('payment_method').default("cashfree"),
+  shippingLink: varchar('shipping_link'),
   accessToken: varchar('access_token'),
+  cashfreeOrderID: varchar('cashfree_order_i_d'),
   updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
   createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}).defaultNow().notNull(),
 }, (columns) => [
-    index('orders_customer_idx').on(columns.customer), uniqueIndex('orders_access_token_idx').on(columns.accessToken), index('orders_updated_at_idx').on(columns.updatedAt), index('orders_created_at_idx').on(columns.createdAt),
+    uniqueIndex('orders_order_code_idx').on(columns.orderCode), index('orders_customer_idx').on(columns.customer), uniqueIndex('orders_access_token_idx').on(columns.accessToken), uniqueIndex('orders_cashfree_order_i_d_idx').on(columns.cashfreeOrderID), index('orders_updated_at_idx').on(columns.updatedAt), index('orders_created_at_idx').on(columns.createdAt),
 ]
 )
 
@@ -1616,6 +1863,7 @@ export const transactions = pgTable('transactions', {
   cashfree_orderID: varchar('cashfree_order_i_d'),
   cashfree_paymentSessionID: varchar('cashfree_payment_session_i_d'),
   cashfree_shippingAddressJSON: varchar('cashfree_shipping_address_j_s_o_n'),
+  cod_codFee: numeric('cod_cod_fee', {mode: 'number'}),
   billingAddress_title: varchar('billing_address_title'),
   billingAddress_firstName: varchar('billing_address_first_name'),
   billingAddress_lastName: varchar('billing_address_last_name'),
@@ -1679,6 +1927,12 @@ export const payload_locked_documents_rels = pgTable('payload_locked_documents_r
   categoriesID: integer('categories_id'),
   mediaID: integer('media_id'),
   collectionsID: integer('collections_id'),
+  'homepage-bannersID': integer('homepage_banners_id'),
+  galleryID: integer('gallery_id'),
+  'promo-codesID': integer('promo_codes_id'),
+  refundsID: integer('refunds_id'),
+  'job-postingsID': integer('job_postings_id'),
+  'career-applicationsID': integer('career_applications_id'),
   formsID: integer('forms_id'),
   'form-submissionsID': integer('form_submissions_id'),
   addressesID: integer('addresses_id'),
@@ -1690,7 +1944,7 @@ export const payload_locked_documents_rels = pgTable('payload_locked_documents_r
   ordersID: integer('orders_id'),
   transactionsID: integer('transactions_id'),
 }, (columns) => [
-    index('payload_locked_documents_rels_order_idx').on(columns.order), index('payload_locked_documents_rels_parent_idx').on(columns.parent), index('payload_locked_documents_rels_path_idx').on(columns.path), index('payload_locked_documents_rels_users_id_idx').on(columns.usersID), index('payload_locked_documents_rels_pages_id_idx').on(columns.pagesID), index('payload_locked_documents_rels_categories_id_idx').on(columns.categoriesID), index('payload_locked_documents_rels_media_id_idx').on(columns.mediaID), index('payload_locked_documents_rels_collections_id_idx').on(columns.collectionsID), index('payload_locked_documents_rels_forms_id_idx').on(columns.formsID), index('payload_locked_documents_rels_form_submissions_id_idx').on(columns['form-submissionsID']), index('payload_locked_documents_rels_addresses_id_idx').on(columns.addressesID), index('payload_locked_documents_rels_variants_id_idx').on(columns.variantsID), index('payload_locked_documents_rels_variant_types_id_idx').on(columns.variantTypesID), index('payload_locked_documents_rels_variant_options_id_idx').on(columns.variantOptionsID), index('payload_locked_documents_rels_products_id_idx').on(columns.productsID), index('payload_locked_documents_rels_carts_id_idx').on(columns.cartsID), index('payload_locked_documents_rels_orders_id_idx').on(columns.ordersID), index('payload_locked_documents_rels_transactions_id_idx').on(columns.transactionsID), foreignKey({
+    index('payload_locked_documents_rels_order_idx').on(columns.order), index('payload_locked_documents_rels_parent_idx').on(columns.parent), index('payload_locked_documents_rels_path_idx').on(columns.path), index('payload_locked_documents_rels_users_id_idx').on(columns.usersID), index('payload_locked_documents_rels_pages_id_idx').on(columns.pagesID), index('payload_locked_documents_rels_categories_id_idx').on(columns.categoriesID), index('payload_locked_documents_rels_media_id_idx').on(columns.mediaID), index('payload_locked_documents_rels_collections_id_idx').on(columns.collectionsID), index('payload_locked_documents_rels_homepage_banners_id_idx').on(columns['homepage-bannersID']), index('payload_locked_documents_rels_gallery_id_idx').on(columns.galleryID), index('payload_locked_documents_rels_promo_codes_id_idx').on(columns['promo-codesID']), index('payload_locked_documents_rels_refunds_id_idx').on(columns.refundsID), index('payload_locked_documents_rels_job_postings_id_idx').on(columns['job-postingsID']), index('payload_locked_documents_rels_career_applications_id_idx').on(columns['career-applicationsID']), index('payload_locked_documents_rels_forms_id_idx').on(columns.formsID), index('payload_locked_documents_rels_form_submissions_id_idx').on(columns['form-submissionsID']), index('payload_locked_documents_rels_addresses_id_idx').on(columns.addressesID), index('payload_locked_documents_rels_variants_id_idx').on(columns.variantsID), index('payload_locked_documents_rels_variant_types_id_idx').on(columns.variantTypesID), index('payload_locked_documents_rels_variant_options_id_idx').on(columns.variantOptionsID), index('payload_locked_documents_rels_products_id_idx').on(columns.productsID), index('payload_locked_documents_rels_carts_id_idx').on(columns.cartsID), index('payload_locked_documents_rels_orders_id_idx').on(columns.ordersID), index('payload_locked_documents_rels_transactions_id_idx').on(columns.transactionsID), foreignKey({
       columns: [columns['parent']],
       foreignColumns: [payload_locked_documents.id],
       name: 'payload_locked_documents_rels_parent_fk'
@@ -1714,6 +1968,30 @@ export const payload_locked_documents_rels = pgTable('payload_locked_documents_r
       columns: [columns['collectionsID']],
       foreignColumns: [collections.id],
       name: 'payload_locked_documents_rels_collections_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['homepage-bannersID']],
+      foreignColumns: [homepage_banners.id],
+      name: 'payload_locked_documents_rels_homepage_banners_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['galleryID']],
+      foreignColumns: [gallery.id],
+      name: 'payload_locked_documents_rels_gallery_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['promo-codesID']],
+      foreignColumns: [promo_codes.id],
+      name: 'payload_locked_documents_rels_promo_codes_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['refundsID']],
+      foreignColumns: [refunds.id],
+      name: 'payload_locked_documents_rels_refunds_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['job-postingsID']],
+      foreignColumns: [job_postings.id],
+      name: 'payload_locked_documents_rels_job_postings_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['career-applicationsID']],
+      foreignColumns: [career_applications.id],
+      name: 'payload_locked_documents_rels_career_applications_fk'
     }).onDelete('cascade'), foreignKey({
       columns: [columns['formsID']],
       foreignColumns: [forms.id],
@@ -1894,6 +2172,82 @@ export const footer_rels = pgTable('footer_rels', {
 ]
 )
 
+
+export const featured_outfits = pgTable('featured_outfits', {
+  id: serial('id').primaryKey(),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}),
+}
+)
+
+
+export const featured_outfits_rels = pgTable('featured_outfits_rels', {
+  id: serial('id').primaryKey(),
+  order: integer('order'),
+  parent: integer('parent_id').notNull(),
+  path: varchar('path').notNull(),
+  productsID: integer('products_id'),
+}, (columns) => [
+    index('featured_outfits_rels_order_idx').on(columns.order), index('featured_outfits_rels_parent_idx').on(columns.parent), index('featured_outfits_rels_path_idx').on(columns.path), index('featured_outfits_rels_products_id_idx').on(columns.productsID), foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [featured_outfits.id],
+      name: 'featured_outfits_rels_parent_fk'
+    }).onDelete('cascade'), foreignKey({
+      columns: [columns['productsID']],
+      foreignColumns: [products.id],
+      name: 'featured_outfits_rels_products_fk'
+    }).onDelete('cascade'),
+]
+)
+
+
+export const instagram_reels_reels = pgTable('instagram_reels_reels', {
+  _order: integer('_order').notNull(),
+  _parentID: integer('_parent_id').notNull(),
+  id: varchar('id').primaryKey(),
+  url: varchar('url').notNull(),
+}, (columns) => [
+    index('instagram_reels_reels_order_idx').on(columns._order), index('instagram_reels_reels_parent_id_idx').on(columns._parentID), foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [instagram_reels.id],
+      name: 'instagram_reels_reels_parent_id_fk'
+    }).onDelete('cascade'),
+]
+)
+
+
+export const instagram_reels = pgTable('instagram_reels', {
+  id: serial('id').primaryKey(),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}),
+}
+)
+
+
+export const promo_banner_messages = pgTable('promo_banner_messages', {
+  _order: integer('_order').notNull(),
+  _parentID: integer('_parent_id').notNull(),
+  id: varchar('id').primaryKey(),
+  text: varchar('text'),
+}, (columns) => [
+    index('promo_banner_messages_order_idx').on(columns._order), index('promo_banner_messages_parent_id_idx').on(columns._parentID), foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [promo_banner.id],
+      name: 'promo_banner_messages_parent_id_fk'
+    }).onDelete('cascade'),
+]
+)
+
+
+export const promo_banner = pgTable('promo_banner', {
+  id: serial('id').primaryKey(),
+  enabled: boolean('enabled').default(false),
+  interval: numeric('interval', {mode: 'number'}).default(4),
+  updatedAt: timestamp('updated_at', {mode: 'string',withTimezone: true,precision: 3}),
+  createdAt: timestamp('created_at', {mode: 'string',withTimezone: true,precision: 3}),
+}
+)
+
 export const relations_users_roles = relations(users_roles, ({ one }) => ({
   parent: one(users, {
     
@@ -2037,17 +2391,17 @@ export const relations_pages_rels = relations(pages_rels, ({ one }) => ({
     references: [pages.id],
     relationName: 'pages',
     }),
-    categoriesID: one(categories, {
-    
-    fields: [pages_rels.categoriesID],
-    references: [categories.id],
-    relationName: 'categories',
-    }),
     productsID: one(products, {
     
     fields: [pages_rels.productsID],
     references: [products.id],
     relationName: 'products',
+    }),
+    categoriesID: one(categories, {
+    
+    fields: [pages_rels.categoriesID],
+    references: [categories.id],
+    relationName: 'categories',
     }),
       }))
 export const relations_pages = relations(pages, ({ one, many }) => ({
@@ -2213,17 +2567,17 @@ export const relations__pages_v_rels = relations(_pages_v_rels, ({ one }) => ({
     references: [pages.id],
     relationName: 'pages',
     }),
-    categoriesID: one(categories, {
-    
-    fields: [_pages_v_rels.categoriesID],
-    references: [categories.id],
-    relationName: 'categories',
-    }),
     productsID: one(products, {
     
     fields: [_pages_v_rels.productsID],
     references: [products.id],
     relationName: 'products',
+    }),
+    categoriesID: one(categories, {
+    
+    fields: [_pages_v_rels.categoriesID],
+    references: [categories.id],
+    relationName: 'categories',
     }),
       }))
 export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({
@@ -2294,6 +2648,110 @@ export const relations_collections = relations(collections, ({ one }) => ({
     fields: [collections.banner],
     references: [media.id],
     relationName: 'banner',
+    }),
+      }))
+export const relations_homepage_banners = relations(homepage_banners, ({ one }) => ({
+  desktopImage: one(media, {
+    
+    fields: [homepage_banners.desktopImage],
+    references: [media.id],
+    relationName: 'desktopImage',
+    }),
+    mobileImage: one(media, {
+    
+    fields: [homepage_banners.mobileImage],
+    references: [media.id],
+    relationName: 'mobileImage',
+    }),
+      }))
+export const relations_gallery_rels = relations(gallery_rels, ({ one }) => ({
+  parent: one(gallery, {
+    
+    fields: [gallery_rels.parent],
+    references: [gallery.id],
+    relationName: '_rels',
+    }),
+    productsID: one(products, {
+    
+    fields: [gallery_rels.productsID],
+    references: [products.id],
+    relationName: 'products',
+    }),
+      }))
+export const relations_gallery = relations(gallery, ({ many }) => ({
+  _rels: many(gallery_rels, {
+            relationName: '_rels',
+    }),
+      }))
+export const relations_promo_codes = relations(promo_codes, () => ({
+  
+      }))
+export const relations_refunds_rels = relations(refunds_rels, ({ one }) => ({
+  parent: one(refunds, {
+    
+    fields: [refunds_rels.parent],
+    references: [refunds.id],
+    relationName: '_rels',
+    }),
+    mediaID: one(media, {
+    
+    fields: [refunds_rels.mediaID],
+    references: [media.id],
+    relationName: 'media',
+    }),
+      }))
+export const relations_refunds = relations(refunds, ({ one, many }) => ({
+  order: one(orders, {
+    
+    fields: [refunds.order],
+    references: [orders.id],
+    relationName: 'order',
+    }),
+    _rels: many(refunds_rels, {
+            relationName: '_rels',
+    }),
+      }))
+export const relations_job_postings_questions_options = relations(job_postings_questions_options, ({ one }) => ({
+  _parentID: one(job_postings_questions, {
+    
+    fields: [job_postings_questions_options._parentID],
+    references: [job_postings_questions.id],
+    relationName: 'options',
+    }),
+      }))
+export const relations_job_postings_questions = relations(job_postings_questions, ({ one, many }) => ({
+  _parentID: one(job_postings, {
+    
+    fields: [job_postings_questions._parentID],
+    references: [job_postings.id],
+    relationName: 'questions',
+    }),
+    options: many(job_postings_questions_options, {
+            relationName: 'options',
+    }),
+      }))
+export const relations_job_postings = relations(job_postings, ({ many }) => ({
+  questions: many(job_postings_questions, {
+            relationName: 'questions',
+    }),
+      }))
+export const relations_career_applications_responses = relations(career_applications_responses, ({ one }) => ({
+  _parentID: one(career_applications, {
+    
+    fields: [career_applications_responses._parentID],
+    references: [career_applications.id],
+    relationName: 'responses',
+    }),
+      }))
+export const relations_career_applications = relations(career_applications, ({ one, many }) => ({
+  job: one(job_postings, {
+    
+    fields: [career_applications.job],
+    references: [job_postings.id],
+    relationName: 'job',
+    }),
+    responses: many(career_applications_responses, {
+            relationName: 'responses',
     }),
       }))
 export const relations_forms_blocks_checkbox = relations(forms_blocks_checkbox, ({ one }) => ({
@@ -2947,6 +3405,42 @@ export const relations_payload_locked_documents_rels = relations(payload_locked_
     references: [collections.id],
     relationName: 'collections',
     }),
+    'homepage-bannersID': one(homepage_banners, {
+    
+    fields: [payload_locked_documents_rels['homepage-bannersID']],
+    references: [homepage_banners.id],
+    relationName: 'homepage-banners',
+    }),
+    galleryID: one(gallery, {
+    
+    fields: [payload_locked_documents_rels.galleryID],
+    references: [gallery.id],
+    relationName: 'gallery',
+    }),
+    'promo-codesID': one(promo_codes, {
+    
+    fields: [payload_locked_documents_rels['promo-codesID']],
+    references: [promo_codes.id],
+    relationName: 'promo-codes',
+    }),
+    refundsID: one(refunds, {
+    
+    fields: [payload_locked_documents_rels.refundsID],
+    references: [refunds.id],
+    relationName: 'refunds',
+    }),
+    'job-postingsID': one(job_postings, {
+    
+    fields: [payload_locked_documents_rels['job-postingsID']],
+    references: [job_postings.id],
+    relationName: 'job-postings',
+    }),
+    'career-applicationsID': one(career_applications, {
+    
+    fields: [payload_locked_documents_rels['career-applicationsID']],
+    references: [career_applications.id],
+    relationName: 'career-applications',
+    }),
     formsID: one(forms, {
     
     fields: [payload_locked_documents_rels.formsID],
@@ -3095,6 +3589,51 @@ export const relations_footer = relations(footer, ({ many }) => ({
             relationName: '_rels',
     }),
       }))
+export const relations_featured_outfits_rels = relations(featured_outfits_rels, ({ one }) => ({
+  parent: one(featured_outfits, {
+    
+    fields: [featured_outfits_rels.parent],
+    references: [featured_outfits.id],
+    relationName: '_rels',
+    }),
+    productsID: one(products, {
+    
+    fields: [featured_outfits_rels.productsID],
+    references: [products.id],
+    relationName: 'products',
+    }),
+      }))
+export const relations_featured_outfits = relations(featured_outfits, ({ many }) => ({
+  _rels: many(featured_outfits_rels, {
+            relationName: '_rels',
+    }),
+      }))
+export const relations_instagram_reels_reels = relations(instagram_reels_reels, ({ one }) => ({
+  _parentID: one(instagram_reels, {
+    
+    fields: [instagram_reels_reels._parentID],
+    references: [instagram_reels.id],
+    relationName: 'reels',
+    }),
+      }))
+export const relations_instagram_reels = relations(instagram_reels, ({ many }) => ({
+  reels: many(instagram_reels_reels, {
+            relationName: 'reels',
+    }),
+      }))
+export const relations_promo_banner_messages = relations(promo_banner_messages, ({ one }) => ({
+  _parentID: one(promo_banner, {
+    
+    fields: [promo_banner_messages._parentID],
+    references: [promo_banner.id],
+    relationName: 'messages',
+    }),
+      }))
+export const relations_promo_banner = relations(promo_banner, ({ many }) => ({
+  messages: many(promo_banner_messages, {
+            relationName: 'messages',
+    }),
+      }))
 
 type DatabaseSchema = {
   enum_users_roles: typeof enum_users_roles
@@ -3126,6 +3665,14 @@ type DatabaseSchema = {
   enum__pages_v_blocks_banner_style: typeof enum__pages_v_blocks_banner_style
   enum__pages_v_version_hero_type: typeof enum__pages_v_version_hero_type
   enum__pages_v_version_status: typeof enum__pages_v_version_status
+  enum_gallery_source: typeof enum_gallery_source
+  enum_gallery_status: typeof enum_gallery_status
+  enum_refunds_reason: typeof enum_refunds_reason
+  enum_refunds_resolution: typeof enum_refunds_resolution
+  enum_refunds_status: typeof enum_refunds_status
+  enum_job_postings_questions_field_type: typeof enum_job_postings_questions_field_type
+  enum_job_postings_employment_type: typeof enum_job_postings_employment_type
+  enum_career_applications_status: typeof enum_career_applications_status
   enum_forms_confirmation_type: typeof enum_forms_confirmation_type
   enum_addresses_country: typeof enum_addresses_country
   enum_variants_status: typeof enum_variants_status
@@ -3145,6 +3692,7 @@ type DatabaseSchema = {
   enum_carts_currency: typeof enum_carts_currency
   enum_orders_status: typeof enum_orders_status
   enum_orders_currency: typeof enum_orders_currency
+  enum_orders_payment_method: typeof enum_orders_payment_method
   enum_transactions_payment_method: typeof enum_transactions_payment_method
   enum_transactions_status: typeof enum_transactions_status
   enum_transactions_currency: typeof enum_transactions_currency
@@ -3182,6 +3730,17 @@ type DatabaseSchema = {
   categories: typeof categories
   media: typeof media
   collections: typeof collections
+  homepage_banners: typeof homepage_banners
+  gallery: typeof gallery
+  gallery_rels: typeof gallery_rels
+  promo_codes: typeof promo_codes
+  refunds: typeof refunds
+  refunds_rels: typeof refunds_rels
+  job_postings_questions_options: typeof job_postings_questions_options
+  job_postings_questions: typeof job_postings_questions
+  job_postings: typeof job_postings
+  career_applications_responses: typeof career_applications_responses
+  career_applications: typeof career_applications
   forms_blocks_checkbox: typeof forms_blocks_checkbox
   forms_blocks_country: typeof forms_blocks_country
   forms_blocks_email: typeof forms_blocks_email
@@ -3238,6 +3797,12 @@ type DatabaseSchema = {
   footer_nav_items: typeof footer_nav_items
   footer: typeof footer
   footer_rels: typeof footer_rels
+  featured_outfits: typeof featured_outfits
+  featured_outfits_rels: typeof featured_outfits_rels
+  instagram_reels_reels: typeof instagram_reels_reels
+  instagram_reels: typeof instagram_reels
+  promo_banner_messages: typeof promo_banner_messages
+  promo_banner: typeof promo_banner
   relations_users_roles: typeof relations_users_roles
   relations_users_sessions: typeof relations_users_sessions
   relations_users: typeof relations_users
@@ -3270,6 +3835,17 @@ type DatabaseSchema = {
   relations_categories: typeof relations_categories
   relations_media: typeof relations_media
   relations_collections: typeof relations_collections
+  relations_homepage_banners: typeof relations_homepage_banners
+  relations_gallery_rels: typeof relations_gallery_rels
+  relations_gallery: typeof relations_gallery
+  relations_promo_codes: typeof relations_promo_codes
+  relations_refunds_rels: typeof relations_refunds_rels
+  relations_refunds: typeof relations_refunds
+  relations_job_postings_questions_options: typeof relations_job_postings_questions_options
+  relations_job_postings_questions: typeof relations_job_postings_questions
+  relations_job_postings: typeof relations_job_postings
+  relations_career_applications_responses: typeof relations_career_applications_responses
+  relations_career_applications: typeof relations_career_applications
   relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox
   relations_forms_blocks_country: typeof relations_forms_blocks_country
   relations_forms_blocks_email: typeof relations_forms_blocks_email
@@ -3326,6 +3902,12 @@ type DatabaseSchema = {
   relations_footer_nav_items: typeof relations_footer_nav_items
   relations_footer_rels: typeof relations_footer_rels
   relations_footer: typeof relations_footer
+  relations_featured_outfits_rels: typeof relations_featured_outfits_rels
+  relations_featured_outfits: typeof relations_featured_outfits
+  relations_instagram_reels_reels: typeof relations_instagram_reels_reels
+  relations_instagram_reels: typeof relations_instagram_reels
+  relations_promo_banner_messages: typeof relations_promo_banner_messages
+  relations_promo_banner: typeof relations_promo_banner
 }
     
 

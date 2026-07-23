@@ -1,5 +1,6 @@
 import type { CollectionAfterChangeHook } from 'payload'
 import { getServerSideURL } from '@/utilities/getURL'
+import { formatOrderReference } from '@/utilities/orderReference'
 
 export const sendOrderStatusEmail: CollectionAfterChangeHook = async ({
   doc,
@@ -145,7 +146,8 @@ export const sendOrderStatusEmail: CollectionAfterChangeHook = async ({
 
     // 7. Construct URLs
     const serverURL = getServerSideURL()
-    const orderURL = `${serverURL}/orders/${doc.id}?email=${encodeURIComponent(toEmail)}&accessToken=${doc.accessToken}`
+    const orderCode = formatOrderReference(doc)
+    const orderURL = `${serverURL}/orders/${orderCode}?email=${encodeURIComponent(toEmail)}&accessToken=${doc.accessToken}`
 
     // 8. Define Email configurations based on status
     let subject = ''
@@ -156,33 +158,33 @@ export const sendOrderStatusEmail: CollectionAfterChangeHook = async ({
 
     switch (currentStatus) {
       case 'confirmed':
-        subject = `Your Honeylooms order #${doc.id} is confirmed!`
+        subject = `Your Honeylooms order ${orderCode} is confirmed!`
         heading = `Thank you for choosing Honeylooms!`
-        intro = `We are absolutely thrilled that you chose Honeylooms. We have confirmed your order #${doc.id} and are preparing it with the utmost care. We will send another update as soon as your items are on their way.`
+        intro = `We are absolutely thrilled that you chose Honeylooms. We have confirmed your order ${orderCode} and are preparing it with the utmost care. We will send another update as soon as your items are on their way.`
         break
       case 'shipped':
-        subject = `Great news! Your Honeylooms order #${doc.id} has shipped! 🚀`
+        subject = `Great news! Your Honeylooms order ${orderCode} has shipped! 🚀`
         heading = `Your package is on its way! 🚀`
-        intro = `Woohoo! Your Honeylooms order #${doc.id} has been shipped and is officially on its way to you! We're super excited for you to receive your hand-loomed treasures. You can track your shipment using the link below.`
+        intro = `Woohoo! Your Honeylooms order ${orderCode} has been shipped and is officially on its way to you! We're super excited for you to receive your hand-loomed treasures. You can track your shipment using the link below.`
         buttonText = 'TRACK YOUR PACKAGE'
         buttonLink = doc.shippingLink || orderURL
         break
       case 'completed':
-        subject = `Delivered: Your Honeylooms order #${doc.id} is complete!`
+        subject = `Delivered: Your Honeylooms order ${orderCode} is complete!`
         heading = `Your order has arrived! 🎉`
-        intro = `Congratulations! Your Honeylooms order #${doc.id} has been successfully delivered. We sincerely hope you absolutely love your new creations. Thank you for choosing us, and we look forward to serving you again soon!`
+        intro = `Congratulations! Your Honeylooms order ${orderCode} has been successfully delivered. We sincerely hope you absolutely love your new creations. Thank you for choosing us, and we look forward to serving you again soon!`
         break
       case 'cancelled':
-        subject = `Cancellation Update: Order #${doc.id}`
+        subject = `Cancellation Update: Order ${orderCode}`
         heading = `Order Cancellation Confirmation`
-        intro = `We are writing to inform you that your Honeylooms order #${doc.id} has been cancelled. If you did not request this cancellation or have any questions, please contact our support team immediately.`
+        intro = `We are writing to inform you that your Honeylooms order ${orderCode} has been cancelled. If you did not request this cancellation or have any questions, please contact our support team immediately.`
         buttonText = 'GO TO WEBSITE'
         buttonLink = serverURL
         break
       case 'refunded':
-        subject = `Refund Processed: Order #${doc.id}`
+        subject = `Refund Processed: Order ${orderCode}`
         heading = `Your Refund Has Been Processed 💳`
-        intro = `We are glad to inform you that a full refund for your order #${doc.id} has been successfully processed. At Honeylooms, we hold ourselves to the highest standards of integrity and customer service. The refunded amount will be credited back to your original payment method shortly.`
+        intro = `We are glad to inform you that a full refund for your order ${orderCode} has been successfully processed. At Honeylooms, we hold ourselves to the highest standards of integrity and customer service. The refunded amount will be credited back to your original payment method shortly.`
         buttonText = 'GO TO WEBSITE'
         buttonLink = serverURL
         break
@@ -358,7 +360,7 @@ export const sendOrderStatusEmail: CollectionAfterChangeHook = async ({
               <div class="order-card-title">Order Overview</div>
               <div class="order-meta-item">
                 <span class="order-meta-label">Order ID:</span>
-                <span>#${doc.id}</span>
+                <span>${orderCode}</span>
               </div>
               <div class="order-meta-item">
                 <span class="order-meta-label">Order Date:</span>

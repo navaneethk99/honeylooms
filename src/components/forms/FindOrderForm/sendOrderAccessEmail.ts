@@ -3,6 +3,7 @@
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { getServerSideURL } from '@/utilities/getURL'
+import { formatOrderReference, parseOrderReference } from '@/utilities/orderReference'
 
 type SendOrderAccessEmailArgs = {
   email: string
@@ -19,12 +20,18 @@ export async function sendOrderAccessEmail({
   orderID,
 }: SendOrderAccessEmailArgs): Promise<SendOrderAccessEmailResult> {
   const payload = await getPayload({ config: configPromise })
+  const internalOrderID = parseOrderReference(orderID)
 
   try {
     const { docs: orders } = await payload.find({
       collection: 'orders',
       where: {
-        and: [{ id: { equals: orderID } }, { customerEmail: { equals: email } }],
+        and: [
+          {
+            or: [{ orderCode: { equals: internalOrderID } }, { id: { equals: internalOrderID } }],
+          },
+          { customerEmail: { equals: email } },
+        ],
       },
       limit: 1,
       depth: 0,
@@ -38,11 +45,12 @@ export async function sendOrderAccessEmail({
 
     const serverURL = getServerSideURL()
     const orderURL = `${serverURL}/orders/${order.id}?email=${encodeURIComponent(email)}&accessToken=${order.accessToken}`
+    const orderReference = formatOrderReference(order)
 
     const emailBody = `
         <h1>View Your Order</h1>
         <p>Click the link below to view your order details:</p>
-        <p><a href="${orderURL}">View Order #${order.id}</a></p>
+        <p><a href="${orderURL}">View Order ${orderReference}</a></p>
         <p>Or copy and paste this URL into your browser:</p>
         <p>${orderURL}</p>
         <p>This link will give you access to view your order details.</p>
@@ -52,7 +60,7 @@ export async function sendOrderAccessEmail({
 
     await payload.sendEmail({
       to: email,
-      subject: `Access your order #${order.id}`,
+      subject: `Access your order ${orderReference}`,
       html: emailBody,
     })
 

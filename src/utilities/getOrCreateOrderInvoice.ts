@@ -3,6 +3,7 @@ import { getEffectiveProductPrice } from '@/utilities/pricing'
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import type { Order } from '@/payload-types'
 import type { PayloadRequest } from 'payload'
+import { formatOrderReference } from '@/utilities/orderReference'
 
 export async function uploadInvoiceToR2(filename: string, buffer: Buffer) {
   const s3Client = new S3Client({
@@ -55,8 +56,10 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
   const resolvedItems = []
   if (doc.items && Array.isArray(doc.items)) {
     for (const item of doc.items) {
-      const productID = item.product && typeof item.product === 'object' ? item.product.id : item.product
-      const variantID = item.variant && typeof item.variant === 'object' ? item.variant?.id : item.variant
+      const productID =
+        item.product && typeof item.product === 'object' ? item.product.id : item.product
+      const variantID =
+        item.variant && typeof item.variant === 'object' ? item.variant?.id : item.variant
 
       let title = 'Product'
       let price = 0
@@ -132,17 +135,21 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
       if (transaction && transaction.billingAddress) {
         billingAddress = transaction.billingAddress
         if (billingAddress.firstName || billingAddress.lastName) {
-          billingName = [billingAddress.firstName, billingAddress.lastName].filter(Boolean).join(' ')
+          billingName = [billingAddress.firstName, billingAddress.lastName]
+            .filter(Boolean)
+            .join(' ')
         }
       }
     } catch (error) {
-      payload.logger.error(`Error fetching transaction for billing address in invoice utility: ${error}`)
+      payload.logger.error(
+        `Error fetching transaction for billing address in invoice utility: ${error}`,
+      )
     }
   }
 
   // 7. Generate Invoice PDF Buffer
   const pdfBuffer = await generateInvoicePDF({
-    orderId: doc.id,
+    orderId: formatOrderReference(doc),
     date: formattedDate,
     paymentMethodLabel,
     customerName,
@@ -175,7 +182,10 @@ export async function getOrCreateOrderInvoice(doc: Order, req: PayloadRequest) {
 
   // 8. Generate standard R2 filename: orderno_custname_date.pdf
   const datePart = new Date(doc.createdAt).toISOString().split('T')[0] // YYYY-MM-DD
-  const namePart = customerName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')
+  const namePart = customerName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
   const r2Filename = `${doc.id}_${namePart || 'customer'}_${datePart}.pdf`
 
   // 9. Upload to Cloudflare R2 bucket under /invoices

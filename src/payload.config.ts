@@ -34,6 +34,7 @@ import { InstagramReels } from '@/globals/InstagramReels'
 import { PromoBanner } from '@/globals/PromoBanner'
 import { getDatabaseURL } from '@/utilities/getDatabaseURL'
 import { plugins } from './plugins'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -44,9 +45,23 @@ export default buildConfig({
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.
       beforeLogin: ['@/components/BeforeLogin#BeforeLogin'],
+      graphics: {
+        Logo: '@/components/Logo/Logo#Logo',
+      },
       // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
       beforeDashboard: ['@/components/BeforeDashboard#BeforeDashboard'],
+    },
+    meta: {
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          url: '/favicon.svg',
+        },
+      ],
+      title: 'ADMIN - HONEYLOOMS',
+      titleSuffix: '',
     },
     user: Users.slug,
   },
@@ -64,12 +79,14 @@ export default buildConfig({
     CareerApplications,
   ],
   db: postgresAdapter({
+    migrationDir: path.resolve(dirname, 'migrations'),
     pool: {
       connectionString: getDatabaseURL(process.env.DATABASE_URL),
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
     },
+    prodMigrations: migrations,
   }),
   editor: lexicalEditor({
     features: () => {

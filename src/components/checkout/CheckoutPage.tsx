@@ -62,9 +62,8 @@ const loadCashfreeScript = async () => {
 
   await cashfreeScriptPromise
 }
-import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
+import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
-import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
 import { Address } from '@/payload-types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AddressItem } from '@/components/addresses/AddressItem'
@@ -72,7 +71,12 @@ import { FormItem } from '@/components/forms/FormItem'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { LottieLoader } from '@/components/LottieLoader'
-import { calculateCartSubtotalFromItems, getEffectiveProductPrice, getOriginalProductPrice, isProductOnSale } from '@/utilities/pricing'
+import {
+  calculateCartSubtotalFromItems,
+  getEffectiveProductPrice,
+  getOriginalProductPrice,
+  isProductOnSale,
+} from '@/utilities/pricing'
 
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
@@ -85,7 +89,6 @@ export const CheckoutPage: React.FC = () => {
   const [email, setEmail] = useState('')
   const [emailEditable, setEmailEditable] = useState(true)
   const { initiatePayment, confirmOrder } = usePayments()
-  const { addresses } = useAddresses()
   const [shippingAddress, setShippingAddress] = useState<Partial<Address>>()
   const [billingAddress, setBillingAddress] = useState<Partial<Address>>()
   const [billingAddressSameAsShipping, setBillingAddressSameAsShipping] = useState(true)
@@ -94,7 +97,11 @@ export const CheckoutPage: React.FC = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'cashfree' | 'cod'>('cashfree')
 
   const [couponCode, setCouponCode] = useState('')
-  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number; message: string } | null>(null)
+  const [appliedDiscount, setAppliedDiscount] = useState<{
+    code: string
+    amount: number
+    message: string
+  } | null>(null)
   const [couponError, setCouponError] = useState<string | null>(null)
   const [validatingCoupon, setValidatingCoupon] = useState(false)
 
@@ -116,18 +123,7 @@ export const CheckoutPage: React.FC = () => {
   const canGoToPayment = Boolean(
     (email || user) && billingAddress && (billingAddressSameAsShipping || shippingAddress),
   )
-
-  // On initial load wait for addresses to be loaded and check to see if we can prefill a default one
-  useEffect(() => {
-    if (!shippingAddress) {
-      if (addresses && addresses.length > 0) {
-        const defaultAddress = addresses[0]
-        if (defaultAddress) {
-          setBillingAddress(defaultAddress)
-        }
-      }
-    }
-  }, [addresses])
+  const canEnterAddress = Boolean(user || (email && !emailEditable))
 
   useEffect(() => {
     return () => {
@@ -142,7 +138,9 @@ export const CheckoutPage: React.FC = () => {
 
   const initiatePaymentIntent = useCallback(
     async (paymentID: string) => {
-      const selectedShippingAddress = billingAddressSameAsShipping ? billingAddress : shippingAddress
+      const selectedShippingAddress = billingAddressSameAsShipping
+        ? billingAddress
+        : shippingAddress
 
       if (!billingAddress?.phone?.trim()) {
         const errorMessage = 'A phone number is required on the billing address.'
@@ -184,7 +182,8 @@ export const CheckoutPage: React.FC = () => {
             }
             clearCart()
             const queryString = queryParams.toString()
-            router.push(`/orders/${paymentData.orderID}${queryString ? `?${queryString}` : ''}`)
+            const publicOrderID = paymentData.orderCode || paymentData.orderID
+            router.push(`/orders/${publicOrderID}${queryString ? `?${queryString}` : ''}`)
             return
           }
 
@@ -196,7 +195,8 @@ export const CheckoutPage: React.FC = () => {
             }
 
             const cashfree = window.Cashfree({
-              mode: process.env.NEXT_PUBLIC_CASHFREE_ENV === 'production' ? 'production' : 'sandbox',
+              mode:
+                process.env.NEXT_PUBLIC_CASHFREE_ENV === 'production' ? 'production' : 'sandbox',
             })
 
             const paymentSessionID = paymentData.paymentSessionID as string
@@ -234,7 +234,9 @@ export const CheckoutPage: React.FC = () => {
               clearCart()
 
               const queryString = queryParams.toString()
-              router.push(`/orders/${confirmResult.orderID}${queryString ? `?${queryString}` : ''}`)
+              const publicOrderID =
+                'orderCode' in confirmResult ? confirmResult.orderCode : confirmResult.orderID
+              router.push(`/orders/${publicOrderID}${queryString ? `?${queryString}` : ''}`)
               return
             }
 
@@ -264,35 +266,51 @@ export const CheckoutPage: React.FC = () => {
         setIsInitiatingPayment(false)
       }
     },
-    [billingAddress, billingAddressSameAsShipping, email, initiatePayment, confirmOrder, shippingAddress, user, clearCart, router, appliedDiscount],
+    [
+      billingAddress,
+      billingAddressSameAsShipping,
+      email,
+      initiatePayment,
+      confirmOrder,
+      shippingAddress,
+      user,
+      clearCart,
+      router,
+      appliedDiscount,
+    ],
   )
 
-  const handleApplyCoupon = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!couponCode.trim()) return
-    setValidatingCoupon(true)
-    setCouponError(null)
-    try {
-      const res = await fetch(`/api/promo-codes/validate?code=${encodeURIComponent(couponCode)}&subtotal=${checkoutSubtotal}`)
-      const data = await res.json()
-      if (data.valid) {
-        setAppliedDiscount({
-          code: data.code,
-          amount: data.discountAmount,
-          message: data.message,
-        })
-        toast.success(data.message)
-      } else {
-        setCouponError(data.message || 'Invalid coupon code')
-        toast.error(data.message || 'Invalid coupon code')
+  const handleApplyCoupon = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      if (!couponCode.trim()) return
+      setValidatingCoupon(true)
+      setCouponError(null)
+      try {
+        const res = await fetch(
+          `/api/promo-codes/validate?code=${encodeURIComponent(couponCode)}&subtotal=${checkoutSubtotal}`,
+        )
+        const data = await res.json()
+        if (data.valid) {
+          setAppliedDiscount({
+            code: data.code,
+            amount: data.discountAmount,
+            message: data.message,
+          })
+          toast.success(data.message)
+        } else {
+          setCouponError(data.message || 'Invalid coupon code')
+          toast.error(data.message || 'Invalid coupon code')
+        }
+      } catch (err) {
+        setCouponError('Failed to validate coupon')
+        toast.error('Failed to validate coupon')
+      } finally {
+        setValidatingCoupon(false)
       }
-    } catch (err) {
-      setCouponError('Failed to validate coupon')
-      toast.error('Failed to validate coupon')
-    } finally {
-      setValidatingCoupon(false)
-    }
-  }, [checkoutSubtotal, couponCode])
+    },
+    [checkoutSubtotal, couponCode],
+  )
 
   const handleRemoveCoupon = useCallback(() => {
     setAppliedDiscount(null)
@@ -325,40 +343,55 @@ export const CheckoutPage: React.FC = () => {
     <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
       {(isInitiatingPayment || isProcessingPayment) && <LottieLoader size="full" />}
       <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
-        <h2 className="font-medium text-3xl">Contact</h2>
+        <h2 className="font-editorial text-4xl font-normal tracking-[-0.03em] text-[#24231f]">
+          Contact
+        </h2>
         {!user && (
-          <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
-            <div className="prose dark:prose-invert">
-              <Button asChild className="no-underline text-inherit" variant="outline">
+          <div className="flex w-full items-center border-y border-[#24231f]/20 py-5">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#6c675d]">
+              <Button
+                asChild
+                className="h-10 rounded-none bg-[#24231f] px-5 text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+              >
                 <Link href="/login">Log in</Link>
               </Button>
-              <p className="mt-0">
-                <span className="mx-2">or</span>
-                <Link href="/create-account">create an account</Link>
+              <p>
+                <span className="mr-1">or</span>
+                <Link
+                  className="text-[#24231f] underline underline-offset-4"
+                  href="/create-account"
+                >
+                  create an account
+                </Link>
               </p>
             </div>
           </div>
         )}
         {user ? (
-          <div className="bg-accent dark:bg-card rounded-lg p-4 ">
-            <div>
-              <p>{user.email}</p>{' '}
-              <p>
+          <div className="border-y border-[#24231f]/20 py-5 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[#24231f]">{user.email}</p>
+              <p className="text-[#6c675d]">
                 Not you?{' '}
-                <Link className="underline" href="/logout">
+                <Link className="text-[#24231f] underline underline-offset-4" href="/logout">
                   Log out
                 </Link>
               </p>
             </div>
           </div>
         ) : (
-          <div className="bg-accent dark:bg-black rounded-lg p-4 ">
+          <div className="border-b border-[#24231f]/20 pb-8">
             <div>
-              <p className="mb-4">Enter your email to checkout as a guest.</p>
+              <p className="mb-5 text-sm text-[#6c675d]">
+                Enter your email to checkout as a guest.
+              </p>
 
-              <FormItem className="mb-6">
-                <Label htmlFor="email">Email Address</Label>
+              <FormItem className="mb-5">
+                <Label className="text-sm text-[#5d594f]" htmlFor="email">
+                  Email address
+                </Label>
                 <Input
+                  className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
                   disabled={!emailEditable}
                   id="email"
                   name="email"
@@ -369,12 +402,12 @@ export const CheckoutPage: React.FC = () => {
               </FormItem>
 
               <Button
+                className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
                 disabled={!email || !emailEditable}
                 onClick={(e) => {
                   e.preventDefault()
                   setEmailEditable(false)
                 }}
-                variant="default"
               >
                 Continue as guest
               </Button>
@@ -382,58 +415,11 @@ export const CheckoutPage: React.FC = () => {
           </div>
         )}
 
-        <h2 className="font-medium text-3xl">Address</h2>
-
-        {billingAddress ? (
-          <div>
-            <AddressItem
-              actions={
-                <Button
-                  variant={'outline'}
-                  disabled={isProcessingPayment || isInitiatingPayment}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setBillingAddress(undefined)
-                  }}
-                >
-                  Remove
-                </Button>
-              }
-              address={billingAddress}
-            />
-            {!billingPhone && (
-              <p className="mt-3 text-sm text-destructive">
-                Add a phone number to this address to use UPI checkout.
-              </p>
-            )}
-          </div>
-        ) : user ? (
-          <CheckoutAddresses heading="Billing address" setAddress={setBillingAddress} />
-        ) : (
-          <CreateAddressModal
-            disabled={!email || Boolean(emailEditable)}
-            callback={(address) => {
-              setBillingAddress(address)
-            }}
-            skipSubmission={true}
-          />
-        )}
-
-        <div className="flex gap-4 items-center">
-          <Checkbox
-            id="shippingTheSameAsBilling"
-            checked={billingAddressSameAsShipping}
-            disabled={isProcessingPayment || isInitiatingPayment || (!user && (!email || Boolean(emailEditable)))}
-            onCheckedChange={(state) => {
-              setBillingAddressSameAsShipping(state as boolean)
-            }}
-          />
-          <Label htmlFor="shippingTheSameAsBilling">Shipping is the same as billing</Label>
-        </div>
-
-        {!billingAddressSameAsShipping && (
+        {canEnterAddress ? (
           <>
-            {shippingAddress ? (
+            <h2 className="font-medium text-3xl">Address</h2>
+
+            {billingAddress ? (
               <div>
                 <AddressItem
                   actions={
@@ -442,37 +428,78 @@ export const CheckoutPage: React.FC = () => {
                       disabled={isProcessingPayment || isInitiatingPayment}
                       onClick={(e) => {
                         e.preventDefault()
-                        setShippingAddress(undefined)
+                        setBillingAddress(undefined)
                       }}
                     >
                       Remove
                     </Button>
                   }
-                  address={shippingAddress}
+                  address={billingAddress}
                 />
-                {!shippingPhone && (
+                {!billingPhone && (
                   <p className="mt-3 text-sm text-destructive">
                     Add a phone number to this address to use UPI checkout.
                   </p>
                 )}
               </div>
-            ) : user ? (
-              <CheckoutAddresses
-                heading="Shipping address"
-                description="Please select a shipping address."
-                setAddress={setShippingAddress}
-              />
             ) : (
-              <CreateAddressModal
-                callback={(address) => {
-                  setShippingAddress(address)
-                }}
-                disabled={!email || Boolean(emailEditable)}
-                skipSubmission={true}
+              <CheckoutAddresses
+                heading="Billing address"
+                idPrefix="billing"
+                setAddress={setBillingAddress}
+                skipSubmission={!user}
               />
             )}
+
+            <div className="flex gap-4 items-center">
+              <Checkbox
+                id="shippingTheSameAsBilling"
+                checked={billingAddressSameAsShipping}
+                disabled={isProcessingPayment || isInitiatingPayment}
+                onCheckedChange={(state) => {
+                  setBillingAddressSameAsShipping(state as boolean)
+                }}
+              />
+              <Label htmlFor="shippingTheSameAsBilling">Shipping is the same as billing</Label>
+            </div>
+
+            {!billingAddressSameAsShipping && (
+              <>
+                {shippingAddress ? (
+                  <div>
+                    <AddressItem
+                      actions={
+                        <Button
+                          variant={'outline'}
+                          disabled={isProcessingPayment || isInitiatingPayment}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setShippingAddress(undefined)
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      }
+                      address={shippingAddress}
+                    />
+                    {!shippingPhone && (
+                      <p className="mt-3 text-sm text-destructive">
+                        Add a phone number to this address to use UPI checkout.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <CheckoutAddresses
+                    heading="Shipping address"
+                    idPrefix="shipping"
+                    setAddress={setShippingAddress}
+                    skipSubmission={!user}
+                  />
+                )}
+              </>
+            )}
           </>
-        )}
+        ) : null}
 
         <div className="flex flex-col gap-4 my-6">
           <h3 className="text-xl font-medium">Select Payment Method</h3>
@@ -526,13 +553,11 @@ export const CheckoutPage: React.FC = () => {
               void initiatePaymentIntent(selectedPaymentMethod)
             }}
           >
-            {isInitiatingPayment || isProcessingPayment ? (
-              'Processing...'
-            ) : selectedPaymentMethod === 'cod' ? (
-              'Place Order (COD)'
-            ) : (
-              'Proceed to Pay'
-            )}
+            {isInitiatingPayment || isProcessingPayment
+              ? 'Processing...'
+              : selectedPaymentMethod === 'cod'
+                ? 'Place Order (COD)'
+                : 'Proceed to Pay'}
           </Button>
         </div>
 
@@ -651,7 +676,9 @@ export const CheckoutPage: React.FC = () => {
           })}
           <hr />
           <div className="flex flex-col gap-2 my-2">
-            <label htmlFor="coupon" className="text-sm font-medium text-foreground">Have a discount coupon?</label>
+            <label htmlFor="coupon" className="text-sm font-medium text-foreground">
+              Have a discount coupon?
+            </label>
             {appliedDiscount ? (
               <div className="flex items-center justify-between p-2 border border-dashed border-emerald-500 rounded bg-emerald-500/5">
                 <div className="flex flex-col">
@@ -701,7 +728,9 @@ export const CheckoutPage: React.FC = () => {
             {appliedDiscount && (
               <div className="flex justify-between items-center text-sm text-emerald-600 dark:text-emerald-400">
                 <span>Discount ({appliedDiscount.code})</span>
-                <span className="flex items-center gap-1">- <Price amount={appliedDiscount.amount} as="span" /></span>
+                <span className="flex items-center gap-1">
+                  - <Price amount={appliedDiscount.amount} as="span" />
+                </span>
               </div>
             )}
             {selectedPaymentMethod === 'cod' && (
@@ -713,10 +742,7 @@ export const CheckoutPage: React.FC = () => {
             <hr className="my-1" />
             <div className="flex justify-between items-center gap-2">
               <span className="uppercase font-medium">Total</span>
-              <Price
-                className="text-3xl font-medium"
-                amount={checkoutTotal}
-              />
+              <Price className="text-3xl font-medium" amount={checkoutTotal} />
             </div>
           </div>
         </div>
