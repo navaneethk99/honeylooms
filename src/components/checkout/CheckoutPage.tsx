@@ -354,7 +354,7 @@ export const CheckoutPage: React.FC = () => {
   return (
     <div className="my-8 flex grow flex-col items-stretch justify-stretch gap-10 md:flex-row md:gap-6 lg:gap-8">
       {(isInitiatingPayment || isProcessingPayment) && <LottieLoader size="full" />}
-      <div className="flex basis-full flex-col justify-stretch gap-8 lg:basis-2/3">
+      <div className="order-2 flex basis-full flex-col justify-stretch gap-8 md:order-1 lg:basis-2/3">
         <h2 className="font-editorial text-4xl font-normal tracking-[-0.03em] text-[#24231f]">
           Contact
         </h2>
@@ -593,7 +593,7 @@ export const CheckoutPage: React.FC = () => {
       </div>
 
       {!cartIsEmpty && (
-        <div className="flex h-fit basis-full flex-col gap-8 border-none bg-primary/5 p-8 lg:basis-1/3 lg:pl-8">
+        <div className="order-1 flex h-fit basis-full flex-col gap-8 border-none bg-primary/5 p-8 md:order-2 lg:basis-1/3 lg:pl-8">
           <h2 className="text-3xl font-medium">Your cart</h2>
           {cart?.items?.map((item, index) => {
             if (typeof item.product === 'object' && item.product) {
