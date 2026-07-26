@@ -34,7 +34,6 @@ import { InstagramReels } from '@/globals/InstagramReels'
 import { PromoBanner } from '@/globals/PromoBanner'
 import { getDatabaseURL } from '@/utilities/getDatabaseURL'
 import { plugins } from './plugins'
-import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -86,8 +85,6 @@ export default buildConfig({
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
     },
-    // Builds read CMS data while prerendering, but must not mutate the database.
-    prodMigrations: process.env.PAYLOAD_SKIP_PROD_MIGRATIONS === 'true' ? undefined : migrations,
   }),
   editor: lexicalEditor({
     features: () => {
