@@ -86,7 +86,8 @@ export default buildConfig({
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
     },
-    prodMigrations: migrations,
+    // Builds read CMS data while prerendering, but must not mutate the database.
+    prodMigrations: process.env.PAYLOAD_SKIP_PROD_MIGRATIONS === 'true' ? undefined : migrations,
   }),
   editor: lexicalEditor({
     features: () => {
