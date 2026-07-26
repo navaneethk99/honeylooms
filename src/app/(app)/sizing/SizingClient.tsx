@@ -14,16 +14,16 @@ interface SizeRow {
 }
 
 const sizeData: SizeRow[] = [
-  {
-    size: 'XXS',
-    chest: 81.3,
-    waist: 81.3,
-    hips: 71.1,
-    sleeve: 71.1,
-    shoulder: 63.5,
-    length: 86.4,
-    collar: 33.0,
-  },
+  // {
+  //   size: 'XXS',
+  //   chest: 81.3,
+  //   waist: 81.3,
+  //   hips: 71.1,
+  //   sleeve: 71.1,
+  //   shoulder: 63.5,
+  //   length: 86.4,
+  //   collar: 33.0,
+  // },
   {
     size: 'XS',
     chest: 86.4,
@@ -56,16 +56,16 @@ const sizeData: SizeRow[] = [
     length: 78,
     collar: 46,
   },
-  {
-    size: 'XXL',
-    chest: 124,
-    waist: 110,
-    hips: 126,
-    sleeve: 67,
-    shoulder: 54,
-    length: 80,
-    collar: 48,
-  },
+  // {
+  //   size: 'XXL',
+  //   chest: 124,
+  //   waist: 110,
+  //   hips: 126,
+  //   sleeve: 67,
+  //   shoulder: 54,
+  //   length: 80,
+  //   collar: 48,
+  // },
 ]
 
 export function SizingClient() {
