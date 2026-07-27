@@ -1,15 +1,15 @@
 'use client'
-import React, { useMemo } from 'react'
+import { RotateCcw } from 'lucide-react'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
+import React from 'react'
 
 export function ClearFilters() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const hasActiveFilters = useMemo(() => {
-    return searchParams.has('category') || searchParams.has('collection') || searchParams.has('q')
-  }, [searchParams])
+  const hasActiveFilters =
+    searchParams.has('category') || searchParams.has('collection') || searchParams.has('q')
 
   if (!hasActiveFilters) return null
 
@@ -18,15 +18,19 @@ export function ClearFilters() {
     params.delete('category')
     params.delete('collection')
     params.delete('q')
-    router.push(pathname + '?' + params.toString())
+    const query = params.toString()
+    router.push(query ? `${pathname}?${query}` : pathname)
   }
 
   return (
     <button
+      type="button"
       onClick={handleClear}
-      className="text-xs uppercase tracking-wider text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white font-semibold transition-colors text-left hover:cursor-pointer pb-2 border-b border-neutral-100 dark:border-neutral-900"
+      title="Reset filters"
+      className="absolute -top-10 right-0 z-20 inline-flex h-8 cursor-pointer items-center gap-2 border border-neutral-200 bg-background/95 px-3 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-neutral-600 shadow-[0_5px_20px_rgba(0,0,0,0.06)] backdrop-blur-sm transition-colors duration-200 hover:border-neutral-400 hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-800 md:right-0 md:top-5 md:h-auto md:border-0 md:bg-transparent md:p-0 md:text-[9px] md:font-normal md:tracking-[0.16em] md:text-[#777166] md:shadow-none md:hover:bg-transparent md:hover:text-[#24231f] dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-neutral-600 dark:hover:bg-neutral-900 dark:hover:text-white dark:focus-visible:outline-neutral-200"
     >
-      Clear Filters &times;
+      <RotateCcw aria-hidden="true" className="size-3" strokeWidth={1.8} />
+      <span>Reset</span>
     </button>
   )
 }

@@ -34,12 +34,23 @@ export const CollectionItem: React.FC<Props> = ({ collection }) => {
 
   return (
     <button
+      aria-pressed={isActive}
       onClick={() => setQuery()}
-      className={clsx('hover:cursor-pointer', {
-        'underline': isActive,
-      })}
+      className={clsx(
+        'group flex w-full cursor-pointer items-center gap-2.5 py-1.5 text-left text-[13px] leading-snug transition-colors duration-200',
+        isActive ? 'font-medium text-[#24231f]' : 'text-[#6c675d] hover:text-[#24231f]',
+      )}
     >
-      {collection.title}
+      <span
+        aria-hidden="true"
+        className={clsx(
+          'size-1.5 shrink-0 rounded-full transition-[background-color,transform] duration-200',
+          isActive
+            ? 'scale-100 bg-[#D9A322]'
+            : 'scale-75 bg-[#24231f]/15 group-hover:scale-100 group-hover:bg-[#24231f]/35',
+        )}
+      />
+      <span className="min-w-0 flex-1 truncate">{collection.title}</span>
     </button>
   )
 }
@@ -140,4 +151,3 @@ export const CollectionSelect: React.FC<{ collections: Collection[] }> = ({ coll
     </div>
   )
 }
-

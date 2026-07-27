@@ -16,9 +16,11 @@ async function CategoryList() {
 
   return (
     <div>
-      <h3 className="text-xs mb-2 text-neutral-500 dark:text-neutral-400">Category</h3>
+      <h3 className="mb-2 text-xs text-neutral-500 md:mb-3 md:font-mono md:text-[9px] md:font-medium md:uppercase md:tracking-[0.18em] md:text-[#777166] dark:text-neutral-400">
+        Categories
+      </h3>
 
-      <ul className="hidden md:block">
+      <ul className="hidden md:flex md:flex-col md:gap-0.5">
         {categories.docs.map((category) => {
           return (
             <li key={category.id}>
