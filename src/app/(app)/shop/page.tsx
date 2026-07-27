@@ -1,5 +1,6 @@
 import { Grid } from '@/components/Grid'
 import { ProductGridItem } from '@/components/ProductGridItem'
+import { ShopProductReveal } from '@/components/ShopProductReveal'
 import React from 'react'
 
 export const metadata = {
@@ -95,7 +96,11 @@ export default async function ShopPage({ searchParams }: Props) {
       {products?.docs.length > 0 ? (
         <Grid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
           {products.docs.map((product) => {
-            return <ProductGridItem key={product.id} product={product} />
+            return (
+              <ShopProductReveal key={product.id}>
+                <ProductGridItem product={product} />
+              </ShopProductReveal>
+            )
           })}
         </Grid>
       ) : null}
