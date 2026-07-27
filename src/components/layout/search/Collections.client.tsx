@@ -37,8 +37,10 @@ export const CollectionItem: React.FC<Props> = ({ collection }) => {
       aria-pressed={isActive}
       onClick={() => setQuery()}
       className={clsx(
-        'group flex w-full cursor-pointer items-center gap-2.5 py-1.5 text-left text-[13px] leading-snug transition-colors duration-200',
-        isActive ? 'font-medium text-[#24231f]' : 'text-[#6c675d] hover:text-[#24231f]',
+        'group -mx-2 flex w-[calc(100%+1rem)] cursor-pointer items-center gap-2.5 px-2 py-1.5 text-left text-[13px] leading-snug transition-colors duration-200',
+        isActive
+          ? 'bg-[#D9A322]/15 font-medium text-[#24231f]'
+          : 'text-[#6c675d] hover:bg-[#24231f]/[0.035] hover:text-[#24231f]',
       )}
     >
       <span
