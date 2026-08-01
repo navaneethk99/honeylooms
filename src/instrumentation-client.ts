@@ -1,13 +1,17 @@
 import posthog from 'posthog-js'
 
-const projectToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN
+const projectToken =
+  process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN ||
+  'phc_BXf4m9MoXm4vpNwVJPhwpwYJNRaux6kSgjyGwRDTBwUz'
 const isPayloadAdmin = window.location.pathname.startsWith('/admin')
 
 if (projectToken && !isPayloadAdmin) {
   posthog.init(projectToken, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://phog.honeylooms.in',
+    ui_host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || 'https://eu.posthog.com',
     capture_pageview: 'history_change',
     defaults: '2026-05-30',
+    person_profiles: 'identified_only',
     disable_session_recording: false,
     session_recording: {
       maskAllInputs: true,
