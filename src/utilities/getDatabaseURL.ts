@@ -7,6 +7,7 @@ export const getDatabaseURL = (value?: string): string => {
     const url = new URL(value)
     const sslmode = url.searchParams.get('sslmode')
 
+    // Upgrade legacy SSL modes so certificate and hostname verification are always enforced.
     if (sslmode && LEGACY_SSL_MODES.has(sslmode)) {
       url.searchParams.set('sslmode', 'verify-full')
     }
