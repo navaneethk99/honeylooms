@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
   experimental: {
     // Gallery submissions may contain multiple files. Leave room for multipart
     // overhead while the application enforces its 100 MB total upload limit.
+    turbopackFileSystemCacheForBuild: true,
     proxyClientMaxBodySize: '110mb',
   },
   serverExternalPackages: ['pdfkit'],
