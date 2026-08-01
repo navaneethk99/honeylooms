@@ -20,7 +20,6 @@ const imageRemotePatterns = imageRemoteURLs.map((item) => {
 
 const nextConfig: NextConfig = {
   experimental: {
-    turbopackFileSystemCacheForBuild: true,
     proxyClientMaxBodySize: '110mb',
   },
 
