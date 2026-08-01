@@ -1,16 +1,13 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 import type { NextConfig } from 'next'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
 
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+
 const imageRemoteURLs = [NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL].filter(
   Boolean,
 ) as string[]
+
 const imageRemotePatterns = imageRemoteURLs.map((item) => {
   const url = new URL(item)
 
@@ -23,17 +20,16 @@ const imageRemotePatterns = imageRemoteURLs.map((item) => {
 
 const nextConfig: NextConfig = {
   experimental: {
-    // Gallery submissions may contain multiple files. Leave room for multipart
-    // overhead while the application enforces its 100 MB total upload limit.
     turbopackFileSystemCacheForBuild: true,
     proxyClientMaxBodySize: '110mb',
   },
+
   serverExternalPackages: ['pdfkit'],
-  // Temporarily required on Windows until Next.js fixes Turbopack Sass resolution.
-  // See: https://github.com/vercel/next.js/issues/86431
+
   sassOptions: {
     loadPaths: ['./node_modules/@payloadcms/ui/dist/scss/'],
   },
+
   images: {
     unoptimized: false,
     localPatterns: [
@@ -54,8 +50,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
   reactStrictMode: true,
   redirects,
+
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
@@ -64,9 +62,6 @@ const nextConfig: NextConfig = {
     }
 
     return webpackConfig
-  },
-  turbopack: {
-    root: path.resolve(dirname),
   },
 }
 
