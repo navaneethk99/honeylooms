@@ -7,6 +7,7 @@ import { getPayload } from 'payload'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
 import { HomepageBannerMedia, HomepageFallbackBanner } from '@/components/HomepageBannerMedia'
+import { HomepageModel } from '@/components/HomepageModel'
 import { HomepageScrollControl } from '@/components/HomepageScrollControl'
 import { InstagramReels } from '@/components/InstagramReels'
 import { CMSLink } from '@/components/Link'
@@ -194,6 +195,7 @@ export default async function HomePage() {
           <HomepageFallbackBanner />
         ) : null}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,19,16,0.08)_20%,rgba(20,19,16,0.74)_100%)]" />
+        <HomepageModel className="fixed bottom-9 left-5 z-40 h-[28%] w-[44%] -translate-x-[4.625rem] translate-y-[6.5rem] sm:w-[34%] md:bottom-12 md:left-10 md:h-[34%] md:w-[24%] md:-translate-x-[7.5rem] md:translate-y-32 lg:left-14 lg:w-[20%]" />
         <div className="relative z-10 flex h-full flex-col justify-between px-5 pb-8 pt-7 md:px-10 md:pb-12 lg:px-14">
           <div className="home-reveal flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-white/80">
             {/*<span>Honeylooms / India</span>
