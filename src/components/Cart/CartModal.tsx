@@ -10,7 +10,6 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
-import { ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -18,10 +17,14 @@ import React, { useEffect, useMemo, useState } from 'react'
 
 import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
-import { OpenCartButton } from './OpenCart'
+import { CartBagModel, OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
 import { Product, Variant } from '@/payload-types'
-import { getEffectiveProductPrice, getOriginalProductPrice, isProductOnSale } from '@/utilities/pricing'
+import {
+  getEffectiveProductPrice,
+  getOriginalProductPrice,
+  isProductOnSale,
+} from '@/utilities/pricing'
 
 export function CartModal() {
   const { cart } = useCart()
@@ -54,7 +57,7 @@ export function CartModal() {
 
         {!cart || cart?.items?.length === 0 ? (
           <div className="text-center flex flex-col items-center gap-2">
-            <ShoppingCart className="h-16" />
+            <CartBagModel className="pointer-events-none" height={112} width={96} />
             <p className="text-center text-2xl font-bold">Your cart is empty.</p>
           </div>
         ) : (
