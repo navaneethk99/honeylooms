@@ -1,14 +1,12 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import dynamic from 'next/dynamic'
+import { SVG3D } from '@/lib/SVG3D'
 import React from 'react'
-
-const SVG3D = dynamic(() => import('3dsvg').then((module) => module.SVG3D), { ssr: false })
 
 const cartBagSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 640" width="512" height="640">
   <path
-    fill="#1848E8"
+    fill="#D9A322"
     fill-rule="evenodd"
     clip-rule="evenodd"
     d="M 122 72 L 390 72 L 418 590 L 94 590 Z M 188 158 a 68 22 0 1 0 136 0 a 68 22 0 1 0 -136 0"

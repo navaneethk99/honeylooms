@@ -1,11 +1,9 @@
 'use client'
 
-import dynamic from 'next/dynamic'
+import { SVG3D } from '@/lib/SVG3D'
 import { useEffect, useState } from 'react'
 
 import styles from './index.module.css'
-
-const SVG3D = dynamic(() => import('3dsvg').then((module) => module.SVG3D), { ssr: false })
 
 const honeycombSvg = `<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M226.941 141.855L242.668 114.617H274.12L289.846 141.855L274.12 169.094H242.668L226.941 141.855Z" fill="#D9A322"/>
