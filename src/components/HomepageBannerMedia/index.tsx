@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 
 type Props = {
   banners: Array<{
@@ -52,7 +51,8 @@ function BannerSlide({
           key={source.dimension}
         >
           <source media="(max-width: 767px)" srcSet={source.mobileSrc} />
-          <Image
+          {/* A native image keeps the picture source authoritative for mobile art direction. */}
+          <img
             alt={stageIndex === 0 ? banner.alt : ''}
             aria-hidden={stageIndex === 0 ? undefined : true}
             className={`${stageIndex === lastStageIndex ? 'home-hero-media ' : ''}size-full object-cover`}
