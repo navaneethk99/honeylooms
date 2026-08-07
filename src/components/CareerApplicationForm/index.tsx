@@ -2,7 +2,8 @@
 
 import { CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import Script from 'next/script'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,23 +22,78 @@ export type ApplicationQuestion = {
 type Props = {
   jobId: number
   questions: ApplicationQuestion[]
+  turnstileSiteKey: string
 }
 
-export function CareerApplicationForm({ jobId, questions }: Props) {
+type TurnstileWidget = {
+  remove: (widgetID: string) => void
+  render: (
+    container: HTMLElement,
+    options: {
+      callback: (token: string) => void
+      'error-callback': () => void
+      'expired-callback': () => void
+      sitekey: string
+    },
+  ) => string
+}
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileWidget
+  }
+}
+
+export function CareerApplicationForm({ jobId, questions, turnstileSiteKey }: Props) {
   const [responses, setResponses] = useState<Record<string, string>>({})
   const [website, setWebsite] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState('')
+  const turnstileContainerRef = useRef<HTMLDivElement>(null)
+  const turnstileWidgetID = useRef<string | null>(null)
+  const isTurnstileConfigured = Boolean(turnstileSiteKey)
+
+  const renderTurnstile = () => {
+    if (!turnstileContainerRef.current || !window.turnstile || turnstileWidgetID.current) return
+
+    turnstileWidgetID.current = window.turnstile.render(turnstileContainerRef.current, {
+      callback: (token) => {
+        setError('')
+        setTurnstileToken(token)
+      },
+      'error-callback': () => {
+        setError('Verification could not be loaded. Please refresh and try again.')
+        setTurnstileToken('')
+      },
+      'expired-callback': () => setTurnstileToken(''),
+      sitekey: turnstileSiteKey,
+    })
+  }
+
+  useEffect(() => {
+    return () => {
+      if (turnstileWidgetID.current && window.turnstile) {
+        window.turnstile.remove(turnstileWidgetID.current)
+      }
+    }
+  }, [])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError('')
+
+    if (!turnstileToken) {
+      setError('Please complete the verification before submitting your application.')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
       const response = await fetch('/api/careers/apply', {
-        body: JSON.stringify({ jobId, responses, website }),
+        body: JSON.stringify({ jobId, responses, turnstileToken, website }),
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
       })
@@ -146,9 +202,26 @@ export function CareerApplicationForm({ jobId, questions }: Props) {
           value={website}
         />
       </div>
+      {isTurnstileConfigured ? (
+        <>
+          <div className="flex justify-center">
+            <div ref={turnstileContainerRef} />
+          </div>
+          <Script
+            id="cloudflare-turnstile"
+            onReady={renderTurnstile}
+            src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+            strategy="afterInteractive"
+          />
+        </>
+      ) : (
+        <p className="text-center text-sm text-destructive" role="alert">
+          Application verification is currently unavailable.
+        </p>
+      )}
       <Button
         className="h-auto w-full rounded-none bg-[#24231f] py-3.5 text-xs tracking-[0.16em] uppercase hover:bg-[#3b3932]"
-        disabled={isSubmitting}
+        disabled={isSubmitting || !turnstileToken || !isTurnstileConfigured}
         type="submit"
       >
         {isSubmitting ? 'Sending application...' : 'Submit application'}
