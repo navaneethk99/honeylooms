@@ -13,6 +13,9 @@ import type { Page } from '@/payload-types'
 import { notFound } from 'next/navigation'
 import { getCachedDocument } from '@/utilities/getDocument'
 
+// CMS pages inspect request-scoped draft mode, including for unknown slugs.
+export const dynamic = 'force-dynamic'
+
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const pages = await payload.find({
@@ -106,5 +109,5 @@ const queryPageBySlug = async ({ slug }: { slug: string }): Promise<Page | null>
     return (result.docs?.[0] as Page) || null
   }
 
-  return (await getCachedDocument('pages', slug)()) as Page || null
+  return ((await getCachedDocument('pages', slug)()) as Page) || null
 }
