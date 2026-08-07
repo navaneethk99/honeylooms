@@ -21,7 +21,9 @@ export const InstagramReels = ({ urls, variant }: InstagramReelsProps) => {
             ? 'bg-[linear-gradient(135deg,#5b8ee9_0%,#3970cf_52%,#2452ab_100%)]'
             : variant === 'pink'
               ? 'bg-[linear-gradient(135deg,#ffb2d6_0%,#f477af_52%,#c83d7a_100%)]'
-              : 'bg-[linear-gradient(135deg,#6376bd_0%,#3d5193_52%,#263870_100%)]'
+              : variant === 'navy'
+                ? 'bg-[linear-gradient(135deg,#6376bd_0%,#3d5193_52%,#263870_100%)]'
+                : 'bg-[linear-gradient(135deg,#ed9478_0%,#c65b40_52%,#9f442f_100%)]'
       }`}
     >
       <div className="mx-auto max-w-[1500px]">
