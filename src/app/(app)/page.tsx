@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { getPayload } from 'payload'
+import { cache } from 'react'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
 import { HomepageMasthead, type MastheadVariant } from '@/components/HomepageMasthead'
@@ -65,22 +66,22 @@ type HomePageProps = {
 const isMastheadVariant = (value?: string): value is MastheadVariant =>
   value === 'red' || value === 'blue' || value === 'pink' || value === 'navy'
 
+const getRandomMastheadVariant = cache((): MastheadVariant => {
+  const randomVariant = Math.random()
+
+  if (randomVariant < 0.25) return 'red'
+  if (randomVariant < 0.5) return 'blue'
+  if (randomVariant < 0.75) return 'pink'
+  return 'navy'
+})
+
 export default async function HomePage({ searchParams }: HomePageProps) {
   const payload = await getPayload({ config: configPromise })
   const { theme } = await searchParams
-  const randomVariant = Math.random()
-  const randomMastheadVariant: MastheadVariant =
-    randomVariant < 0.25
-      ? 'red'
-      : randomVariant < 0.5
-        ? 'blue'
-        : randomVariant < 0.75
-          ? 'pink'
-          : 'navy'
   const mastheadVariant =
     process.env.NODE_ENV === 'development' && isMastheadVariant(theme)
       ? theme
-      : randomMastheadVariant
+      : getRandomMastheadVariant()
 
   const [productsResult, categoriesResult, collectionsResult, instagramReelsGlobal] =
     await Promise.all([
