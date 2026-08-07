@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -17,6 +18,29 @@ const normalizeURL = (value: unknown) => {
   } catch {
     return null
   }
+}
+
+const verifyTurnstileToken = async (token: unknown, request: Request) => {
+  const secret = process.env.TURNSTILE_SECRET_KEY
+  if (!secret) {
+    throw new Error('Turnstile is not configured.')
+  }
+
+  if (typeof token !== 'string' || !token) {
+    return false
+  }
+
+  const formData = new URLSearchParams({ response: token, secret })
+  const remoteIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+  if (remoteIP) formData.set('remoteip', remoteIP)
+
+  const response = await fetch(TURNSTILE_VERIFY_URL, {
+    body: formData,
+    method: 'POST',
+  })
+  const result: unknown = await response.json()
+
+  return response.ok && isRecord(result) && result.success === true
 }
 
 export async function POST(request: Request) {
@@ -38,6 +62,14 @@ export async function POST(request: Request) {
 
     if (!jobID || !isRecord(body.responses)) {
       return NextResponse.json({ error: 'Invalid application.' }, { status: 400 })
+    }
+
+    const isHuman = await verifyTurnstileToken(body.turnstileToken, request)
+    if (!isHuman) {
+      return NextResponse.json(
+        { error: 'Please complete the verification before submitting your application.' },
+        { status: 400 },
+      )
     }
 
     const payload = await getPayload({ config: configPromise })

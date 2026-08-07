@@ -74,7 +74,11 @@ export default async function CareerApplicationPage({ params }: Props) {
         </header>
 
         <div className="py-8 flex justify-center items-center">
-          <CareerApplicationForm jobId={job.id} questions={questions} />
+          <CareerApplicationForm
+            jobId={job.id}
+            questions={questions}
+            turnstileSiteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}
+          />
         </div>
       </div>
     </div>
