@@ -375,7 +375,7 @@ export const CheckoutPage: React.FC = () => {
   }
 
   return (
-    <div className="my-8 flex grow flex-col items-stretch justify-stretch gap-10 md:flex-row md:gap-6 lg:gap-8">
+    <div className="my-8 flex grow flex-col items-stretch justify-stretch gap-10 bg-white md:flex-row md:gap-6 lg:gap-8">
       {(isInitiatingPayment || isProcessingPayment) && <LottieLoader size="full" />}
       <div className="order-2 flex basis-full flex-col justify-stretch gap-8 md:order-1 lg:basis-2/3">
         <h2 className="font-editorial text-4xl font-normal tracking-[-0.03em] text-[#24231f]">
@@ -386,7 +386,7 @@ export const CheckoutPage: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#6c675d]">
               <Button
                 asChild
-                className="h-10 rounded-none bg-[#24231f] px-5 text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+                className="h-10 rounded-none bg-[#24231f] px-5 text-white shadow-none hover:bg-[#3b3933]"
               >
                 <Link href="/login">Log in</Link>
               </Button>
@@ -437,7 +437,7 @@ export const CheckoutPage: React.FC = () => {
               </FormItem>
 
               <Button
-                className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+                className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-white shadow-none hover:bg-[#3b3933]"
                 disabled={!email || !emailEditable}
                 onClick={(e) => {
                   e.preventDefault()
@@ -616,7 +616,7 @@ export const CheckoutPage: React.FC = () => {
       </div>
 
       {!cartIsEmpty && (
-        <div className="order-1 flex h-fit basis-full flex-col gap-8 border-none bg-primary/5 p-8 md:order-2 lg:basis-1/3 lg:pl-8">
+        <div className="order-1 flex h-fit basis-full flex-col gap-8 border border-[#24231f]/15 bg-white p-8 md:order-2 lg:basis-1/3 lg:pl-8">
           <h2 className="text-3xl font-medium">Your cart</h2>
           {cart?.items?.map((item, index) => {
             if (typeof item.product === 'object' && item.product) {
@@ -663,7 +663,7 @@ export const CheckoutPage: React.FC = () => {
 
               return (
                 <div className="flex items-start gap-4" key={index}>
-                  <div className="relative aspect-[1/1] w-20 shrink-0 overflow-hidden border border-[#24231f]/20 bg-[#ebe5da]">
+                  <div className="relative aspect-[1/1] w-20 shrink-0 overflow-hidden border border-[#24231f]/20 bg-white">
                     {image && typeof image !== 'string' && (
                       <Media fill imgClassName="object-cover" resource={image} size="80px" />
                     )}
@@ -740,7 +740,7 @@ export const CheckoutPage: React.FC = () => {
                   placeholder="Enter code"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  className="bg-[#F6F1E8] rounded-none h-12"
+                  className="h-12 rounded-none bg-white"
                 />
                 <Button
                   type="submit"

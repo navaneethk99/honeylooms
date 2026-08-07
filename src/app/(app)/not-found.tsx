@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <section className="flex min-h-[52svh] items-center bg-[#f5f1e8] text-[#24231f]">
+    <section className="flex min-h-[52svh] items-center bg-white text-[#24231f]">
       <div className="container py-20 text-center md:py-28">
         <p className="text-[10px] tracking-[0.24em] text-[#8a6718] uppercase">Error 404</p>
         <h1 className="mt-5 font-editorial text-[clamp(5rem,18vw,11rem)] leading-[0.75] tracking-[-0.07em]">
@@ -12,7 +12,10 @@ export default function NotFound() {
           The page you are looking for is not here, or may have moved.
         </p>
         <div className="mt-9 flex items-center justify-center gap-5 text-[10px] tracking-[0.18em] uppercase">
-          <Link className="border-b border-[#24231f] pb-1 transition-opacity hover:opacity-55" href="/">
+          <Link
+            className="border-b border-[#24231f] pb-1 transition-opacity hover:opacity-55"
+            href="/"
+          >
             Home
           </Link>
           <Link

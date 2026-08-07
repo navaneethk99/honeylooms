@@ -1,9 +1,9 @@
 import type { Footer as FooterType } from '@/payload-types'
 
 import { FooterMenu } from '@/components/Footer/menu'
-import { LogoIcon } from '@/components/icons/logo'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { ArrowUpRight } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 const socialLinks = [
@@ -14,12 +14,12 @@ const socialLinks = [
 
 const SocialLinks = () => (
   <div className="min-w-0">
-    <h3 className="mb-4 text-[9px] uppercase tracking-[0.22em] text-[#8a6718]">Social</h3>
+    <h3 className="mb-4 text-[9px] uppercase tracking-[0.22em] text-white/60">Social</h3>
     <ul className="space-y-2">
       {socialLinks.map((link) => (
         <li key={link.href}>
           <Link
-            className="group inline-flex items-center gap-1.5 text-xs text-[#24231f]/60 transition-colors hover:text-[#24231f]"
+            className="group inline-flex items-center gap-1.5 text-xs text-white/65 transition-colors hover:text-white"
             href={link.href}
             rel="noopener noreferrer"
             target="_blank"
@@ -39,12 +39,18 @@ export async function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-[#24231f]/15 bg-[#eee8dc] text-[#24231f]">
+    <footer className="site-footer border-t-4 border-white bg-[#102d70] text-white">
       <div className="mx-auto max-w-[1500px] px-5 md:px-10 lg:px-14">
         <div className="grid gap-12 py-12 md:grid-cols-12 md:py-16">
           <div className="md:col-span-4">
             <Link className="inline-block" href="/" aria-label="Honeylooms home">
-              <LogoIcon className="w-44 md:w-52" />
+              <Image
+                alt="Honeylooms"
+                className="h-auto w-44 md:w-52"
+                height={393}
+                src="/hlms.svg"
+                width={1800}
+              />
             </Link>
             <p className="mt-8 max-w-xs font-editorial text-3xl leading-[0.95] tracking-[-0.025em] md:text-4xl">
               Rooted in craft.
@@ -52,7 +58,7 @@ export async function Footer() {
               Ready for now.
             </p>
             <Link
-              className="group mt-7 inline-flex items-center gap-2 border-b border-[#24231f]/30 pb-1 text-[9px] uppercase tracking-[0.2em] transition-colors hover:border-[#24231f]"
+              className="group mt-7 inline-flex items-center gap-2 border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] transition-colors hover:border-white"
               href="/shop?sort=-createdAt"
             >
               Shop new arrivals
@@ -67,7 +73,7 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-[#24231f]/15 py-5 text-[9px] uppercase tracking-[0.18em] text-[#24231f]/45 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 border-t border-white/15 py-5 text-[9px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <p>&copy; {currentYear} Honeylooms</p>
           {/*<p>India / Worldwide</p>*/}
         </div>
