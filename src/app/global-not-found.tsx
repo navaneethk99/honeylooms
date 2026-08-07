@@ -14,7 +14,7 @@ export default function GlobalNotFound() {
       <body
         style={{
           alignItems: 'center',
-          background: '#f5f1e8',
+          background: '#fff',
           color: '#24231f',
           display: 'flex',
           fontFamily: 'var(--font-geist-sans), sans-serif',

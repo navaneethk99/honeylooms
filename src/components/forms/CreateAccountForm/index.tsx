@@ -123,7 +123,7 @@ export const CreateAccountForm: React.FC = () => {
 
       <div className="mt-7">
         <Button
-          className="h-11 w-full rounded-none bg-[#24231f] text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+          className="h-11 w-full rounded-none bg-[#24231f] text-sm text-white shadow-none hover:bg-[#3b3933]"
           disabled={loading}
           type="submit"
           variant="default"

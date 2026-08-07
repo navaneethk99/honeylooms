@@ -18,6 +18,14 @@
   height: min(76%, 46rem);
 }
 
+body:has(.homepage-masthead--red) .site-footer {
+  background: #c51c25;
+}
+
+body:has(.homepage-masthead--blue) .site-footer {
+  background: #1d469f;
+}
+
 .homepage-masthead h1 {
   --glitch-x: 50%;
   --glitch-y: 50%;

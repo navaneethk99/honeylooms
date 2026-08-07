@@ -26,7 +26,7 @@ export function FooterMenu({ children, menu }: Props) {
     <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-7 gap-y-9 sm:grid-cols-4">
       {chunks.map((chunk, chunkIndex) => (
         <div className="min-w-0" key={chunkIndex}>
-          <h3 className="mb-4 text-[9px] uppercase tracking-[0.22em] text-[#8a6718]">
+          <h3 className="mb-4 text-[9px] uppercase tracking-[0.22em] text-white/60">
             {columnTitles[chunkIndex] || `More ${chunkIndex + 1}`}
           </h3>
           <ul className="space-y-2">
@@ -35,7 +35,7 @@ export function FooterMenu({ children, menu }: Props) {
                 <CMSLink
                   appearance="link"
                   {...item.link}
-                  className="h-auto justify-start p-0 text-left text-xs font-normal text-[#24231f]/60 no-underline transition-colors hover:text-[#24231f] hover:no-underline"
+                  className="h-auto justify-start p-0 text-left text-xs font-normal text-white/65 no-underline transition-colors hover:text-white hover:no-underline"
                 />
               </li>
             ))}

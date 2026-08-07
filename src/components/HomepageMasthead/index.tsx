@@ -6,7 +6,7 @@ import Image from 'next/image'
 
 import './index.css'
 
-type MastheadVariant = 'blue' | 'red'
+export type MastheadVariant = 'blue' | 'red'
 
 const mastheadVariants = {
   blue: {

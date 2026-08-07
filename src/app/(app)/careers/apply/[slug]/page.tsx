@@ -53,7 +53,7 @@ export default async function CareerApplicationPage({ params }: Props) {
   }))
 
   return (
-    <div className="bg-[#f5f1e8] text-neutral-900">
+    <div className="bg-white text-neutral-900">
       <div className="container max-w-3xl py-12 md:py-20">
         <Link
           className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"

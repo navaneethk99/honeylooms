@@ -50,7 +50,7 @@ export default async function CareersPage() {
   )
 
   return (
-    <div className="bg-[#f5f1e8] text-neutral-900">
+    <div className="bg-white text-neutral-900">
       <section className="container py-14 md:py-20">
         <div className="max-w-2xl">
           <h1 className="text-3xl font-editorial tracking-tight md:text-4xl">Careers</h1>

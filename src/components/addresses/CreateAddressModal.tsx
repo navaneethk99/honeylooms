@@ -60,7 +60,7 @@ export const CreateAddressModal: React.FC<Props> = ({
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="max-h-[calc(100dvh-2rem)] touch-pan-y overscroll-contain rounded-none border-[#24231f]/20 bg-[#f5f1e8] shadow-none"
+        className="max-h-[calc(100dvh-2rem)] touch-pan-y overscroll-contain rounded-none border-[#24231f]/20 bg-white shadow-none"
         data-lenis-prevent
       >
         <DialogHeader>

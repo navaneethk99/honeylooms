@@ -1,6 +1,6 @@
 .site-header {
   border-bottom: 1px solid rgb(36 35 31 / 18%);
-  background: #f5f1e8;
+  background: #fff;
   color: #24231f;
 }
 
@@ -123,7 +123,7 @@
 }
 
 .mobile-menu-panel {
-  background: #f5f1e8;
+  background: #fff;
   color: #24231f;
 }
 

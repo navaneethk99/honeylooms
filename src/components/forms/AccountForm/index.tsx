@@ -190,7 +190,7 @@ export const AccountForm: React.FC = () => {
         </Fragment>
       )}
       <Button
-        className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+        className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-white shadow-none hover:bg-[#3b3933]"
         disabled={isLoading || isSubmitting || !isDirty}
         type="submit"
         variant="default"

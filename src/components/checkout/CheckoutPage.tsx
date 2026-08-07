@@ -386,7 +386,7 @@ export const CheckoutPage: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#6c675d]">
               <Button
                 asChild
-                className="h-10 rounded-none bg-[#24231f] px-5 text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+                className="h-10 rounded-none bg-[#24231f] px-5 text-white shadow-none hover:bg-[#3b3933]"
               >
                 <Link href="/login">Log in</Link>
               </Button>
@@ -437,7 +437,7 @@ export const CheckoutPage: React.FC = () => {
               </FormItem>
 
               <Button
-                className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+                className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-white shadow-none hover:bg-[#3b3933]"
                 disabled={!email || !emailEditable}
                 onClick={(e) => {
                   e.preventDefault()
@@ -740,7 +740,7 @@ export const CheckoutPage: React.FC = () => {
                   placeholder="Enter code"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  className="bg-[#F6F1E8] rounded-none h-12"
+                  className="h-12 rounded-none bg-white"
                 />
                 <Button
                   type="submit"

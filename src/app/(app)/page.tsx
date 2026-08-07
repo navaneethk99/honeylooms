@@ -114,7 +114,7 @@ export default async function HomePage() {
       .slice(0, 4) ?? []
 
   return (
-    <article className="home-page overflow-hidden bg-[#f5f1e8] text-[#24231f]">
+    <article className="home-page overflow-hidden bg-white text-[#24231f]">
       <HomepageScrollControl />
       <HomepageMasthead variant={mastheadVariant} />
 
@@ -156,7 +156,7 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <section className="relative h-64 overflow-hidden border-b border-[#24231f]/20 bg-[#D9A322] text-[#24231f] md:h-96">
+      {/* <section className="relative h-64 overflow-hidden border-b border-[#24231f]/20 bg-[#D9A322] text-[#24231f] md:h-96">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-right bg-repeat-x opacity-[0.52] md:bg-center md:opacity-[0.82]"
@@ -175,10 +175,16 @@ export default async function HomePage() {
             textiles deserves to evolve with every generation.
           </p>
         </div>
-      </section>
+      </section> */}
 
       {categories.length > 0 ? (
-        <section className="bg-[#ded8cc] px-5 py-16 md:px-10 md:py-24 lg:px-14">
+        <section
+          className={`px-5 py-6 md:px-10 md:py-8 lg:px-14 ${
+            mastheadVariant === 'red'
+              ? 'bg-[linear-gradient(135deg,#f76b5e_0%,#e44042_52%,#ba2632_100%)] text-white'
+              : 'bg-[linear-gradient(135deg,#5b8ee9_0%,#3970cf_52%,#2452ab_100%)] text-white'
+          }`}
+        >
           <div className="mx-auto max-w-[1500px]">
             <div className="mb-9 md:mb-12 md:flex md:items-end md:justify-between">
               <div>
@@ -189,7 +195,7 @@ export default async function HomePage() {
                   Shop by category
                 </h2>
               </div>
-              <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#5d594f] md:mt-0">
+              <p className="mt-5 max-w-sm text-sm leading-relaxed text-white md:mt-0">
                 Everyday forms, expressive details, and silhouettes designed for repeat wear.
               </p>
             </div>
@@ -209,7 +215,7 @@ export default async function HomePage() {
             >
               {categories.map(({ category, image }, index) => (
                 <Link
-                  className={`group relative aspect-[2/3] w-full max-w-[20rem] overflow-hidden bg-[#c9c2b6] ${
+                  className={`group relative aspect-[2/3] w-full max-w-[20rem] overflow-hidden border-4 border-white bg-[#c9c2b6] ${
                     index % 2 === 1 ? 'lg:mt-12' : ''
                   }`}
                   href={`/shop?category=${category.id}`}
@@ -236,7 +242,7 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <section className="relative h-64 overflow-hidden border-b border-[#24231f]/20 bg-[#8f3f32] px-5 py-16 text-[#f5f1e8] md:h-96 md:px-10 md:py-24 lg:px-14">
+      {/* <section className="relative h-64 overflow-hidden border-b border-[#24231f]/20 bg-[#8f3f32] px-5 py-16 text-white md:h-96 md:px-10 md:py-24 lg:px-14">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-repeat-x opacity-[0.18] [mask-image:linear-gradient(90deg,transparent,black_5%,black_95%,transparent)]"
@@ -252,7 +258,7 @@ export default async function HomePage() {
             overdone.
           </p>
         </div>
-      </section>
+      </section> */}
 
       {collections.length > 0 ? (
         <section className="px-5 py-16 md:px-10 md:py-24 lg:px-14">
@@ -323,7 +329,7 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <InstagramReels urls={instagramReelUrls} />
+      <InstagramReels urls={instagramReelUrls} variant={mastheadVariant} />
 
       {/* <section className="grid border-y border-[#24231f]/15 bg-[#ebe5da] sm:grid-cols-3">
         {[

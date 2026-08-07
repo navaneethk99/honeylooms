@@ -123,7 +123,7 @@ export const AddressSelectionModal: React.FC<AddressSelectionModalProps> = ({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
-          className="h-11 w-fit rounded-none border-[#24231f]/30 bg-transparent px-5 font-normal text-[#24231f] shadow-none hover:bg-[#24231f] hover:text-[#f5f1e8]"
+          className="h-11 w-fit rounded-none border-[#24231f]/30 bg-transparent px-5 font-normal text-[#24231f] shadow-none hover:bg-[#24231f] hover:text-white"
           disabled={disabled}
           variant="outline"
         >
@@ -131,7 +131,7 @@ export const AddressSelectionModal: React.FC<AddressSelectionModalProps> = ({
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="max-h-[calc(100dvh-2rem)] touch-pan-y overscroll-contain rounded-none border-[#24231f]/20 bg-[#f5f1e8] p-0 text-[#24231f] shadow-none sm:max-w-xl"
+        className="max-h-[calc(100dvh-2rem)] touch-pan-y overscroll-contain rounded-none border-[#24231f]/20 bg-white p-0 text-[#24231f] shadow-none sm:max-w-xl"
         data-lenis-prevent
       >
         <DialogHeader className="border-b border-[#24231f]/20 px-6 py-6 pr-14">
@@ -147,7 +147,7 @@ export const AddressSelectionModal: React.FC<AddressSelectionModalProps> = ({
                 address={address}
                 beforeActions={
                   <Button
-                    className="h-9 rounded-none bg-[#24231f] px-4 text-xs font-normal uppercase tracking-[0.12em] text-[#f5f1e8] shadow-none hover:bg-[#3b3933]"
+                    className="h-9 rounded-none bg-[#24231f] px-4 text-xs font-normal uppercase tracking-[0.12em] text-white shadow-none hover:bg-[#3b3933]"
                     onClick={(e) => {
                       e.preventDefault()
                       setAddress(address)

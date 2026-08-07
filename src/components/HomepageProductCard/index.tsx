@@ -59,7 +59,7 @@ export function HomepageProductCard({ product }: Props) {
           </div>
         )}
 
-        {/*<span className="absolute left-3 top-3 bg-[#f5f1e8]/95 px-2.5 py-1 text-[9px] uppercase tracking-[0.18em] text-[#24231f]">
+        {/*<span className="absolute left-3 top-3 bg-white/95 px-2.5 py-1 text-[9px] uppercase tracking-[0.18em] text-[#24231f]">
           {onSale ? 'Special price' : 'New arrival'}
         </span>*/}
       </div>

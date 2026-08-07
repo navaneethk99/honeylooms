@@ -110,7 +110,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <LottiePrefetcher />
 
           <Header />
-          <main className="flex-1 bg-[#f5f1e8] text-black">{children}</main>
+          <main className="flex-1 bg-white text-black">{children}</main>
           <Footer />
         </Providers>
         <Analytics />
