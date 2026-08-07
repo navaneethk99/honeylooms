@@ -14,6 +14,14 @@
   background: radial-gradient(circle at 50% 42%, #4178dc 0%, #1d469f 42%, #081b52 100%);
 }
 
+.homepage-masthead--pink {
+  background: radial-gradient(circle at 50% 42%, #ff9dcc 0%, #df4d91 42%, #941d50 100%);
+}
+
+.homepage-masthead--navy {
+  background: radial-gradient(circle at 50% 42%, #485aa2 0%, #24336f 42%, #0d173f 100%);
+}
+
 .homepage-masthead--blue .homepage-masthead__model {
   height: min(76%, 46rem);
 }
@@ -24,6 +32,14 @@ body:has(.homepage-masthead--red) .site-footer {
 
 body:has(.homepage-masthead--blue) .site-footer {
   background: #1d469f;
+}
+
+body:has(.homepage-masthead--pink) .site-footer {
+  background: #df4d91;
+}
+
+body:has(.homepage-masthead--navy) .site-footer {
+  background: #24336f;
 }
 
 .homepage-masthead h1 {

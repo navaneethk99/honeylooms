@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { getPayload } from 'payload'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
-import { HomepageMasthead } from '@/components/HomepageMasthead'
+import { HomepageMasthead, type MastheadVariant } from '@/components/HomepageMasthead'
 import { HomepageScrollControl } from '@/components/HomepageScrollControl'
 import { InstagramReels } from '@/components/InstagramReels'
 import { Media } from '@/components/Media'
@@ -58,9 +58,29 @@ const productHasCategory = (product: Product, categoryID: Category['id']) =>
     typeof category === 'object' ? category.id === categoryID : category === categoryID,
   ) ?? false
 
-export default async function HomePage() {
+type HomePageProps = {
+  searchParams: Promise<{ theme?: string }>
+}
+
+const isMastheadVariant = (value?: string): value is MastheadVariant =>
+  value === 'red' || value === 'blue' || value === 'pink' || value === 'navy'
+
+export default async function HomePage({ searchParams }: HomePageProps) {
   const payload = await getPayload({ config: configPromise })
-  const mastheadVariant = Math.random() < 0.5 ? 'red' : 'blue'
+  const { theme } = await searchParams
+  const randomVariant = Math.random()
+  const randomMastheadVariant: MastheadVariant =
+    randomVariant < 0.25
+      ? 'red'
+      : randomVariant < 0.5
+        ? 'blue'
+        : randomVariant < 0.75
+          ? 'pink'
+          : 'navy'
+  const mastheadVariant =
+    process.env.NODE_ENV === 'development' && isMastheadVariant(theme)
+      ? theme
+      : randomMastheadVariant
 
   const [productsResult, categoriesResult, collectionsResult, instagramReelsGlobal] =
     await Promise.all([
@@ -182,7 +202,11 @@ export default async function HomePage() {
           className={`px-5 py-6 md:px-10 md:py-8 lg:px-14 ${
             mastheadVariant === 'red'
               ? 'bg-[linear-gradient(135deg,#f76b5e_0%,#e44042_52%,#ba2632_100%)] text-white'
-              : 'bg-[linear-gradient(135deg,#5b8ee9_0%,#3970cf_52%,#2452ab_100%)] text-white'
+              : mastheadVariant === 'blue'
+                ? 'bg-[linear-gradient(135deg,#5b8ee9_0%,#3970cf_52%,#2452ab_100%)] text-white'
+                : mastheadVariant === 'pink'
+                  ? 'bg-[linear-gradient(135deg,#ffb2d6_0%,#f477af_52%,#c83d7a_100%)] text-white'
+                  : 'bg-[linear-gradient(135deg,#6376bd_0%,#3d5193_52%,#263870_100%)] text-white'
           }`}
         >
           <div className="mx-auto max-w-[1500px]">
