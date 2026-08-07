@@ -22,6 +22,10 @@
   background: radial-gradient(circle at 50% 42%, #485aa2 0%, #24336f 42%, #0d173f 100%);
 }
 
+.homepage-masthead--brown {
+  background: radial-gradient(circle at 50% 42%, #cf7458 0%, #9f442f 42%, #5e2419 100%);
+}
+
 .homepage-masthead--blue .homepage-masthead__model {
   height: min(76%, 46rem);
 }
@@ -42,9 +46,11 @@ body:has(.homepage-masthead--navy) .site-footer {
   background: #24336f;
 }
 
+body:has(.homepage-masthead--brown) .site-footer {
+  background: #9f442f;
+}
+
 .homepage-masthead h1 {
-  --glitch-x: 50%;
-  --glitch-y: 50%;
   position: relative;
   z-index: 1;
   margin: 0;
@@ -201,72 +207,6 @@ body:has(.homepage-masthead--navy) .site-footer {
   }
 }
 
-.homepage-masthead h1::before,
-.homepage-masthead h1::after {
-  position: absolute;
-  inset: 0;
-  content: attr(data-text);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.homepage-masthead h1::before {
-  color: #7ef0e0;
-  clip-path: inset(18% 0 58% 0);
-  transform: translateX(-0.04em);
-  -webkit-mask-image: radial-gradient(
-    circle 17rem at var(--glitch-x) var(--glitch-y),
-    #000 0%,
-    #000 44%,
-    transparent 72%
-  );
-  mask-image: radial-gradient(
-    circle 17rem at var(--glitch-x) var(--glitch-y),
-    #000 0%,
-    #000 44%,
-    transparent 72%
-  );
-}
-
-.homepage-masthead h1::after {
-  color: #ff795e;
-  clip-path: inset(62% 0 13% 0);
-  transform: translateX(0.04em);
-  -webkit-mask-image: radial-gradient(
-    circle 17rem at var(--glitch-x) var(--glitch-y),
-    #000 0%,
-    #000 44%,
-    transparent 72%
-  );
-  mask-image: radial-gradient(
-    circle 17rem at var(--glitch-x) var(--glitch-y),
-    #000 0%,
-    #000 44%,
-    transparent 72%
-  );
-}
-
-.homepage-masthead h1:hover::before,
-.homepage-masthead h1:hover::after {
-  opacity: 0.9;
-  animation: masthead-static-scan 140ms steps(2, end) infinite;
-}
-
-@keyframes masthead-static-scan {
-  0%,
-  100% {
-    clip-path: inset(18% 0 58% 0);
-  }
-
-  50% {
-    clip-path: inset(57% 0 18% 0);
-  }
-}
-
-.homepage-masthead h1:hover::after {
-  animation-direction: reverse;
-}
-
 @media (min-width: 768px) {
   .homepage-masthead {
     min-height: calc(100svh - 107px);
@@ -277,19 +217,5 @@ body:has(.homepage-masthead--navy) .site-footer {
 @media (min-width: 1024px) {
   .homepage-masthead {
     padding-inline: 3.5rem;
-  }
-}
-
-@media (hover: none) {
-  .homepage-masthead h1:hover::before,
-  .homepage-masthead h1:hover::after {
-    animation: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .homepage-masthead h1:hover::before,
-  .homepage-masthead h1:hover::after {
-    animation: none;
   }
 }

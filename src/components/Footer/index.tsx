@@ -3,6 +3,7 @@ import type { Footer as FooterType } from '@/payload-types'
 import { FooterMenu } from '@/components/Footer/menu'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { ArrowUpRight } from 'lucide-react'
+import { cookies } from 'next/headers'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -11,6 +12,19 @@ const socialLinks = [
   { href: 'https://x.com/honeylooms', label: 'X / Twitter' },
   { href: 'https://www.linkedin.com/company/honeylooms/', label: 'LinkedIn' },
 ]
+
+type FooterTheme = 'blue' | 'brown' | 'navy' | 'pink' | 'red'
+
+const isFooterTheme = (value?: string): value is FooterTheme =>
+  value === 'red' || value === 'blue' || value === 'pink' || value === 'navy' || value === 'brown'
+
+const footerThemeClasses: Record<FooterTheme, string> = {
+  blue: 'bg-[#1d469f]',
+  brown: 'bg-[#9f442f]',
+  navy: 'bg-[#24336f]',
+  pink: 'bg-[#df4d91]',
+  red: 'bg-[#c51c25]',
+}
 
 const SocialLinks = () => (
   <div className="min-w-0">
@@ -35,11 +49,16 @@ const SocialLinks = () => (
 
 export async function Footer() {
   const footer: FooterType = await getCachedGlobal('footer', 1)()
+  const cookieStore = await cookies()
+  const storedTheme = cookieStore.get('honeylooms-theme')?.value
+  const footerTheme = isFooterTheme(storedTheme) ? storedTheme : 'navy'
   const menu = footer.navItems || []
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="site-footer border-t-4 border-white bg-[#102d70] text-white">
+    <footer
+      className={`site-footer border-t-4 border-white text-white ${footerThemeClasses[footerTheme]}`}
+    >
       <div className="mx-auto max-w-[1500px] px-5 md:px-10 lg:px-14">
         <div className="grid gap-12 py-12 md:grid-cols-12 md:py-16">
           <div className="md:col-span-4">

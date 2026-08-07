@@ -1,7 +1,7 @@
 import configPromise from '@payload-config'
 import { ArrowUpRight } from 'lucide-react'
 import type { Metadata } from 'next'
-import { draftMode } from 'next/headers'
+import { cookies, draftMode } from 'next/headers'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import { cache } from 'react'
@@ -64,24 +64,29 @@ type HomePageProps = {
 }
 
 const isMastheadVariant = (value?: string): value is MastheadVariant =>
-  value === 'red' || value === 'blue' || value === 'pink' || value === 'navy'
+  value === 'red' || value === 'blue' || value === 'pink' || value === 'navy' || value === 'brown'
 
 const getRandomMastheadVariant = cache((): MastheadVariant => {
   const randomVariant = Math.random()
 
-  if (randomVariant < 0.25) return 'red'
-  if (randomVariant < 0.5) return 'blue'
-  if (randomVariant < 0.75) return 'pink'
-  return 'navy'
+  if (randomVariant < 0.2) return 'red'
+  if (randomVariant < 0.4) return 'blue'
+  if (randomVariant < 0.6) return 'pink'
+  if (randomVariant < 0.8) return 'navy'
+  return 'brown'
 })
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const payload = await getPayload({ config: configPromise })
   const { theme } = await searchParams
+  const cookieStore = await cookies()
+  const storedTheme = cookieStore.get('honeylooms-theme')?.value
   const mastheadVariant =
     process.env.NODE_ENV === 'development' && isMastheadVariant(theme)
       ? theme
-      : getRandomMastheadVariant()
+      : isMastheadVariant(storedTheme)
+        ? storedTheme
+        : getRandomMastheadVariant()
 
   const [productsResult, categoriesResult, collectionsResult, instagramReelsGlobal] =
     await Promise.all([
@@ -207,7 +212,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 ? 'bg-[linear-gradient(135deg,#5b8ee9_0%,#3970cf_52%,#2452ab_100%)] text-white'
                 : mastheadVariant === 'pink'
                   ? 'bg-[linear-gradient(135deg,#ffb2d6_0%,#f477af_52%,#c83d7a_100%)] text-white'
-                  : 'bg-[linear-gradient(135deg,#6376bd_0%,#3d5193_52%,#263870_100%)] text-white'
+                  : mastheadVariant === 'navy'
+                    ? 'bg-[linear-gradient(135deg,#6376bd_0%,#3d5193_52%,#263870_100%)] text-white'
+                    : 'bg-[linear-gradient(135deg,#ed9478_0%,#c65b40_52%,#9f442f_100%)] text-white'
           }`}
         >
           <div className="mx-auto max-w-[1500px]">

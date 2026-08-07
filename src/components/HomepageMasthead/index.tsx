@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import type { AnimationEvent, PointerEvent } from 'react'
+import type { AnimationEvent } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 import './index.css'
 
-export type MastheadVariant = 'blue' | 'navy' | 'pink' | 'red'
+export type MastheadVariant = 'blue' | 'brown' | 'navy' | 'pink' | 'red'
 
 const mastheadVariants = {
   blue: {
@@ -15,6 +15,12 @@ const mastheadVariants = {
     height: 634,
     src: '/aarna_2.webp',
     width: 322,
+  },
+  brown: {
+    alt: 'Aarna wearing a brown Honeylooms top',
+    height: 640,
+    src: '/aarna_5.webp',
+    width: 387,
   },
   pink: {
     alt: 'Aarna wearing a pink Honeylooms top',
@@ -36,19 +42,24 @@ const mastheadVariants = {
   },
 } as const
 
-const variantOptions: MastheadVariant[] = ['red', 'blue', 'pink', 'navy']
+const variantOptions: MastheadVariant[] = ['red', 'blue', 'pink', 'navy', 'brown']
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 export function HomepageMasthead({ variant }: { variant: MastheadVariant }) {
   const model = mastheadVariants[variant]
   const router = useRouter()
   const mastheadRef = useRef<HTMLElement>(null)
-  const wordmarkRef = useRef<HTMLHeadingElement>(null)
   const isAnimatingRef = useRef(false)
   const [isWordmarkForeground, setIsWordmarkForeground] = useState(false)
   const [isReversing, setIsReversing] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isThemeSwitcherVisible, setIsThemeSwitcherVisible] = useState(true)
+
+  useEffect(() => {
+    sessionStorage.setItem('honeylooms-theme', variant)
+    document.cookie = `honeylooms-theme=${variant}; Path=/; SameSite=Lax`
+    router.refresh()
+  }, [router, variant])
 
   useEffect(() => {
     if (!isDevelopment) return
@@ -100,20 +111,6 @@ export function HomepageMasthead({ variant }: { variant: MastheadVariant }) {
     return () => masthead.removeEventListener('wheel', handleWheel)
   }, [isReversing, isWordmarkForeground])
 
-  const updateCursorPosition = (event: PointerEvent<HTMLElement>) => {
-    const wordmarkBounds = wordmarkRef.current?.getBoundingClientRect()
-    if (wordmarkBounds) {
-      wordmarkRef.current?.style.setProperty(
-        '--glitch-x',
-        `${event.clientX - wordmarkBounds.left}px`,
-      )
-      wordmarkRef.current?.style.setProperty(
-        '--glitch-y',
-        `${event.clientY - wordmarkBounds.top}px`,
-      )
-    }
-  }
-
   const completeAnimation = (event: AnimationEvent<HTMLHeadingElement>) => {
     if (event.animationName === 'masthead-wordmark-advance') {
       isAnimatingRef.current = false
@@ -136,12 +133,8 @@ export function HomepageMasthead({ variant }: { variant: MastheadVariant }) {
       className={`homepage-masthead homepage-masthead--${variant} ${
         isWordmarkForeground ? 'homepage-masthead--wordmark-foreground' : ''
       } ${isReversing ? 'homepage-masthead--wordmark-reversing' : ''}`}
-      onPointerEnter={updateCursorPosition}
-      onPointerMove={updateCursorPosition}
     >
-      <h1 ref={wordmarkRef} data-text="HONEYLOOMS" onAnimationEnd={completeAnimation}>
-        HONEYLOOMS
-      </h1>
+      <h1 onAnimationEnd={completeAnimation}>HONEYLOOMS</h1>
       {isDevelopment && isThemeSwitcherVisible ? (
         <div className="absolute right-4 top-4 z-10 flex overflow-hidden border border-white/50 bg-black/25 text-[9px] uppercase tracking-[0.14em] text-white backdrop-blur-sm md:right-6 md:top-6">
           {variantOptions.map((option) => (
