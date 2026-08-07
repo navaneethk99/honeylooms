@@ -21,6 +21,7 @@ const imageRemotePatterns = imageRemoteURLs.map((item) => {
 
 const nextConfig: NextConfig = {
   experimental: {
+    globalNotFound: true,
     proxyClientMaxBodySize: '110mb',
   },
 
