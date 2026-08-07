@@ -7,7 +7,7 @@ import { CheckoutPage } from '@/components/checkout/CheckoutPage'
 
 export default function Checkout() {
   return (
-    <div className="container min-h-[90vh] flex">
+    <div className="container flex min-h-[90vh] bg-white">
       {(!process.env.CASHFREE_APP_ID || !process.env.CASHFREE_SECRET_KEY) && (
         <div>
           <Fragment>
