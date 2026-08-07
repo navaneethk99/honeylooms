@@ -83,7 +83,9 @@ export default buildConfig({
       connectionString: getDatabaseURL(process.env.DATABASE_URL),
       max: 10,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
+      // Serverless Postgres can take longer than five seconds to wake on the
+      // first request, particularly while Payload introspects the schema.
+      connectionTimeoutMillis: 30000,
     },
   }),
   editor: lexicalEditor({

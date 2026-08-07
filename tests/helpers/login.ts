@@ -11,19 +11,21 @@ export interface LoginOptions {
 }
 
 /**
- * Logs the user into the admin panel via the login page.
+ * Logs the user into the customer website before opening the admin panel.
  */
 export async function login({
   page,
   serverURL = 'http://localhost:3000',
   user,
 }: LoginOptions): Promise<void> {
-  await page.goto(`${serverURL}/admin/login`)
+  await page.goto(`${serverURL}/login`)
 
-  await page.fill('#field-email', user.email)
-  await page.fill('#field-password', user.password)
+  await page.fill('#email', user.email)
+  await page.fill('#password', user.password)
   await page.click('button[type="submit"]')
 
+  await page.waitForURL(`${serverURL}/account`)
+  await page.goto(`${serverURL}/admin`)
   await page.waitForURL(`${serverURL}/admin`)
 
   const dashboardArtifact = page.locator('span[title="Dashboard"]')

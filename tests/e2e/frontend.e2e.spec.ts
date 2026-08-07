@@ -179,8 +179,7 @@ test.describe('Frontend', () => {
   test('authenticated customers cannot access /admin', async ({ page }) => {
     await createUserAndLogin(page.request, userEmail, userPassword, false)
     await page.goto(`${baseURL}/admin`)
-    const heading = page.locator('h1').first()
-    await expect(heading).toContainText('Unauthorized')
+    await expect(page.getByRole('heading', { name: 'Lost in the weave.' })).toBeVisible()
   })
 
   test('Guest can create and view order', async ({ page }) => {
