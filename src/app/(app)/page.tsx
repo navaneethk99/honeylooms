@@ -6,15 +6,11 @@ import Link from 'next/link'
 import { getPayload } from 'payload'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
-import { HomepageBannerMedia, HomepageFallbackBanner } from '@/components/HomepageBannerMedia'
-import { HomepageModel } from '@/components/HomepageModel'
+import { HomepageMasthead } from '@/components/HomepageMasthead'
 import { HomepageScrollControl } from '@/components/HomepageScrollControl'
 import { InstagramReels } from '@/components/InstagramReels'
-import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import { PromoPopup } from '@/components/PromoPopup'
-import { RichText } from '@/components/RichText'
-import { homeStaticData } from '@/endpoints/seed/home-static'
 import type {
   Category,
   Collection,
@@ -25,10 +21,6 @@ import type {
 import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedGlobal } from '@/utilities/getGlobals'
-import { getMediaUrl } from '@/utilities/getMediaUrl'
-import { bannerImagePresets, type BannerImagePresetName } from '@/utilities/bannerImagePresets'
-
-const ENABLE_SVG_HOMEPAGE_BANNER = process.env.ENABLE_SVG_HOMEPAGE_BANNER !== 'false'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getHomepageData()
@@ -61,37 +53,16 @@ const getProductMedia = (product?: Product | null): MediaType | null => {
   return image && typeof image === 'object' ? image : null
 }
 
-const getBannerStageUrl = (image: MediaType, presetName: BannerImagePresetName) => {
-  const generatedPreview = getMediaUrl(
-    image.sizes?.[presetName]?.url || (presetName === 'bannerPreview' ? image.thumbnailURL : null),
-  )
-
-  return (
-    generatedPreview ||
-    `/api/banner-preview/${image.id}?size=${presetName}&v=${encodeURIComponent(image.updatedAt)}`
-  )
-}
-
 const productHasCategory = (product: Product, categoryID: Category['id']) =>
   product.categories?.some((category) =>
     typeof category === 'object' ? category.id === categoryID : category === categoryID,
   ) ?? false
 
-const getHeroLink = (link: NonNullable<PageType['hero']['links']>[number]['link']) => (
-  <CMSLink
-    {...link}
-    appearance="inline"
-    className="group inline-flex items-center gap-3 border-b border-white/50 pb-1.5 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:border-white"
-  >
-    <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-  </CMSLink>
-)
-
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
-  const page = (await getHomepageData()) || (homeStaticData() as PageType)
+  const mastheadVariant = Math.random() < 0.5 ? 'red' : 'blue'
 
-  const [productsResult, categoriesResult, collectionsResult, bannerResult, instagramReelsGlobal] =
+  const [productsResult, categoriesResult, collectionsResult, instagramReelsGlobal] =
     await Promise.all([
       payload.find({
         collection: 'products',
@@ -116,14 +87,6 @@ export default async function HomePage() {
         overrideAccess: false,
         sort: '-createdAt',
       }),
-      payload.find({
-        collection: 'homepage-banners',
-        depth: 1,
-        limit: 12,
-        overrideAccess: false,
-        sort: '-updatedAt',
-        where: { active: { equals: true } },
-      }),
       getCachedGlobal('instagram-reels', 0)().catch(() => null),
     ])
 
@@ -144,41 +107,6 @@ export default async function HomePage() {
     homepageCollections.length > 0 ? homepageCollections : collectionsResult.docs
   ).slice(0, 3) as Collection[]
 
-  const homepageBanners = bannerResult.docs.flatMap((banner) => {
-    const desktopImage =
-      banner.desktopImage && typeof banner.desktopImage === 'object' ? banner.desktopImage : null
-    const mobileImage =
-      banner.mobileImage && typeof banner.mobileImage === 'object' ? banner.mobileImage : null
-    const desktopSrc = getMediaUrl(desktopImage?.url)
-    const mobileSrc = getMediaUrl(mobileImage?.url)
-
-    if (!desktopImage || !mobileImage || !desktopSrc || !mobileSrc) return []
-
-    const sources = [
-      ...bannerImagePresets
-        .filter(({ name }) => name !== 'bannerPreview')
-        .map(({ dimension, name }) => ({
-          desktopSrc: getBannerStageUrl(desktopImage, name),
-          dimension,
-          mobileSrc: getBannerStageUrl(mobileImage, name),
-        })),
-      {
-        desktopSrc,
-        dimension: 4000,
-        mobileSrc,
-      },
-    ]
-
-    return [
-      {
-        alt: desktopImage.alt || mobileImage.alt || '',
-        id: String(banner.id),
-        rotationDelay: banner.rotationDelay ?? 5,
-        sources,
-      },
-    ]
-  })
-
   const instagramReelUrls =
     instagramReelsGlobal?.reels
       ?.map((reel) => reel.url)
@@ -188,63 +116,7 @@ export default async function HomePage() {
   return (
     <article className="home-page overflow-hidden bg-[#f5f1e8] text-[#24231f]">
       <HomepageScrollControl />
-      <section className="relative aspect-[1/1.7] bg-[#24231f] text-white md:aspect-[1.7/1]">
-        {homepageBanners.length > 0 ? (
-          <HomepageBannerMedia banners={homepageBanners} />
-        ) : ENABLE_SVG_HOMEPAGE_BANNER ? (
-          <HomepageFallbackBanner />
-        ) : null}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,19,16,0.08)_20%,rgba(20,19,16,0.74)_100%)]" />
-        <HomepageModel className="fixed bottom-9 left-5 z-40 h-[28%] w-[44%] -translate-x-[4.625rem] translate-y-[6.5rem] sm:w-[34%] md:bottom-12 md:left-10 md:h-[34%] md:w-[24%] md:-translate-x-[7.5rem] md:translate-y-32 lg:left-14 lg:w-[20%]" />
-        <div className="relative z-10 flex h-full flex-col justify-between px-5 pb-8 pt-7 md:px-10 md:pb-12 lg:px-14">
-          <div className="home-reveal flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-white/80">
-            {/*<span>Honeylooms / India</span>
-            <span className="hidden sm:inline">Contemporary Indian clothing</span>*/}
-          </div>
-
-          <div className="home-reveal max-w-4xl [animation-delay:120ms]">
-            {page.hero.richText ? (
-              <RichText
-                className="max-w-none [&_h1]:font-editorial [&_h1]:text-[clamp(3.6rem,9vw,8.5rem)] [&_h1]:font-normal [&_h1]:leading-[0.8] [&_h1]:tracking-[-0.04em] [&_h2]:font-editorial [&_h2]:text-[clamp(3.6rem,9vw,8.5rem)] [&_h2]:font-normal [&_h2]:leading-[0.8] [&_p]:hidden"
-                data={page.hero.richText}
-                enableGutter={false}
-                enableProse={false}
-              />
-            ) : (
-              <h1 className="font-editorial text-[clamp(3.8rem,10vw,9rem)] leading-[0.8] tracking-[-0.04em]">
-                Woven for
-                <br />
-                <em>now.</em>
-              </h1>
-            )}
-
-            <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
-              {page.hero.links?.length ? (
-                page.hero.links.map(({ link, id }, index) => (
-                  <span key={id || `${link.label}-${index}`}>{getHeroLink(link)}</span>
-                ))
-              ) : (
-                <>
-                  <Link
-                    className="group inline-flex items-center gap-3 border-b border-white/50 pb-1.5 text-[11px] uppercase tracking-[0.2em] transition-colors hover:border-white"
-                    href="/shop"
-                  >
-                    Shop new arrivals
-                    <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </Link>
-                  <Link
-                    className="group inline-flex items-center gap-3 border-b border-white/50 pb-1.5 text-[11px] uppercase tracking-[0.2em] transition-colors hover:border-white"
-                    href="/collections"
-                  >
-                    Explore collections
-                    <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+      <HomepageMasthead variant={mastheadVariant} />
 
       {latestProducts.length > 0 ? (
         <section id="latest-arrivals" className="px-5 py-16 md:px-10 md:py-24 lg:px-14">
