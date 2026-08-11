@@ -250,6 +250,33 @@ const queueWelcomeEmail = ({
   })
 }
 
+const updatePendingRegistration = async ({
+  email,
+  encryptedPassword,
+  name,
+  payload,
+}: {
+  email: string
+  encryptedPassword: string
+  name: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  // Keep updated_at unchanged because it also controls when another OTP email may be sent.
+  const result = await payload.db.pool.query<{ id: number }>(
+    `
+      UPDATE account_verifications
+      SET
+        encrypted_password = $2,
+        name = $3
+      WHERE email = $1
+      RETURNING id
+    `,
+    [email, encryptedPassword, name],
+  )
+
+  return Boolean(result.rows[0])
+}
+
 const takeVerificationEmailSlot = async ({
   email,
   payload,
@@ -306,7 +333,8 @@ const takeVerificationEmailSlot = async ({
   return refreshedAccount ? { name: refreshedAccount.name, otp } : undefined
 }
 
-// A matching request consumes the record's remaining slots so the code can only succeed once.
+// A matching request consumes the remaining slots so the code can only succeed once. A match
+// already waiting on the fifth failed update may still finish, but later requests stay locked out.
 const claimVerificationAttempt = async ({
   email,
   otpHash,
@@ -323,18 +351,35 @@ const claimVerificationAttempt = async ({
     name: string
   }>(
     `
-      UPDATE account_verifications
+      WITH eligible_attempt AS MATERIALIZED (
+        SELECT id
+        FROM account_verifications
+        WHERE email = $1
+          AND otp_attempts < $2
+          AND expires_at > NOW()
+      )
+      UPDATE account_verifications AS verification
       SET
-        otp_attempts = CASE WHEN otp_hash = $3 THEN $2 ELSE otp_attempts + 1 END,
+        otp_attempts = CASE
+          WHEN verification.otp_hash = $3 THEN $2
+          ELSE verification.otp_attempts + 1
+        END,
         updated_at = NOW()
-      WHERE email = $1
-        AND otp_attempts < $2
-        AND expires_at > NOW()
+      FROM eligible_attempt
+      WHERE verification.id = eligible_attempt.id
+        AND verification.expires_at > NOW()
+        AND (
+          verification.otp_attempts < $2
+          OR (
+            verification.otp_hash = $3
+            AND verification.otp_attempts = $2
+          )
+        )
       RETURNING
-        id,
-        name,
-        encrypted_password AS "encryptedPassword",
-        otp_hash = $3 AS "isMatch"
+        verification.id,
+        verification.name,
+        verification.encrypted_password AS "encryptedPassword",
+        verification.otp_hash = $3 AS "isMatch"
     `,
     [email, MAX_OTP_ATTEMPTS, otpHash],
   )
@@ -370,13 +415,13 @@ export async function POST(request: Request) {
         return Response.json({ email })
       }
 
-      const existingVerification = await payload.find({
-        collection: 'account-verifications',
-        where: { email: { equals: email } },
-        limit: 1,
-        overrideAccess: true,
+      const encryptedPassword = encryptPassword(password)
+      const existingAccount = await updatePendingRegistration({
+        email,
+        encryptedPassword,
+        name,
+        payload,
       })
-      const existingAccount = existingVerification.docs[0]
 
       if (existingAccount) {
         const verificationEmail = await takeVerificationEmailSlot({ email, payload })
@@ -392,7 +437,7 @@ export async function POST(request: Request) {
         data: {
           email,
           encryptedOtp: encryptPassword(otp),
-          encryptedPassword: encryptPassword(password),
+          encryptedPassword,
           expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
           name,
           otpAttempts: 0,
