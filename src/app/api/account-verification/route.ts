@@ -250,6 +250,38 @@ const queueWelcomeEmail = ({
   })
 }
 
+// Allocate each verification request one of the limited attempt slots atomically.
+const takeVerificationAttempt = async ({
+  email,
+  payload,
+}: {
+  email: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const result = await payload.db.pool.query<{
+    encryptedPassword: string
+    id: number
+    name: string
+    otpHash: string
+  }>(
+    `
+      UPDATE account_verifications
+      SET otp_attempts = otp_attempts + 1, updated_at = NOW()
+      WHERE email = $1
+        AND otp_attempts < $2
+        AND expires_at > NOW()
+      RETURNING
+        id,
+        name,
+        encrypted_password AS "encryptedPassword",
+        otp_hash AS "otpHash"
+    `,
+    [email, MAX_OTP_ATTEMPTS],
+  )
+
+  return result.rows[0]
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as RegistrationRequest | VerificationRequest
@@ -284,53 +316,62 @@ export async function POST(request: Request) {
         overrideAccess: true,
       })
       const existingAccount = existingVerification.docs[0]
-      const otp = randomInt(100000, 1000000).toString()
 
       if (existingAccount) {
-        await payload.update({
-          collection: 'account-verifications',
-          id: existingAccount.id,
-          data: {
-            email,
-            encryptedOtp: encryptPassword(otp),
-            encryptedPassword: encryptPassword(password),
-            expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
-            name,
-            otpAttempts: 0,
-            otpHash: hashOTP(email, otp),
-          },
-          overrideAccess: true,
-        })
-      } else {
-        await payload.create({
-          collection: 'account-verifications',
-          data: {
-            email,
-            encryptedOtp: encryptPassword(otp),
-            encryptedPassword: encryptPassword(password),
-            expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
-            name,
-            otpAttempts: 0,
-            otpHash: hashOTP(email, otp),
-          },
-          overrideAccess: true,
-        })
+        const canReuseOTP =
+          existingAccount.otpAttempts < MAX_OTP_ATTEMPTS &&
+          new Date(existingAccount.expiresAt) > new Date()
+        const otp = canReuseOTP
+          ? decryptPassword(existingAccount.encryptedOtp)
+          : randomInt(100000, 1000000).toString()
+
+        if (!canReuseOTP) {
+          await payload.update({
+            collection: 'account-verifications',
+            id: existingAccount.id,
+            data: {
+              encryptedOtp: encryptPassword(otp),
+              expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
+              otpAttempts: 0,
+              otpHash: hashOTP(email, otp),
+            },
+            overrideAccess: true,
+          })
+        }
+
+        queueVerificationEmail({ email, name: existingAccount.name, otp, payload })
+        return Response.json({ email })
       }
+
+      const otp = randomInt(100000, 1000000).toString()
+      await payload.create({
+        collection: 'account-verifications',
+        data: {
+          email,
+          encryptedOtp: encryptPassword(otp),
+          encryptedPassword: encryptPassword(password),
+          expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
+          name,
+          otpAttempts: 0,
+          otpHash: hashOTP(email, otp),
+        },
+        overrideAccess: true,
+      })
 
       queueVerificationEmail({ email, name, otp, payload })
       return Response.json({ email })
     }
 
-    const verification = await payload.find({
-      collection: 'account-verifications',
-      where: { email: { equals: email } },
-      limit: 1,
-      overrideAccess: true,
-    })
-    const account = verification.docs[0]
-    if (!account) throw new APIError('Invalid verification request.', 400)
-
     if (body.action === 'resend') {
+      const verification = await payload.find({
+        collection: 'account-verifications',
+        where: { email: { equals: email } },
+        limit: 1,
+        overrideAccess: true,
+      })
+      const account = verification.docs[0]
+      if (!account) throw new APIError('Invalid verification request.', 400)
+
       const cooldownRemaining =
         RESEND_COOLDOWN_MS - (Date.now() - new Date(account.updatedAt).getTime())
       if (cooldownRemaining > 0) {
@@ -357,30 +398,13 @@ export async function POST(request: Request) {
     }
 
     const otp = getString(body.otp)
-    const isExpired = new Date(account.expiresAt) < new Date()
-    if (
-      account.otpAttempts >= MAX_OTP_ATTEMPTS ||
-      otp.length !== 6 ||
-      isExpired ||
-      hashOTP(email, otp) !== account.otpHash
-    ) {
-      const nextAttempt = (account.otpAttempts || 0) + 1
-      if (nextAttempt >= MAX_OTP_ATTEMPTS || isExpired) {
-        await payload.delete({
-          collection: 'account-verifications',
-          id: account.id,
-          overrideAccess: true,
-        })
-      } else {
-        await payload.update({
-          collection: 'account-verifications',
-          id: account.id,
-          data: { otpAttempts: nextAttempt },
-          overrideAccess: true,
-        })
-      }
+    if (otp.length !== 6) {
       throw new APIError('That verification code is invalid or has expired.', 400)
     }
+
+    const account = await takeVerificationAttempt({ email, payload })
+    if (!account || hashOTP(email, otp) !== account.otpHash)
+      throw new APIError('That verification code is invalid or has expired.', 400)
 
     const existingUser = await payload.find({
       collection: 'users',
