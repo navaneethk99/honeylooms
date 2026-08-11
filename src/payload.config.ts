@@ -25,6 +25,7 @@ import { JobPostings } from '@/collections/JobPostings'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
+import { AccountVerifications } from '@/collections/AccountVerifications'
 import { PromoCodes } from '@/collections/PromoCodes'
 import { Refunds } from '@/collections/Refunds'
 import { Footer } from '@/globals/Footer'
@@ -66,6 +67,7 @@ export default buildConfig({
   },
   collections: [
     Users,
+    AccountVerifications,
     Pages,
     Categories,
     Media,

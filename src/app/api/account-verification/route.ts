@@ -1,0 +1,901 @@
+import configPromise from '@payload-config'
+import { getServerSideURL } from '@/utilities/getURL'
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHmac,
+  createHash,
+  randomBytes,
+  randomInt,
+  timingSafeEqual,
+} from 'crypto'
+import { after } from 'next/server'
+import { APIError, getPayload } from 'payload'
+
+const OTP_EXPIRY_MS = 10 * 60 * 1000
+const RESEND_COOLDOWN_MS = 60 * 1000
+const MAX_OTP_ATTEMPTS = 5
+const REGISTRATION_COOKIE = 'honeylooms_pending_registration'
+
+type RegistrationRequest = {
+  action: 'register'
+  email?: unknown
+  name?: unknown
+  password?: unknown
+  passwordConfirm?: unknown
+}
+
+type VerificationRequest = {
+  action: 'verify' | 'resend'
+  email?: unknown
+  otp?: unknown
+}
+
+type LinkVerificationRequest = {
+  action: 'verify-link'
+  token?: unknown
+}
+
+type VerificationStatusRequest = {
+  action: 'status'
+  token?: unknown
+}
+
+const getString = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
+
+const payloadSecret = process.env.PAYLOAD_SECRET
+if (!payloadSecret) {
+  throw new Error('PAYLOAD_SECRET is required for account verification.')
+}
+
+const encryptionKey = createHash('sha256').update(payloadSecret).digest()
+
+const hashOTP = (email: string, otp: string) =>
+  createHmac('sha256', encryptionKey).update(`${email.toLowerCase()}:${otp}`).digest('hex')
+
+const signVerificationToken = (payload: string) =>
+  createHmac('sha256', encryptionKey).update(payload).digest('base64url')
+
+const readSignedTokenPayload = (token: string) => {
+  if (!token || token.length > 2048) return undefined
+
+  const [payload, providedSignature, extra] = token.split('.')
+  if (!payload || !providedSignature || extra) return undefined
+
+  const expectedSignature = signVerificationToken(payload)
+  const providedBuffer = Buffer.from(providedSignature)
+  const expectedBuffer = Buffer.from(expectedSignature)
+  if (
+    providedBuffer.length !== expectedBuffer.length ||
+    !timingSafeEqual(providedBuffer, expectedBuffer)
+  ) {
+    return undefined
+  }
+
+  try {
+    return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Record<string, unknown>
+  } catch {
+    return undefined
+  }
+}
+
+const createVerificationToken = (email: string, otp: string) => {
+  const payload = Buffer.from(
+    JSON.stringify({
+      email: email.toLowerCase(),
+      expiresAt: Date.now() + OTP_EXPIRY_MS,
+      otpHash: hashOTP(email, otp),
+      purpose: 'verify-account',
+    }),
+  ).toString('base64url')
+
+  return `${payload}.${signVerificationToken(payload)}`
+}
+
+const readVerificationToken = (token: string) => {
+  const decoded = readSignedTokenPayload(token)
+  if (
+    !decoded ||
+    typeof decoded.email !== 'string' ||
+    typeof decoded.expiresAt !== 'number' ||
+    typeof decoded.otpHash !== 'string' ||
+    decoded.purpose !== 'verify-account' ||
+    decoded.expiresAt <= Date.now()
+  ) {
+    return undefined
+  }
+
+  return { email: decoded.email.toLowerCase(), otpHash: decoded.otpHash }
+}
+
+const createVerificationStatusProof = (email: string, createdAfter: number) =>
+  createHmac('sha256', encryptionKey)
+    .update(`verification-status:${email.toLowerCase()}:${createdAfter}`)
+    .digest('base64url')
+
+const createVerificationStatusToken = ({
+  canObserveVerification,
+  createdAfter,
+  email,
+}: {
+  canObserveVerification: boolean
+  createdAfter: number
+  email: string
+}) => {
+  const payload = Buffer.from(
+    JSON.stringify({
+      createdAfter,
+      email: email.toLowerCase(),
+      expiresAt: createdAfter + OTP_EXPIRY_MS,
+      // A decoy proof has the same shape but cannot authorize positive status polling.
+      proof: canObserveVerification
+        ? createVerificationStatusProof(email, createdAfter)
+        : randomBytes(32).toString('base64url'),
+      purpose: 'verification-status',
+    }),
+  ).toString('base64url')
+
+  return `${payload}.${signVerificationToken(payload)}`
+}
+
+const readVerificationStatusToken = (token: string) => {
+  const decoded = readSignedTokenPayload(token)
+  if (
+    !decoded ||
+    typeof decoded.createdAfter !== 'number' ||
+    typeof decoded.email !== 'string' ||
+    typeof decoded.expiresAt !== 'number' ||
+    typeof decoded.proof !== 'string' ||
+    decoded.purpose !== 'verification-status' ||
+    decoded.expiresAt <= Date.now()
+  ) {
+    return undefined
+  }
+
+  const email = decoded.email.toLowerCase()
+  const expectedProof = createVerificationStatusProof(email, decoded.createdAfter)
+  const providedBuffer = Buffer.from(decoded.proof)
+  const expectedBuffer = Buffer.from(expectedProof)
+  const canObserveVerification =
+    providedBuffer.length === expectedBuffer.length &&
+    timingSafeEqual(providedBuffer, expectedBuffer)
+
+  return { canObserveVerification, createdAfter: decoded.createdAfter, email }
+}
+
+const createRegistrationToken = (email: string, encryptedPassword: string) =>
+  createHmac('sha256', encryptionKey)
+    .update(`${email.toLowerCase()}:${encryptedPassword}`)
+    .digest('base64url')
+
+const getCookie = (request: Request, name: string) => {
+  const cookie = request.headers
+    .get('cookie')
+    ?.split(';')
+    .map((value) => value.trim().split('='))
+    .find(([cookieName]) => cookieName === name)
+
+  return cookie?.slice(1).join('=')
+}
+
+const ownsPendingRegistration = ({
+  email,
+  encryptedPassword,
+  request,
+}: {
+  email: string
+  encryptedPassword: string
+  request: Request
+}) => {
+  // This capability binds active credentials to the browser that created them.
+  const providedToken = getCookie(request, REGISTRATION_COOKIE)
+  if (!providedToken) return false
+
+  const expectedToken = createRegistrationToken(email, encryptedPassword)
+  const providedBuffer = Buffer.from(providedToken)
+  const expectedBuffer = Buffer.from(expectedToken)
+
+  return (
+    providedBuffer.length === expectedBuffer.length &&
+    timingSafeEqual(providedBuffer, expectedBuffer)
+  )
+}
+
+const registrationResponse = ({
+  canObserveVerification,
+  createdAfter,
+  email,
+  encryptedPassword,
+}: {
+  canObserveVerification: boolean
+  createdAfter: number
+  email: string
+  encryptedPassword: string
+}) => {
+  const response = Response.json({
+    email,
+    verificationStatusToken: createVerificationStatusToken({
+      canObserveVerification,
+      createdAfter,
+      email,
+    }),
+  })
+
+  const cookie = [
+    `${REGISTRATION_COOKIE}=${createRegistrationToken(email, encryptedPassword)}`,
+    `Max-Age=${Math.ceil(OTP_EXPIRY_MS / 1000)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Strict',
+    process.env.NODE_ENV === 'production' ? 'Secure' : '',
+  ]
+    .filter(Boolean)
+    .join('; ')
+  response.headers.append('Set-Cookie', cookie)
+
+  return response
+}
+
+const encryptPassword = (password: string) => {
+  const iv = randomBytes(12)
+  const cipher = createCipheriv('aes-256-gcm', encryptionKey, iv)
+  const encrypted = Buffer.concat([cipher.update(password, 'utf8'), cipher.final()])
+  return `${iv.toString('base64')}.${cipher.getAuthTag().toString('base64')}.${encrypted.toString('base64')}`
+}
+
+const decryptPassword = (encryptedPassword: string) => {
+  const [iv, authTag, encrypted] = encryptedPassword.split('.')
+  if (!iv || !authTag || !encrypted) throw new Error('Invalid encrypted password.')
+  const decipher = createDecipheriv('aes-256-gcm', encryptionKey, Buffer.from(iv, 'base64'))
+  decipher.setAuthTag(Buffer.from(authTag, 'base64'))
+  return Buffer.concat([
+    decipher.update(Buffer.from(encrypted, 'base64')),
+    decipher.final(),
+  ]).toString('utf8')
+}
+
+const escapeHTML = (value: string) =>
+  value.replace(/[&<>'"]/g, (character) => {
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;',
+    }
+    return entities[character]
+  })
+
+const sendVerificationEmail = async ({
+  email,
+  name,
+  otp,
+  payload,
+}: {
+  email: string
+  name: string
+  otp: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const serverURL = getServerSideURL()
+  const verificationURL = new URL('/create-account', serverURL)
+  verificationURL.searchParams.set('verification', createVerificationToken(email, otp))
+
+  await payload.sendEmail({
+    to: email,
+    subject: 'Verify your Honeylooms account',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Verify your Honeylooms account</title>
+          <style>
+            body { margin: 0; padding: 0; background-color: #faf8f5; color: #1c1917; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+            .wrapper { padding: 40px 20px; background-color: #faf8f5; }
+            .container { max-width: 600px; margin: 0 auto; overflow: hidden; border: 1px solid #f5f5f4; border-top: 4px solid #D9A321; border-radius: 12px; background-color: #ffffff; box-shadow: 0 10px 25px rgba(28,25,23,0.05); }
+            .header { padding: 40px 30px; background-color: #141414; text-align: center; }
+            .content { padding: 40px 35px; }
+            h1 { margin: 0 0 12px; color: #1c1917; font-size: 22px; font-weight: 700; }
+            .intro-text { margin: 0 0 24px; color: #44403c; font-size: 15px; line-height: 1.6; }
+            .code-card { margin: 28px 0; padding: 24px; border: 1px solid #f5f5f4; border-radius: 8px; background-color: #faf8f5; text-align: center; }
+            .code-label { margin: 0 0 12px; color: #78716c; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+            .code { margin: 0; color: #1c1917; font-size: 30px; font-weight: 700; letter-spacing: 8px; }
+            .btn-container { margin: 28px 0; text-align: center; }
+            .btn { display: inline-block; border: 1px solid #D9A321; border-radius: 6px; background-color: #141414; padding: 14px 32px; color: #ffffff !important; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-decoration: none; }
+            .alternative { margin: 0 0 20px; color: #78716c; font-size: 13px; line-height: 1.6; text-align: center; }
+            .notice { margin: 0; padding: 12px 16px; border-left: 3px solid #D9A321; border-radius: 0 6px 6px 0; background-color: #faf8f5; color: #44403c; font-size: 13px; line-height: 1.6; }
+            .footer { padding: 30px; border-top: 1px solid #f5f5f4; background-color: #faf8f5; color: #78716c; font-size: 12px; line-height: 1.6; text-align: center; }
+            .footer a { color: #D9A321; text-decoration: none; }
+          </style>
+        </head>
+        <body>
+          <div class="wrapper">
+            <div class="container">
+              <div class="header">
+                <img src="${serverURL}/logo.svg" alt="Honeylooms" style="display:block;height:auto;max-width:240px;margin:0 auto;" />
+              </div>
+              <div class="content">
+                <h1>Verify your email address</h1>
+                <p class="intro-text">Dear ${escapeHTML(name)},</p>
+                <p class="intro-text">Confirm your email address to finish creating your Honeylooms account.</p>
+                <div class="btn-container"><a href="${verificationURL.toString()}" class="btn">VERIFY EMAIL</a></div>
+                <p class="alternative">Or enter this verification code on the account page:</p>
+                <div class="code-card">
+                  <p class="code-label">Your verification code</p>
+                  <p class="code">${otp}</p>
+                </div>
+                <p class="notice">This code expires in 10 minutes. If you did not request an account, you can safely ignore this email.</p>
+              </div>
+              <div class="footer">
+                &copy; ${new Date().getFullYear()} Honeylooms. All rights reserved.<br/>
+                If you have any questions or concerns, please contact us at <a href="mailto:contact@honeylooms.in">contact@honeylooms.in</a>.
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  })
+}
+
+const queueVerificationEmail = ({
+  email,
+  name,
+  otp,
+  payload,
+}: {
+  email: string
+  name: string
+  otp: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  after(async () => {
+    try {
+      await sendVerificationEmail({ email, name, otp, payload })
+    } catch (error) {
+      payload.logger.error({ err: error, msg: `Failed to send verification email to ${email}` })
+    }
+  })
+}
+
+const queueWelcomeEmail = ({
+  email,
+  name,
+  payload,
+}: {
+  email: string
+  name: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  after(async () => {
+    try {
+      const serverURL = getServerSideURL()
+      const { docs: products } = await payload.find({
+        collection: 'products',
+        depth: 1,
+        draft: false,
+        limit: 2,
+        overrideAccess: true,
+        sort: '-createdAt',
+        where: { _status: { equals: 'published' } },
+      })
+      const productCards = products
+        .map((product) => {
+          const galleryImage = product.gallery?.[0]?.image
+          const imageURL =
+            galleryImage && typeof galleryImage === 'object' && galleryImage.url
+              ? new URL(galleryImage.url, serverURL).toString()
+              : null
+          const imageAlt =
+            galleryImage && typeof galleryImage === 'object' ? galleryImage.alt : product.title
+
+          return `
+            <a href="${serverURL}/products/${product.slug}" class="product-card">
+              ${imageURL ? `<img src="${imageURL}" alt="${escapeHTML(imageAlt)}" />` : ''}
+              <span>${escapeHTML(product.title)}</span>
+            </a>
+          `
+        })
+        .join('')
+
+      await payload.sendEmail({
+        to: email,
+        subject: 'Welcome to Honeylooms',
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <title>Welcome to Honeylooms</title>
+              <style>
+                body { margin: 0; padding: 0; background-color: #faf8f5; color: #1c1917; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+                .wrapper { padding: 40px 20px; background-color: #faf8f5; }
+                .container { max-width: 600px; margin: 0 auto; overflow: hidden; border: 1px solid #f5f5f4; border-top: 4px solid #D9A321; border-radius: 12px; background-color: #ffffff; box-shadow: 0 10px 25px rgba(28,25,23,0.05); }
+                .header { padding: 40px 30px; background-color: #141414; text-align: center; }
+                .content { padding: 40px 35px; }
+                h1 { margin: 0 0 12px; color: #1c1917; font-size: 24px; font-weight: 700; }
+                .intro-text { margin: 0 0 18px; color: #44403c; font-size: 15px; line-height: 1.6; }
+                .eyebrow { margin: 30px 0 14px; color: #78716c; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+                .products { display: flex; gap: 12px; }
+                .product-card { display: block; flex: 1; overflow: hidden; border: 1px solid #f5f5f4; border-radius: 8px; color: #1c1917; font-size: 13px; font-weight: 600; text-align: center; text-decoration: none; }
+                .product-card img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+                .product-card span { display: block; padding: 12px 8px; }
+                .btn-container { margin: 32px 0 4px; text-align: center; }
+                .btn { display: inline-block; border: 1px solid #D9A321; border-radius: 6px; background-color: #141414; padding: 14px 32px; color: #ffffff !important; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-decoration: none; }
+                .footer { padding: 30px; border-top: 1px solid #f5f5f4; background-color: #faf8f5; color: #78716c; font-size: 12px; line-height: 1.6; text-align: center; }
+                .footer a { color: #D9A321; text-decoration: none; }
+              </style>
+            </head>
+            <body>
+              <div class="wrapper">
+                <div class="container">
+                  <div class="header">
+                    <img src="${serverURL}/logo.svg" alt="Honeylooms" style="display:block;height:auto;max-width:240px;margin:0 auto;" />
+                  </div>
+                  <div class="content">
+                    <h1>Welcome to Honeylooms, ${escapeHTML(name)}.</h1>
+                    <p class="intro-text">We are delighted to have you with us. Discover thoughtfully made pieces that celebrate Indian craft and feel at home in your everyday wardrobe.</p>
+                    ${productCards ? `<p class="eyebrow">Made for your wardrobe</p><div class="products">${productCards}</div>` : ''}
+                    <div class="btn-container"><a href="${serverURL}/shop" class="btn">SHOP THE COLLECTION</a></div>
+                  </div>
+                  <div class="footer">
+                    &copy; ${new Date().getFullYear()} Honeylooms. All rights reserved.<br/>
+                    If you have any questions or concerns, please contact us at <a href="mailto:contact@honeylooms.in">contact@honeylooms.in</a>.
+                  </div>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      })
+    } catch (error) {
+      payload.logger.error({ err: error, msg: `Failed to send welcome email to ${email}` })
+    }
+  })
+}
+
+const updatePendingRegistration = async ({
+  email,
+  encryptedPassword,
+  previousEncryptedPassword,
+  name,
+  payload,
+}: {
+  email: string
+  encryptedPassword: string
+  previousEncryptedPassword: string
+  name: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  // Keep updated_at unchanged because it also controls when another OTP email may be sent.
+  const result = await payload.db.pool.query<{ id: number }>(
+    `
+      UPDATE account_verifications
+      SET
+        encrypted_password = $2,
+        name = $3
+      WHERE email = $1
+        AND encrypted_password = $4
+        AND otp_attempts < $5
+        AND expires_at > NOW()
+      RETURNING id
+    `,
+    [email, encryptedPassword, name, previousEncryptedPassword, MAX_OTP_ATTEMPTS],
+  )
+
+  return Boolean(result.rows[0])
+}
+
+const restartExpiredRegistration = async ({
+  email,
+  encryptedPassword,
+  previousEncryptedPassword,
+  name,
+  otp,
+  payload,
+}: {
+  email: string
+  encryptedPassword: string
+  previousEncryptedPassword: string
+  name: string
+  otp: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const result = await payload.db.pool.query<{ id: number }>(
+    `
+      UPDATE account_verifications
+      SET
+        encrypted_otp = $2,
+        encrypted_password = $3,
+        expires_at = $4,
+        name = $5,
+        otp_attempts = 0,
+        otp_hash = $6,
+        updated_at = NOW()
+      WHERE email = $1
+        AND expires_at <= NOW()
+        AND encrypted_password = $7
+      RETURNING id
+    `,
+    [
+      email,
+      encryptPassword(otp),
+      encryptedPassword,
+      new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
+      name,
+      hashOTP(email, otp),
+      previousEncryptedPassword,
+    ],
+  )
+
+  return Boolean(result.rows[0])
+}
+
+const takeVerificationEmailSlot = async ({
+  email,
+  payload,
+}: {
+  email: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const cooldownStartedBefore = new Date(Date.now() - RESEND_COOLDOWN_MS).toISOString()
+  const reusableCode = await payload.db.pool.query<{
+    encryptedOtp: string
+    name: string
+  }>(
+    `
+      UPDATE account_verifications
+      SET updated_at = NOW()
+      WHERE email = $1
+        AND otp_attempts < $2
+        AND expires_at > NOW()
+        AND updated_at <= $3
+      RETURNING encrypted_otp AS "encryptedOtp", name
+    `,
+    [email, MAX_OTP_ATTEMPTS, cooldownStartedBefore],
+  )
+  const reusableAccount = reusableCode.rows[0]
+  if (reusableAccount) {
+    return { name: reusableAccount.name, otp: decryptPassword(reusableAccount.encryptedOtp) }
+  }
+
+  const otp = randomInt(100000, 1000000).toString()
+  const refreshedCode = await payload.db.pool.query<{ name: string }>(
+    `
+      UPDATE account_verifications
+      SET
+        encrypted_otp = $2,
+        otp_hash = $3,
+        expires_at = $4,
+        updated_at = NOW()
+      WHERE email = $1
+        AND expires_at <= NOW()
+        AND otp_attempts < $6
+        AND updated_at <= $5
+      RETURNING name
+    `,
+    [
+      email,
+      encryptPassword(otp),
+      hashOTP(email, otp),
+      new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
+      cooldownStartedBefore,
+      MAX_OTP_ATTEMPTS,
+    ],
+  )
+  const refreshedAccount = refreshedCode.rows[0]
+
+  return refreshedAccount ? { name: refreshedAccount.name, otp } : undefined
+}
+
+// MAX + 1 marks a successful claim. It lets a match already racing the fifth failure finish while
+// preventing another matching request from claiming the same pending registration.
+const claimVerificationAttempt = async ({
+  email,
+  otpHash,
+  payload,
+}: {
+  email: string
+  otpHash: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const result = await payload.db.pool.query<{
+    encryptedPassword: string
+    id: number
+    isMatch: boolean
+    name: string
+  }>(
+    `
+      WITH eligible_attempt AS MATERIALIZED (
+        SELECT id
+        FROM account_verifications
+        WHERE email = $1
+          AND otp_attempts < $2
+          AND expires_at > NOW()
+      )
+      UPDATE account_verifications AS verification
+      SET
+        otp_attempts = CASE
+          WHEN verification.otp_hash = $3 THEN $2 + 1
+          ELSE verification.otp_attempts + 1
+        END,
+        updated_at = NOW()
+      FROM eligible_attempt
+      WHERE verification.id = eligible_attempt.id
+        AND verification.expires_at > NOW()
+        AND (
+          verification.otp_attempts < $2
+          OR (
+            verification.otp_hash = $3
+            AND verification.otp_attempts = $2
+          )
+        )
+      RETURNING
+        verification.id,
+        verification.name,
+        verification.encrypted_password AS "encryptedPassword",
+        verification.otp_hash = $3 AS "isMatch"
+    `,
+    [email, MAX_OTP_ATTEMPTS, otpHash],
+  )
+  const account = result.rows[0]
+
+  return account?.isMatch ? account : undefined
+}
+
+const completeVerification = async ({
+  email,
+  invalidMessage = 'That verification code is invalid or has expired.',
+  otpHash,
+  payload,
+}: {
+  email: string
+  invalidMessage?: string
+  otpHash: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const account = await claimVerificationAttempt({ email, otpHash, payload })
+  if (!account) throw new APIError(invalidMessage, 400)
+
+  const existingUser = await payload.find({
+    collection: 'users',
+    where: { email: { equals: email } },
+    limit: 1,
+    overrideAccess: true,
+  })
+  if (existingUser.docs[0])
+    throw new APIError('An account already exists for this email address.', 409)
+
+  await payload.create({
+    collection: 'users',
+    data: { email, name: account.name, password: decryptPassword(account.encryptedPassword) },
+    overrideAccess: true,
+  })
+  await payload.delete({
+    collection: 'account-verifications',
+    id: account.id,
+    overrideAccess: true,
+  })
+  queueWelcomeEmail({ email, name: account.name, payload })
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as
+      | LinkVerificationRequest
+      | RegistrationRequest
+      | VerificationRequest
+      | VerificationStatusRequest
+    const payload = await getPayload({ config: configPromise })
+
+    if (body.action === 'status') {
+      const verification = readVerificationStatusToken(getString(body.token))
+      if (!verification) throw new APIError('Invalid verification status request.', 400)
+
+      const existingUser = await payload.find({
+        collection: 'users',
+        where: {
+          createdAt: { greater_than: new Date(verification.createdAfter).toISOString() },
+          email: { equals: verification.email },
+        },
+        limit: 1,
+        overrideAccess: true,
+      })
+      return Response.json({
+        verified: verification.canObserveVerification && Boolean(existingUser.docs[0]),
+      })
+    }
+
+    if (body.action === 'verify-link') {
+      const verification = readVerificationToken(getString(body.token))
+      if (!verification) {
+        throw new APIError('That verification link or code is invalid or has expired.', 400)
+      }
+
+      await completeVerification({
+        invalidMessage: 'That verification link is invalid or has expired.',
+        payload,
+        ...verification,
+      })
+      return Response.json({ email: verification.email })
+    }
+
+    const email = getString(body.email).toLowerCase()
+
+    if (!email || !email.includes('@'))
+      throw new APIError('A valid email address is required.', 400)
+
+    if (body.action === 'register') {
+      const createdAfter = Date.now()
+      const name = getString(body.name)
+      const password = getString(body.password)
+      const passwordConfirm = getString(body.passwordConfirm)
+      if (!name || !password || password !== passwordConfirm) {
+        throw new APIError('Please provide your name and matching passwords.', 400)
+      }
+
+      const encryptedPassword = encryptPassword(password)
+      const existingUser = await payload.find({
+        collection: 'users',
+        where: { email: { equals: email } },
+        limit: 1,
+        overrideAccess: true,
+      })
+      if (existingUser.docs[0]) {
+        return registrationResponse({
+          canObserveVerification: false,
+          createdAfter,
+          email,
+          encryptedPassword,
+        })
+      }
+
+      const existingVerification = await payload.find({
+        collection: 'account-verifications',
+        where: { email: { equals: email } },
+        limit: 1,
+        overrideAccess: true,
+      })
+      const existingAccount = existingVerification.docs[0]
+
+      if (existingAccount) {
+        const mayReplaceCredentials = ownsPendingRegistration({
+          email,
+          encryptedPassword: existingAccount.encryptedPassword,
+          request,
+        })
+
+        if (new Date(existingAccount.expiresAt).getTime() <= Date.now()) {
+          if (mayReplaceCredentials) {
+            const otp = randomInt(100000, 1000000).toString()
+            const restarted = await restartExpiredRegistration({
+              email,
+              encryptedPassword,
+              previousEncryptedPassword: existingAccount.encryptedPassword,
+              name,
+              otp,
+              payload,
+            })
+            if (!restarted) {
+              throw new APIError('That verification code is invalid or has expired.', 400)
+            }
+
+            queueVerificationEmail({ email, name, otp, payload })
+            return registrationResponse({
+              canObserveVerification: true,
+              createdAfter,
+              email,
+              encryptedPassword,
+            })
+          }
+
+          const verificationEmail = await takeVerificationEmailSlot({ email, payload })
+          if (verificationEmail) {
+            queueVerificationEmail({ email, payload, ...verificationEmail })
+          }
+          return registrationResponse({
+            canObserveVerification: false,
+            createdAfter,
+            email,
+            encryptedPassword,
+          })
+        }
+
+        if (existingAccount.otpAttempts >= MAX_OTP_ATTEMPTS) {
+          throw new APIError('That verification code is invalid or has expired.', 400)
+        }
+
+        if (mayReplaceCredentials) {
+          const updated = await updatePendingRegistration({
+            email,
+            encryptedPassword,
+            previousEncryptedPassword: existingAccount.encryptedPassword,
+            name,
+            payload,
+          })
+          if (!updated) {
+            throw new APIError('That verification code is invalid or has expired.', 400)
+          }
+        }
+
+        const verificationEmail = await takeVerificationEmailSlot({ email, payload })
+        if (verificationEmail) {
+          queueVerificationEmail({ email, payload, ...verificationEmail })
+        }
+        return registrationResponse({
+          canObserveVerification: mayReplaceCredentials,
+          createdAfter,
+          email,
+          encryptedPassword,
+        })
+      }
+
+      const otp = randomInt(100000, 1000000).toString()
+      await payload.create({
+        collection: 'account-verifications',
+        data: {
+          email,
+          encryptedOtp: encryptPassword(otp),
+          encryptedPassword,
+          expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
+          name,
+          otpAttempts: 0,
+          otpHash: hashOTP(email, otp),
+        },
+        overrideAccess: true,
+      })
+
+      queueVerificationEmail({ email, name, otp, payload })
+      return registrationResponse({
+        canObserveVerification: true,
+        createdAfter,
+        email,
+        encryptedPassword,
+      })
+    }
+
+    if (body.action === 'resend') {
+      const verification = await payload.find({
+        collection: 'account-verifications',
+        where: { email: { equals: email } },
+        limit: 1,
+        overrideAccess: true,
+      })
+      const account = verification.docs[0]
+      if (!account) throw new APIError('Invalid verification request.', 400)
+      if (account.otpAttempts >= MAX_OTP_ATTEMPTS) {
+        throw new APIError('That verification code is invalid or has expired.', 400)
+      }
+
+      const verificationEmail = await takeVerificationEmailSlot({ email, payload })
+      if (!verificationEmail) {
+        const cooldownRemaining =
+          RESEND_COOLDOWN_MS - (Date.now() - new Date(account.updatedAt).getTime())
+        if (cooldownRemaining > 0) {
+          throw new APIError(
+            `Please wait ${Math.ceil(cooldownRemaining / 1000)} seconds before requesting another code.`,
+            429,
+          )
+        }
+        throw new APIError('That verification code is invalid or has expired.', 400)
+      }
+
+      queueVerificationEmail({ email, payload, ...verificationEmail })
+      return Response.json({ email })
+    }
+
+    const otp = getString(body.otp)
+    if (otp.length !== 6) {
+      throw new APIError('That verification code is invalid or has expired.', 400)
+    }
+
+    await completeVerification({ email, otpHash: hashOTP(email, otp), payload })
+    return Response.json({ email })
+  } catch (error) {
+    const message =
+      error instanceof APIError ? error.message : 'Unable to process your verification request.'
+    const status = error instanceof APIError ? error.status : 500
+    return Response.json({ message }, { status })
+  }
+}

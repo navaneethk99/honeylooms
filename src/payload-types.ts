@@ -85,6 +85,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    'account-verifications': AccountVerification;
     pages: Page;
     categories: Category;
     media: Media;
@@ -125,6 +126,7 @@ export interface Config {
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    'account-verifications': AccountVerificationsSelect<false> | AccountVerificationsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -218,7 +220,7 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
-  name?: string | null;
+  name: string;
   roles?: ('admin' | 'customer')[] | null;
   orders?: {
     docs?: (number | Order)[];
@@ -1116,6 +1118,22 @@ export interface Address {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "account-verifications".
+ */
+export interface AccountVerification {
+  id: number;
+  email: string;
+  name: string;
+  encryptedPassword: string;
+  encryptedOtp: string;
+  otpHash: string;
+  otpAttempts: number;
+  expiresAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Active banners rotate on the homepage, with the most recently updated first.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1339,6 +1357,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'account-verifications';
+        value: number | AccountVerification;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1486,6 +1508,21 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "account-verifications_select".
+ */
+export interface AccountVerificationsSelect<T extends boolean = true> {
+  email?: T;
+  name?: T;
+  encryptedPassword?: T;
+  encryptedOtp?: T;
+  otpHash?: T;
+  otpAttempts?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

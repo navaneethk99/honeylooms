@@ -2,8 +2,11 @@
 
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
+import { Info } from 'lucide-react'
 
 import { Message } from '../Message'
+
+const ACCOUNT_LOGIN_WARNING = 'Please login to access your account settings.'
 
 export type Props = {
   className?: string
@@ -31,6 +34,19 @@ export const RenderParamsComponent: React.FC<Props> = ({
       <div className={className}>
         {paramValues.map((paramValue, index) => {
           if (!paramValue) return null
+
+          if (paramValue === ACCOUNT_LOGIN_WARNING) {
+            return (
+              <div
+                className="mb-8 flex items-center gap-2 border-y border-[#24231f] bg-[#24231f] px-4 py-3 text-sm text-white"
+                key={paramValue}
+                role="status"
+              >
+                <Info aria-hidden="true" className="size-4 shrink-0 text-white/70" />
+                <p className="font-medium tracking-[0.01em]">{paramValue}</p>
+              </div>
+            )
+          }
 
           return (
             <Message

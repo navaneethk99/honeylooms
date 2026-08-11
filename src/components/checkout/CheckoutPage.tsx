@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/providers/Auth'
+import { Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
@@ -81,8 +82,18 @@ import {
 
 const MOBILE_NUMBER_PATTERN = /^[0-9]{10}$/
 
+const getAddressNameDefaults = (name?: string | null) => {
+  const [firstName = '', ...lastNameParts] = name?.trim().split(/\s+/) || []
+
+  return {
+    firstName,
+    lastName: lastNameParts.join(' '),
+  }
+}
+
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
+  const addressNameDefaults = getAddressNameDefaults(user?.name)
   const router = useRouter()
   const { cart, clearCart } = useCart()
   const [error, setError] = useState<null | string>(null)
@@ -403,12 +414,18 @@ export const CheckoutPage: React.FC = () => {
           </div>
         )}
         {user ? (
-          <div className="border-y border-[#24231f]/20 py-5 text-sm">
+          <div className="border-y border-[#24231f] bg-[#24231f] px-4 py-3 text-sm text-white">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[#24231f]">{user.email}</p>
-              <p className="text-[#6c675d]">
+              <div className="flex items-center gap-2">
+                <Info aria-hidden="true" className="size-4 text-white/70" />
+                <p className="font-medium tracking-[0.01em]">{user.email}</p>
+              </div>
+              <p className="text-white/70">
                 Not you?{' '}
-                <Link className="text-[#24231f] underline underline-offset-4" href="/logout">
+                <Link
+                  className="font-medium text-white underline underline-offset-4"
+                  href="/logout"
+                >
                   Log out
                 </Link>
               </p>
@@ -480,6 +497,7 @@ export const CheckoutPage: React.FC = () => {
               <CheckoutAddresses
                 heading="Billing address"
                 idPrefix="billing"
+                initialData={addressNameDefaults}
                 onShowNewAddressForm={() => setShowNewBillingAddressForm(true)}
                 setAddress={setBillingAddress}
                 showNewAddressForm={showNewBillingAddressForm}
@@ -527,6 +545,7 @@ export const CheckoutPage: React.FC = () => {
                   <CheckoutAddresses
                     heading="Shipping address"
                     idPrefix="shipping"
+                    initialData={addressNameDefaults}
                     onShowNewAddressForm={() => setShowNewShippingAddressForm(true)}
                     setAddress={setShippingAddress}
                     showNewAddressForm={showNewShippingAddressForm}

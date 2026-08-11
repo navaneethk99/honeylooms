@@ -38,5 +38,6 @@ export const metadata: Metadata = {
     title: 'Create Account',
     url: '/create-account',
   }),
+  referrer: 'no-referrer',
   title: 'Create Account',
 }

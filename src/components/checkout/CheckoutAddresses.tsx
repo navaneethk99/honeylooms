@@ -15,6 +15,7 @@ import { useAddresses } from '@payloadcms/plugin-ecommerce/client/react'
 import { useEffect, useState } from 'react'
 
 type Props = {
+  initialData?: Pick<Address, 'firstName' | 'lastName'>
   setAddress: React.Dispatch<React.SetStateAction<Partial<Address> | undefined>>
   heading?: string
   description?: string
@@ -31,6 +32,7 @@ type AddressSelectionModalProps = Pick<Props, 'disabled' | 'setAddress'> & {
 }
 
 export const CheckoutAddresses: React.FC<Props> = ({
+  initialData,
   setAddress,
   disabled,
   idPrefix,
@@ -49,10 +51,6 @@ export const CheckoutAddresses: React.FC<Props> = ({
       setAddress((currentAddress) => currentAddress || defaultAddress)
     }
   }, [defaultAddress, setAddress])
-
-  if (!addresses && !skipSubmission) {
-    return null
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -90,6 +88,7 @@ export const CheckoutAddresses: React.FC<Props> = ({
             callback={setAddress}
             disabled={disabled}
             idPrefix={idPrefix}
+            initialData={initialData}
             skipSubmission={skipSubmission}
             submitLabel="Use this address"
           />

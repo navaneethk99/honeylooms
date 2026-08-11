@@ -19,17 +19,22 @@ type FormData = {
 
 export const LoginForm: React.FC = () => {
   const searchParams = useSearchParams()
-  const allParams = searchParams.toString() ? `?${searchParams.toString()}` : ''
+  const createAccountSearchParams = new URLSearchParams(searchParams.toString())
+  createAccountSearchParams.delete('warning')
+  const createAccountParams = createAccountSearchParams.toString()
+  const createAccountHref = `/create-account${createAccountParams ? `?${createAccountParams}` : ''}`
   const redirect = useRef(searchParams.get('redirect'))
   const { login } = useAuth()
   const router = useRouter()
-  const [error, setError] = React.useState<null | string>(null)
+  const [error, setError] = React.useState<null | React.ReactNode>(null)
 
   const {
     formState: { errors, isLoading },
     handleSubmit,
     register,
-  } = useForm<FormData>()
+  } = useForm<FormData>({
+    defaultValues: { email: searchParams.get('email') || '' },
+  })
 
   const onSubmit = useCallback(
     async (data: FormData) => {
@@ -38,10 +43,19 @@ export const LoginForm: React.FC = () => {
         if (redirect?.current) router.push(redirect.current)
         else router.push('/account')
       } catch (_) {
-        setError('There was an error with the credentials provided. Please try again.')
+        setError(
+          <>
+            We couldn&apos;t log you in with these credentials. If you don&apos;t have an account,
+            please{' '}
+            <Link className="underline underline-offset-4" href={createAccountHref}>
+              create an account
+            </Link>{' '}
+            to continue.
+          </>,
+        )
       }
     },
-    [login, router],
+    [createAccountHref, login, router],
   )
 
   return (
@@ -89,10 +103,7 @@ export const LoginForm: React.FC = () => {
         </Button>
         <p className="mt-5 text-sm text-[#6c675d]">
           Don&apos;t have an account?{' '}
-          <Link
-            className="text-[#24231f] underline underline-offset-4"
-            href={`/create-account${allParams}`}
-          >
+          <Link className="text-[#24231f] underline underline-offset-4" href={createAccountHref}>
             Create an account
           </Link>
         </p>
