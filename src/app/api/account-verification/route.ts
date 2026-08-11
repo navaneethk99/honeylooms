@@ -7,6 +7,7 @@ import {
   createHash,
   randomBytes,
   randomInt,
+  timingSafeEqual,
 } from 'crypto'
 import { after } from 'next/server'
 import { APIError, getPayload } from 'payload'
@@ -14,6 +15,7 @@ import { APIError, getPayload } from 'payload'
 const OTP_EXPIRY_MS = 10 * 60 * 1000
 const RESEND_COOLDOWN_MS = 60 * 1000
 const MAX_OTP_ATTEMPTS = 5
+const REGISTRATION_COOKIE = 'honeylooms_pending_registration'
 
 type RegistrationRequest = {
   action: 'register'
@@ -37,6 +39,69 @@ const encryptionKey = createHash('sha256')
 
 const hashOTP = (email: string, otp: string) =>
   createHmac('sha256', encryptionKey).update(`${email.toLowerCase()}:${otp}`).digest('hex')
+
+const createRegistrationToken = (email: string, encryptedPassword: string) =>
+  createHmac('sha256', encryptionKey)
+    .update(`${email.toLowerCase()}:${encryptedPassword}`)
+    .digest('base64url')
+
+const getCookie = (request: Request, name: string) => {
+  const cookie = request.headers
+    .get('cookie')
+    ?.split(';')
+    .map((value) => value.trim().split('='))
+    .find(([cookieName]) => cookieName === name)
+
+  return cookie?.slice(1).join('=')
+}
+
+const ownsPendingRegistration = ({
+  email,
+  encryptedPassword,
+  request,
+}: {
+  email: string
+  encryptedPassword: string
+  request: Request
+}) => {
+  // This capability binds active credentials to the browser that created them.
+  const providedToken = getCookie(request, REGISTRATION_COOKIE)
+  if (!providedToken) return false
+
+  const expectedToken = createRegistrationToken(email, encryptedPassword)
+  const providedBuffer = Buffer.from(providedToken)
+  const expectedBuffer = Buffer.from(expectedToken)
+
+  return (
+    providedBuffer.length === expectedBuffer.length &&
+    timingSafeEqual(providedBuffer, expectedBuffer)
+  )
+}
+
+const registrationResponse = ({
+  email,
+  encryptedPassword,
+}: {
+  email: string
+  encryptedPassword?: string
+}) => {
+  const response = Response.json({ email })
+  if (!encryptedPassword) return response
+
+  const cookie = [
+    `${REGISTRATION_COOKIE}=${createRegistrationToken(email, encryptedPassword)}`,
+    `Max-Age=${Math.ceil(OTP_EXPIRY_MS / 1000)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Strict',
+    process.env.NODE_ENV === 'production' ? 'Secure' : '',
+  ]
+    .filter(Boolean)
+    .join('; ')
+  response.headers.append('Set-Cookie', cookie)
+
+  return response
+}
 
 const encryptPassword = (password: string) => {
   const iv = randomBytes(12)
@@ -253,11 +318,13 @@ const queueWelcomeEmail = ({
 const updatePendingRegistration = async ({
   email,
   encryptedPassword,
+  previousEncryptedPassword,
   name,
   payload,
 }: {
   email: string
   encryptedPassword: string
+  previousEncryptedPassword: string
   name: string
   payload: Awaited<ReturnType<typeof getPayload>>
 }) => {
@@ -269,9 +336,53 @@ const updatePendingRegistration = async ({
         encrypted_password = $2,
         name = $3
       WHERE email = $1
+        AND encrypted_password = $4
+        AND otp_attempts < $5
+        AND expires_at > NOW()
       RETURNING id
     `,
-    [email, encryptedPassword, name],
+    [email, encryptedPassword, name, previousEncryptedPassword, MAX_OTP_ATTEMPTS],
+  )
+
+  return Boolean(result.rows[0])
+}
+
+const restartExpiredRegistration = async ({
+  email,
+  encryptedPassword,
+  name,
+  otp,
+  payload,
+}: {
+  email: string
+  encryptedPassword: string
+  name: string
+  otp: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const result = await payload.db.pool.query<{ id: number }>(
+    `
+      UPDATE account_verifications
+      SET
+        encrypted_otp = $2,
+        encrypted_password = $3,
+        expires_at = $4,
+        name = $5,
+        otp_attempts = 0,
+        otp_hash = $6,
+        updated_at = NOW()
+      WHERE email = $1
+        AND expires_at <= NOW()
+      RETURNING id
+    `,
+    [
+      email,
+      encryptPassword(otp),
+      encryptedPassword,
+      new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
+      name,
+      hashOTP(email, otp),
+    ],
   )
 
   return Boolean(result.rows[0])
@@ -312,11 +423,11 @@ const takeVerificationEmailSlot = async ({
       SET
         encrypted_otp = $2,
         otp_hash = $3,
-        otp_attempts = 0,
         expires_at = $4,
         updated_at = NOW()
       WHERE email = $1
         AND expires_at <= NOW()
+        AND otp_attempts < $6
         AND updated_at <= $5
       RETURNING name
     `,
@@ -326,6 +437,7 @@ const takeVerificationEmailSlot = async ({
       hashOTP(email, otp),
       new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
       cooldownStartedBefore,
+      MAX_OTP_ATTEMPTS,
     ],
   )
   const refreshedAccount = refreshedCode.rows[0]
@@ -333,8 +445,8 @@ const takeVerificationEmailSlot = async ({
   return refreshedAccount ? { name: refreshedAccount.name, otp } : undefined
 }
 
-// A matching request consumes the remaining slots so the code can only succeed once. A match
-// already waiting on the fifth failed update may still finish, but later requests stay locked out.
+// MAX + 1 marks a successful claim. It lets a match already racing the fifth failure finish while
+// preventing another matching request from claiming the same pending registration.
 const claimVerificationAttempt = async ({
   email,
   otpHash,
@@ -361,7 +473,7 @@ const claimVerificationAttempt = async ({
       UPDATE account_verifications AS verification
       SET
         otp_attempts = CASE
-          WHEN verification.otp_hash = $3 THEN $2
+          WHEN verification.otp_hash = $3 THEN $2 + 1
           ELSE verification.otp_attempts + 1
         END,
         updated_at = NOW()
@@ -416,19 +528,62 @@ export async function POST(request: Request) {
       }
 
       const encryptedPassword = encryptPassword(password)
-      const existingAccount = await updatePendingRegistration({
-        email,
-        encryptedPassword,
-        name,
-        payload,
+      const existingVerification = await payload.find({
+        collection: 'account-verifications',
+        where: { email: { equals: email } },
+        limit: 1,
+        overrideAccess: true,
       })
+      const existingAccount = existingVerification.docs[0]
 
       if (existingAccount) {
+        if (new Date(existingAccount.expiresAt).getTime() <= Date.now()) {
+          const otp = randomInt(100000, 1000000).toString()
+          const restarted = await restartExpiredRegistration({
+            email,
+            encryptedPassword,
+            name,
+            otp,
+            payload,
+          })
+          if (!restarted) {
+            throw new APIError('That verification code is invalid or has expired.', 400)
+          }
+
+          queueVerificationEmail({ email, name, otp, payload })
+          return registrationResponse({ email, encryptedPassword })
+        }
+
+        if (existingAccount.otpAttempts >= MAX_OTP_ATTEMPTS) {
+          throw new APIError('That verification code is invalid or has expired.', 400)
+        }
+
+        const mayReplaceCredentials = ownsPendingRegistration({
+          email,
+          encryptedPassword: existingAccount.encryptedPassword,
+          request,
+        })
+        if (mayReplaceCredentials) {
+          const updated = await updatePendingRegistration({
+            email,
+            encryptedPassword,
+            previousEncryptedPassword: existingAccount.encryptedPassword,
+            name,
+            payload,
+          })
+          if (!updated) {
+            throw new APIError('That verification code is invalid or has expired.', 400)
+          }
+        }
+
         const verificationEmail = await takeVerificationEmailSlot({ email, payload })
         if (verificationEmail) {
           queueVerificationEmail({ email, payload, ...verificationEmail })
         }
-        return Response.json({ email })
+        return registrationResponse({
+          email,
+          encryptedPassword: mayReplaceCredentials ? encryptedPassword : undefined,
+        })
       }
 
       const otp = randomInt(100000, 1000000).toString()
@@ -447,7 +602,7 @@ export async function POST(request: Request) {
       })
 
       queueVerificationEmail({ email, name, otp, payload })
-      return Response.json({ email })
+      return registrationResponse({ email, encryptedPassword })
     }
 
     if (body.action === 'resend') {
@@ -459,6 +614,9 @@ export async function POST(request: Request) {
       })
       const account = verification.docs[0]
       if (!account) throw new APIError('Invalid verification request.', 400)
+      if (account.otpAttempts >= MAX_OTP_ATTEMPTS) {
+        throw new APIError('That verification code is invalid or has expired.', 400)
+      }
 
       const verificationEmail = await takeVerificationEmailSlot({ email, payload })
       if (!verificationEmail) {
