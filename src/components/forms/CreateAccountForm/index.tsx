@@ -10,7 +10,7 @@ import { useAuth } from '@/providers/Auth'
 import { Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 type FormData = {
@@ -129,66 +129,59 @@ export const CreateAccountForm: React.FC = () => {
     [login, router, searchParams, step, verificationEmail, verificationToken],
   )
 
+  const checkVerificationStatus = useEffectEvent(async (isCancelled: () => boolean) => {
+    if (verificationInProgressRef.current) return false
+
+    try {
+      const response = await fetch('/api/account-verification', {
+        body: JSON.stringify({ action: 'status', token: verificationStatusToken }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      if (!response.ok || isCancelled()) return false
+
+      const result = await response.json()
+      if (!result.verified || isCancelled()) return false
+
+      verificationInProgressRef.current = true
+      setLoading(true)
+      try {
+        await login({ email: verificationEmail, password: getValues('password') })
+        const redirect = searchParams.get('redirect')
+        if (redirect) router.push(redirect)
+        else router.push(`/account?success=${encodeURIComponent('Account created successfully')}`)
+      } catch {
+        const loginParams = new URLSearchParams({
+          email: verificationEmail,
+          success: 'Email verified. Log in to continue.',
+        })
+        const redirect = searchParams.get('redirect')
+        if (redirect) loginParams.set('redirect', redirect)
+        router.push(`/login?${loginParams.toString()}`)
+      }
+      return true
+    } catch {
+      return false
+    }
+  })
+
   useEffect(() => {
     if (step !== 'verification' || !verificationEmail || !verificationStatusToken) return
 
     let cancelled = false
     let timer: ReturnType<typeof setTimeout>
 
-    const scheduleNextCheck = () => {
-      if (!cancelled) timer = setTimeout(checkVerificationStatus, 2500)
+    const poll = async () => {
+      const complete = await checkVerificationStatus(() => cancelled)
+      if (!cancelled && !complete) timer = setTimeout(poll, 2500)
     }
 
-    const checkVerificationStatus = async () => {
-      if (verificationInProgressRef.current) {
-        scheduleNextCheck()
-        return
-      }
-
-      try {
-        const response = await fetch('/api/account-verification', {
-          body: JSON.stringify({ action: 'status', token: verificationStatusToken }),
-          headers: { 'Content-Type': 'application/json' },
-          method: 'POST',
-        })
-        if (!response.ok || cancelled) {
-          scheduleNextCheck()
-          return
-        }
-
-        const result = await response.json()
-        if (!result.verified) {
-          scheduleNextCheck()
-          return
-        }
-
-        verificationInProgressRef.current = true
-        setLoading(true)
-        try {
-          await login({ email: verificationEmail, password: getValues('password') })
-          const redirect = searchParams.get('redirect')
-          if (redirect) router.push(redirect)
-          else router.push(`/account?success=${encodeURIComponent('Account created successfully')}`)
-        } catch {
-          const loginParams = new URLSearchParams({
-            email: verificationEmail,
-            success: 'Email verified. Log in to continue.',
-          })
-          const redirect = searchParams.get('redirect')
-          if (redirect) loginParams.set('redirect', redirect)
-          router.push(`/login?${loginParams.toString()}`)
-        }
-      } catch {
-        scheduleNextCheck()
-      }
-    }
-
-    scheduleNextCheck()
+    timer = setTimeout(poll, 2500)
     return () => {
       cancelled = true
       clearTimeout(timer)
     }
-  }, [getValues, login, router, searchParams, step, verificationEmail, verificationStatusToken])
+  }, [step, verificationEmail, verificationStatusToken])
 
   const resendCode = useCallback(async () => {
     if (resendSecondsRemaining) return
