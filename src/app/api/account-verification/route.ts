@@ -250,23 +250,83 @@ const queueWelcomeEmail = ({
   })
 }
 
-// Allocate each verification request one of the limited attempt slots atomically.
-const takeVerificationAttempt = async ({
+const takeVerificationEmailSlot = async ({
   email,
   payload,
 }: {
   email: string
   payload: Awaited<ReturnType<typeof getPayload>>
 }) => {
-  const result = await payload.db.pool.query<{
-    encryptedPassword: string
-    id: number
+  const cooldownStartedBefore = new Date(Date.now() - RESEND_COOLDOWN_MS).toISOString()
+  const reusableCode = await payload.db.pool.query<{
+    encryptedOtp: string
     name: string
-    otpHash: string
   }>(
     `
       UPDATE account_verifications
-      SET otp_attempts = otp_attempts + 1, updated_at = NOW()
+      SET updated_at = NOW()
+      WHERE email = $1
+        AND otp_attempts < $2
+        AND expires_at > NOW()
+        AND updated_at <= $3
+      RETURNING encrypted_otp AS "encryptedOtp", name
+    `,
+    [email, MAX_OTP_ATTEMPTS, cooldownStartedBefore],
+  )
+  const reusableAccount = reusableCode.rows[0]
+  if (reusableAccount) {
+    return { name: reusableAccount.name, otp: decryptPassword(reusableAccount.encryptedOtp) }
+  }
+
+  const otp = randomInt(100000, 1000000).toString()
+  const refreshedCode = await payload.db.pool.query<{ name: string }>(
+    `
+      UPDATE account_verifications
+      SET
+        encrypted_otp = $2,
+        otp_hash = $3,
+        otp_attempts = 0,
+        expires_at = $4,
+        updated_at = NOW()
+      WHERE email = $1
+        AND expires_at <= NOW()
+        AND updated_at <= $5
+      RETURNING name
+    `,
+    [
+      email,
+      encryptPassword(otp),
+      hashOTP(email, otp),
+      new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
+      cooldownStartedBefore,
+    ],
+  )
+  const refreshedAccount = refreshedCode.rows[0]
+
+  return refreshedAccount ? { name: refreshedAccount.name, otp } : undefined
+}
+
+// A matching request consumes the record's remaining slots so the code can only succeed once.
+const claimVerificationAttempt = async ({
+  email,
+  otpHash,
+  payload,
+}: {
+  email: string
+  otpHash: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const result = await payload.db.pool.query<{
+    encryptedPassword: string
+    id: number
+    isMatch: boolean
+    name: string
+  }>(
+    `
+      UPDATE account_verifications
+      SET
+        otp_attempts = CASE WHEN otp_hash = $3 THEN $2 ELSE otp_attempts + 1 END,
+        updated_at = NOW()
       WHERE email = $1
         AND otp_attempts < $2
         AND expires_at > NOW()
@@ -274,12 +334,13 @@ const takeVerificationAttempt = async ({
         id,
         name,
         encrypted_password AS "encryptedPassword",
-        otp_hash AS "otpHash"
+        otp_hash = $3 AS "isMatch"
     `,
-    [email, MAX_OTP_ATTEMPTS],
+    [email, MAX_OTP_ATTEMPTS, otpHash],
   )
+  const account = result.rows[0]
 
-  return result.rows[0]
+  return account?.isMatch ? account : undefined
 }
 
 export async function POST(request: Request) {
@@ -318,29 +379,10 @@ export async function POST(request: Request) {
       const existingAccount = existingVerification.docs[0]
 
       if (existingAccount) {
-        if (existingAccount.otpAttempts >= MAX_OTP_ATTEMPTS) {
-          return Response.json({ email })
+        const verificationEmail = await takeVerificationEmailSlot({ email, payload })
+        if (verificationEmail) {
+          queueVerificationEmail({ email, payload, ...verificationEmail })
         }
-
-        const canReuseOTP = new Date(existingAccount.expiresAt) > new Date()
-        const otp = canReuseOTP
-          ? decryptPassword(existingAccount.encryptedOtp)
-          : randomInt(100000, 1000000).toString()
-
-        if (!canReuseOTP) {
-          await payload.update({
-            collection: 'account-verifications',
-            id: existingAccount.id,
-            data: {
-              encryptedOtp: encryptPassword(otp),
-              expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
-              otpHash: hashOTP(email, otp),
-            },
-            overrideAccess: true,
-          })
-        }
-
-        queueVerificationEmail({ email, name: existingAccount.name, otp, payload })
         return Response.json({ email })
       }
 
@@ -372,31 +414,21 @@ export async function POST(request: Request) {
       })
       const account = verification.docs[0]
       if (!account) throw new APIError('Invalid verification request.', 400)
-      if (account.otpAttempts >= MAX_OTP_ATTEMPTS) {
+
+      const verificationEmail = await takeVerificationEmailSlot({ email, payload })
+      if (!verificationEmail) {
+        const cooldownRemaining =
+          RESEND_COOLDOWN_MS - (Date.now() - new Date(account.updatedAt).getTime())
+        if (cooldownRemaining > 0) {
+          throw new APIError(
+            `Please wait ${Math.ceil(cooldownRemaining / 1000)} seconds before requesting another code.`,
+            429,
+          )
+        }
         throw new APIError('That verification code is invalid or has expired.', 400)
       }
 
-      const cooldownRemaining =
-        RESEND_COOLDOWN_MS - (Date.now() - new Date(account.updatedAt).getTime())
-      if (cooldownRemaining > 0) {
-        throw new APIError(
-          `Please wait ${Math.ceil(cooldownRemaining / 1000)} seconds before requesting another code.`,
-          429,
-        )
-      }
-
-      const otp = randomInt(100000, 1000000).toString()
-      await payload.update({
-        collection: 'account-verifications',
-        id: account.id,
-        data: {
-          encryptedOtp: encryptPassword(otp),
-          expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
-          otpHash: hashOTP(email, otp),
-        },
-        overrideAccess: true,
-      })
-      queueVerificationEmail({ email, name: account.name, otp, payload })
+      queueVerificationEmail({ email, payload, ...verificationEmail })
       return Response.json({ email })
     }
 
@@ -405,9 +437,8 @@ export async function POST(request: Request) {
       throw new APIError('That verification code is invalid or has expired.', 400)
     }
 
-    const account = await takeVerificationAttempt({ email, payload })
-    if (!account || hashOTP(email, otp) !== account.otpHash)
-      throw new APIError('That verification code is invalid or has expired.', 400)
+    const account = await claimVerificationAttempt({ email, otpHash: hashOTP(email, otp), payload })
+    if (!account) throw new APIError('That verification code is invalid or has expired.', 400)
 
     const existingUser = await payload.find({
       collection: 'users',
