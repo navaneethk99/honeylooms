@@ -115,8 +115,9 @@ export const AccountForm: React.FC = () => {
               </Label>
               <Input
                 autoComplete="email"
-                className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
+                className="h-11 cursor-not-allowed rounded-none border-[#24231f]/25 bg-[#24231f]/5 px-3 text-[#5d594f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
                 id="email"
+                readOnly
                 {...register('email', { required: 'Please provide an email.' })}
                 type="email"
               />
