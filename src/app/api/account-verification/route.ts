@@ -318,9 +318,11 @@ export async function POST(request: Request) {
       const existingAccount = existingVerification.docs[0]
 
       if (existingAccount) {
-        const canReuseOTP =
-          existingAccount.otpAttempts < MAX_OTP_ATTEMPTS &&
-          new Date(existingAccount.expiresAt) > new Date()
+        if (existingAccount.otpAttempts >= MAX_OTP_ATTEMPTS) {
+          return Response.json({ email })
+        }
+
+        const canReuseOTP = new Date(existingAccount.expiresAt) > new Date()
         const otp = canReuseOTP
           ? decryptPassword(existingAccount.encryptedOtp)
           : randomInt(100000, 1000000).toString()
@@ -332,7 +334,6 @@ export async function POST(request: Request) {
             data: {
               encryptedOtp: encryptPassword(otp),
               expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
-              otpAttempts: 0,
               otpHash: hashOTP(email, otp),
             },
             overrideAccess: true,
@@ -371,6 +372,9 @@ export async function POST(request: Request) {
       })
       const account = verification.docs[0]
       if (!account) throw new APIError('Invalid verification request.', 400)
+      if (account.otpAttempts >= MAX_OTP_ATTEMPTS) {
+        throw new APIError('That verification code is invalid or has expired.', 400)
+      }
 
       const cooldownRemaining =
         RESEND_COOLDOWN_MS - (Date.now() - new Date(account.updatedAt).getTime())
@@ -388,7 +392,6 @@ export async function POST(request: Request) {
         data: {
           encryptedOtp: encryptPassword(otp),
           expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
-          otpAttempts: 0,
           otpHash: hashOTP(email, otp),
         },
         overrideAccess: true,
