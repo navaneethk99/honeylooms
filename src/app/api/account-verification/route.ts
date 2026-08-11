@@ -33,9 +33,12 @@ type VerificationRequest = {
 
 const getString = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
 
-const encryptionKey = createHash('sha256')
-  .update(process.env.PAYLOAD_SECRET || '')
-  .digest()
+const payloadSecret = process.env.PAYLOAD_SECRET
+if (!payloadSecret) {
+  throw new Error('PAYLOAD_SECRET is required for account verification.')
+}
+
+const encryptionKey = createHash('sha256').update(payloadSecret).digest()
 
 const hashOTP = (email: string, otp: string) =>
   createHmac('sha256', encryptionKey).update(`${email.toLowerCase()}:${otp}`).digest('hex')
