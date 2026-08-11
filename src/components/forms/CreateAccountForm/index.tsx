@@ -40,10 +40,13 @@ export const CreateAccountForm: React.FC = () => {
   const [resendAvailableAt, setResendAvailableAt] = useState(0)
   const [now, setNow] = useState(Date.now())
   const [verificationEmail, setVerificationEmail] = useState('')
+  const [verificationStatusToken, setVerificationStatusToken] = useState('')
   const otpInputRefs = useRef<Array<HTMLInputElement | null>>([])
+  const verificationInProgressRef = useRef(false)
 
   const {
     formState: { errors },
+    getValues,
     handleSubmit,
     register,
     setValue,
@@ -67,6 +70,7 @@ export const CreateAccountForm: React.FC = () => {
       setError(null)
       setSuccess(null)
       setLoading(true)
+      verificationInProgressRef.current = true
       try {
         const response = await fetch('/api/account-verification', {
           body: JSON.stringify(
@@ -90,6 +94,7 @@ export const CreateAccountForm: React.FC = () => {
 
         if (step === 'account') {
           setVerificationEmail(result.email)
+          setVerificationStatusToken(result.verificationStatusToken || '')
           setResendAvailableAt(Date.now() + RESEND_COOLDOWN_MS)
           setStep('verification')
           return
@@ -117,11 +122,73 @@ export const CreateAccountForm: React.FC = () => {
             : 'There was an error creating the account. Please try again.',
         )
       } finally {
+        verificationInProgressRef.current = false
         setLoading(false)
       }
     },
     [login, router, searchParams, step, verificationEmail, verificationToken],
   )
+
+  useEffect(() => {
+    if (step !== 'verification' || !verificationEmail || !verificationStatusToken) return
+
+    let cancelled = false
+    let timer: ReturnType<typeof setTimeout>
+
+    const scheduleNextCheck = () => {
+      if (!cancelled) timer = setTimeout(checkVerificationStatus, 2500)
+    }
+
+    const checkVerificationStatus = async () => {
+      if (verificationInProgressRef.current) {
+        scheduleNextCheck()
+        return
+      }
+
+      try {
+        const response = await fetch('/api/account-verification', {
+          body: JSON.stringify({ action: 'status', token: verificationStatusToken }),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        })
+        if (!response.ok || cancelled) {
+          scheduleNextCheck()
+          return
+        }
+
+        const result = await response.json()
+        if (!result.verified) {
+          scheduleNextCheck()
+          return
+        }
+
+        verificationInProgressRef.current = true
+        setLoading(true)
+        try {
+          await login({ email: verificationEmail, password: getValues('password') })
+          const redirect = searchParams.get('redirect')
+          if (redirect) router.push(redirect)
+          else router.push(`/account?success=${encodeURIComponent('Account created successfully')}`)
+        } catch {
+          const loginParams = new URLSearchParams({
+            email: verificationEmail,
+            success: 'Email verified. Log in to continue.',
+          })
+          const redirect = searchParams.get('redirect')
+          if (redirect) loginParams.set('redirect', redirect)
+          router.push(`/login?${loginParams.toString()}`)
+        }
+      } catch {
+        scheduleNextCheck()
+      }
+    }
+
+    scheduleNextCheck()
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [getValues, login, router, searchParams, step, verificationEmail, verificationStatusToken])
 
   const resendCode = useCallback(async () => {
     if (resendSecondsRemaining) return
@@ -260,6 +327,9 @@ export const CreateAccountForm: React.FC = () => {
             </Label>
             <p className="mb-2 text-sm text-[#6c675d]">
               Enter the six-digit code sent to {verificationEmail}.
+            </p>
+            <p className="mb-3 text-sm text-[#6c675d]">
+              Keep this page open to be signed in automatically if you verify on another device.
             </p>
             <input
               type="hidden"

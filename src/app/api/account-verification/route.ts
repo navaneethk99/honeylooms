@@ -36,6 +36,11 @@ type LinkVerificationRequest = {
   token?: unknown
 }
 
+type VerificationStatusRequest = {
+  action: 'status'
+  token?: unknown
+}
+
 const getString = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
 
 const payloadSecret = process.env.PAYLOAD_SECRET
@@ -51,19 +56,7 @@ const hashOTP = (email: string, otp: string) =>
 const signVerificationToken = (payload: string) =>
   createHmac('sha256', encryptionKey).update(payload).digest('base64url')
 
-const createVerificationToken = (email: string, otp: string) => {
-  const payload = Buffer.from(
-    JSON.stringify({
-      email: email.toLowerCase(),
-      expiresAt: Date.now() + OTP_EXPIRY_MS,
-      otpHash: hashOTP(email, otp),
-    }),
-  ).toString('base64url')
-
-  return `${payload}.${signVerificationToken(payload)}`
-}
-
-const readVerificationToken = (token: string) => {
+const readSignedTokenPayload = (token: string) => {
   if (!token || token.length > 2048) return undefined
 
   const [payload, providedSignature, extra] = token.split('.')
@@ -80,24 +73,66 @@ const readVerificationToken = (token: string) => {
   }
 
   try {
-    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as {
-      email?: unknown
-      expiresAt?: unknown
-      otpHash?: unknown
-    }
-    if (
-      typeof decoded.email !== 'string' ||
-      typeof decoded.expiresAt !== 'number' ||
-      typeof decoded.otpHash !== 'string' ||
-      decoded.expiresAt <= Date.now()
-    ) {
-      return undefined
-    }
-
-    return { email: decoded.email.toLowerCase(), otpHash: decoded.otpHash }
+    return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Record<string, unknown>
   } catch {
     return undefined
   }
+}
+
+const createVerificationToken = (email: string, otp: string) => {
+  const payload = Buffer.from(
+    JSON.stringify({
+      email: email.toLowerCase(),
+      expiresAt: Date.now() + OTP_EXPIRY_MS,
+      otpHash: hashOTP(email, otp),
+      purpose: 'verify-account',
+    }),
+  ).toString('base64url')
+
+  return `${payload}.${signVerificationToken(payload)}`
+}
+
+const readVerificationToken = (token: string) => {
+  const decoded = readSignedTokenPayload(token)
+  if (
+    !decoded ||
+    typeof decoded.email !== 'string' ||
+    typeof decoded.expiresAt !== 'number' ||
+    typeof decoded.otpHash !== 'string' ||
+    decoded.purpose !== 'verify-account' ||
+    decoded.expiresAt <= Date.now()
+  ) {
+    return undefined
+  }
+
+  return { email: decoded.email.toLowerCase(), otpHash: decoded.otpHash }
+}
+
+const createVerificationStatusToken = (email: string) => {
+  const payload = Buffer.from(
+    JSON.stringify({
+      email: email.toLowerCase(),
+      expiresAt: Date.now() + OTP_EXPIRY_MS,
+      purpose: 'verification-status',
+    }),
+  ).toString('base64url')
+
+  return `${payload}.${signVerificationToken(payload)}`
+}
+
+const readVerificationStatusToken = (token: string) => {
+  const decoded = readSignedTokenPayload(token)
+  if (
+    !decoded ||
+    typeof decoded.email !== 'string' ||
+    typeof decoded.expiresAt !== 'number' ||
+    decoded.purpose !== 'verification-status' ||
+    decoded.expiresAt <= Date.now()
+  ) {
+    return undefined
+  }
+
+  return { email: decoded.email.toLowerCase() }
 }
 
 const createRegistrationToken = (email: string, encryptedPassword: string) =>
@@ -145,7 +180,10 @@ const registrationResponse = ({
   email: string
   encryptedPassword?: string
 }) => {
-  const response = Response.json({ email })
+  const response = Response.json({
+    email,
+    ...(encryptedPassword ? { verificationStatusToken: createVerificationStatusToken(email) } : {}),
+  })
   if (!encryptedPassword) return response
 
   const cookie = [
@@ -417,12 +455,14 @@ const updatePendingRegistration = async ({
 const restartExpiredRegistration = async ({
   email,
   encryptedPassword,
+  previousEncryptedPassword,
   name,
   otp,
   payload,
 }: {
   email: string
   encryptedPassword: string
+  previousEncryptedPassword: string
   name: string
   otp: string
   payload: Awaited<ReturnType<typeof getPayload>>
@@ -440,6 +480,7 @@ const restartExpiredRegistration = async ({
         updated_at = NOW()
       WHERE email = $1
         AND expires_at <= NOW()
+        AND encrypted_password = $7
       RETURNING id
     `,
     [
@@ -449,6 +490,7 @@ const restartExpiredRegistration = async ({
       new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
       name,
       hashOTP(email, otp),
+      previousEncryptedPassword,
     ],
   )
 
@@ -606,8 +648,24 @@ const completeVerification = async ({
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as
-      LinkVerificationRequest | RegistrationRequest | VerificationRequest
+      | LinkVerificationRequest
+      | RegistrationRequest
+      | VerificationRequest
+      | VerificationStatusRequest
     const payload = await getPayload({ config: configPromise })
+
+    if (body.action === 'status') {
+      const verification = readVerificationStatusToken(getString(body.token))
+      if (!verification) throw new APIError('Invalid verification status request.', 400)
+
+      const existingUser = await payload.find({
+        collection: 'users',
+        where: { email: { equals: verification.email } },
+        limit: 1,
+        overrideAccess: true,
+      })
+      return Response.json({ verified: Boolean(existingUser.docs[0]) })
+    }
 
     if (body.action === 'verify-link') {
       const verification = readVerificationToken(getString(body.token))
@@ -656,32 +714,42 @@ export async function POST(request: Request) {
       const existingAccount = existingVerification.docs[0]
 
       if (existingAccount) {
+        const mayReplaceCredentials = ownsPendingRegistration({
+          email,
+          encryptedPassword: existingAccount.encryptedPassword,
+          request,
+        })
+
         if (new Date(existingAccount.expiresAt).getTime() <= Date.now()) {
-          const otp = randomInt(100000, 1000000).toString()
-          const restarted = await restartExpiredRegistration({
-            email,
-            encryptedPassword,
-            name,
-            otp,
-            payload,
-          })
-          if (!restarted) {
-            throw new APIError('That verification code is invalid or has expired.', 400)
+          if (mayReplaceCredentials) {
+            const otp = randomInt(100000, 1000000).toString()
+            const restarted = await restartExpiredRegistration({
+              email,
+              encryptedPassword,
+              previousEncryptedPassword: existingAccount.encryptedPassword,
+              name,
+              otp,
+              payload,
+            })
+            if (!restarted) {
+              throw new APIError('That verification code is invalid or has expired.', 400)
+            }
+
+            queueVerificationEmail({ email, name, otp, payload })
+            return registrationResponse({ email, encryptedPassword })
           }
 
-          queueVerificationEmail({ email, name, otp, payload })
-          return registrationResponse({ email, encryptedPassword })
+          const verificationEmail = await takeVerificationEmailSlot({ email, payload })
+          if (verificationEmail) {
+            queueVerificationEmail({ email, payload, ...verificationEmail })
+          }
+          return registrationResponse({ email })
         }
 
         if (existingAccount.otpAttempts >= MAX_OTP_ATTEMPTS) {
           throw new APIError('That verification code is invalid or has expired.', 400)
         }
 
-        const mayReplaceCredentials = ownsPendingRegistration({
-          email,
-          encryptedPassword: existingAccount.encryptedPassword,
-          request,
-        })
         if (mayReplaceCredentials) {
           const updated = await updatePendingRegistration({
             email,
