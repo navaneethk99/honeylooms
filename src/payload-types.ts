@@ -1128,6 +1128,7 @@ export interface AccountVerification {
   encryptedPassword: string;
   encryptedOtp: string;
   otpHash: string;
+  otpAttempts: number;
   expiresAt: string;
   updatedAt: string;
   createdAt: string;
@@ -1518,6 +1519,7 @@ export interface AccountVerificationsSelect<T extends boolean = true> {
   encryptedPassword?: T;
   encryptedOtp?: T;
   otpHash?: T;
+  otpAttempts?: T;
   expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;

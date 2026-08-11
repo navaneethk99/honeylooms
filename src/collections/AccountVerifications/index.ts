@@ -20,6 +20,7 @@ export const AccountVerifications: CollectionConfig = {
     { name: 'encryptedPassword', type: 'text', required: true },
     { name: 'encryptedOtp', type: 'text', required: true },
     { name: 'otpHash', type: 'text', required: true },
+    { name: 'otpAttempts', type: 'number', defaultValue: 0, min: 0, required: true },
     { name: 'expiresAt', type: 'date', required: true },
   ],
 }

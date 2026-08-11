@@ -13,6 +13,7 @@ import { APIError, getPayload } from 'payload'
 
 const OTP_EXPIRY_MS = 10 * 60 * 1000
 const RESEND_COOLDOWN_MS = 60 * 1000
+const MAX_OTP_ATTEMPTS = 5
 
 type RegistrationRequest = {
   action: 'register'
@@ -273,7 +274,7 @@ export async function POST(request: Request) {
         overrideAccess: true,
       })
       if (existingUser.docs[0]) {
-        throw new APIError('An account already exists for this email address.', 409)
+        return Response.json({ email })
       }
 
       const existingVerification = await payload.find({
@@ -283,11 +284,7 @@ export async function POST(request: Request) {
         overrideAccess: true,
       })
       const existingAccount = existingVerification.docs[0]
-      const existingCodeIsValid =
-        existingAccount?.encryptedOtp && new Date(existingAccount.expiresAt) > new Date()
-      const otp = existingCodeIsValid
-        ? decryptPassword(existingAccount.encryptedOtp)
-        : randomInt(100000, 1000000).toString()
+      const otp = randomInt(100000, 1000000).toString()
 
       if (existingAccount) {
         await payload.update({
@@ -295,15 +292,12 @@ export async function POST(request: Request) {
           id: existingAccount.id,
           data: {
             email,
+            encryptedOtp: encryptPassword(otp),
             encryptedPassword: encryptPassword(password),
-            ...(existingCodeIsValid
-              ? {}
-              : {
-                  encryptedOtp: encryptPassword(otp),
-                  expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
-                  otpHash: hashOTP(email, otp),
-                }),
+            expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
             name,
+            otpAttempts: 0,
+            otpHash: hashOTP(email, otp),
           },
           overrideAccess: true,
         })
@@ -316,6 +310,7 @@ export async function POST(request: Request) {
             encryptedPassword: encryptPassword(password),
             expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
             name,
+            otpAttempts: 0,
             otpHash: hashOTP(email, otp),
           },
           overrideAccess: true,
@@ -352,6 +347,7 @@ export async function POST(request: Request) {
         data: {
           encryptedOtp: encryptPassword(otp),
           expiresAt: new Date(Date.now() + OTP_EXPIRY_MS).toISOString(),
+          otpAttempts: 0,
           otpHash: hashOTP(email, otp),
         },
         overrideAccess: true,
@@ -362,7 +358,27 @@ export async function POST(request: Request) {
 
     const otp = getString(body.otp)
     const isExpired = new Date(account.expiresAt) < new Date()
-    if (otp.length !== 6 || isExpired || hashOTP(email, otp) !== account.otpHash) {
+    if (
+      account.otpAttempts >= MAX_OTP_ATTEMPTS ||
+      otp.length !== 6 ||
+      isExpired ||
+      hashOTP(email, otp) !== account.otpHash
+    ) {
+      const nextAttempt = (account.otpAttempts || 0) + 1
+      if (nextAttempt >= MAX_OTP_ATTEMPTS || isExpired) {
+        await payload.delete({
+          collection: 'account-verifications',
+          id: account.id,
+          overrideAccess: true,
+        })
+      } else {
+        await payload.update({
+          collection: 'account-verifications',
+          id: account.id,
+          data: { otpAttempts: nextAttempt },
+          overrideAccess: true,
+        })
+      }
       throw new APIError('That verification code is invalid or has expired.', 400)
     }
 

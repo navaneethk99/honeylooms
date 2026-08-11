@@ -16,10 +16,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     CREATE UNIQUE INDEX IF NOT EXISTS "account_verifications_email_idx"
       ON "account_verifications" USING btree ("email");
 
-    ALTER TABLE "users"
-      DROP COLUMN IF EXISTS "email_verification_expires_at",
-      DROP COLUMN IF EXISTS "email_verification_code_hash",
-      DROP COLUMN IF EXISTS "email_verified";
   `)
 }
 
