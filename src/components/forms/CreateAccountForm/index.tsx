@@ -27,12 +27,15 @@ const RESEND_COOLDOWN_MS = 60 * 1000
 export const CreateAccountForm: React.FC = () => {
   const searchParams = useSearchParams()
   const allParams = searchParams.toString() ? `?${searchParams.toString()}` : ''
+  const verificationToken = searchParams.get('verification') || ''
   const { login } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
   const [success, setSuccess] = useState<null | string>(null)
-  const [step, setStep] = useState<'account' | 'verification'>('account')
+  const [step, setStep] = useState<'account' | 'link' | 'verification'>(() =>
+    verificationToken ? 'link' : 'account',
+  )
   const [otpDigits, setOtpDigits] = useState<string[]>(Array(6).fill(''))
   const [resendAvailableAt, setResendAvailableAt] = useState(0)
   const [now, setNow] = useState(Date.now())
@@ -67,15 +70,17 @@ export const CreateAccountForm: React.FC = () => {
       try {
         const response = await fetch('/api/account-verification', {
           body: JSON.stringify(
-            step === 'account'
-              ? {
-                  action: 'register',
-                  email: data.email,
-                  name: data.name,
-                  password: data.password,
-                  passwordConfirm: data.passwordConfirm,
-                }
-              : { action: 'verify', email: verificationEmail, otp: data.otp },
+            step === 'link'
+              ? { action: 'verify-link', token: verificationToken }
+              : step === 'account'
+                ? {
+                    action: 'register',
+                    email: data.email,
+                    name: data.name,
+                    password: data.password,
+                    passwordConfirm: data.passwordConfirm,
+                  }
+                : { action: 'verify', email: verificationEmail, otp: data.otp },
           ),
           headers: { 'Content-Type': 'application/json' },
           method: 'POST',
@@ -87,6 +92,17 @@ export const CreateAccountForm: React.FC = () => {
           setVerificationEmail(result.email)
           setResendAvailableAt(Date.now() + RESEND_COOLDOWN_MS)
           setStep('verification')
+          return
+        }
+
+        if (step === 'link') {
+          const loginParams = new URLSearchParams({
+            email: result.email,
+            success: 'Email verified. Log in to continue.',
+          })
+          const redirect = searchParams.get('redirect')
+          if (redirect) loginParams.set('redirect', redirect)
+          router.push(`/login?${loginParams.toString()}`)
           return
         }
 
@@ -104,7 +120,7 @@ export const CreateAccountForm: React.FC = () => {
         setLoading(false)
       }
     },
-    [login, router, searchParams, step, verificationEmail],
+    [login, router, searchParams, step, verificationEmail, verificationToken],
   )
 
   const resendCode = useCallback(async () => {
@@ -237,7 +253,7 @@ export const CreateAccountForm: React.FC = () => {
               {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
             </FormItem>
           </>
-        ) : (
+        ) : step === 'verification' ? (
           <FormItem>
             <Label className="text-sm text-[#5d594f]" htmlFor="otp">
               Verification code
@@ -273,6 +289,16 @@ export const CreateAccountForm: React.FC = () => {
             </div>
             {errors.otp && <FormError message={errors.otp.message} />}
           </FormItem>
+        ) : (
+          <div className="border-y border-[#24231f]/20 py-6">
+            <p className="font-medium tracking-[0.01em] text-[#24231f]">
+              Confirm your email address
+            </p>
+            <p className="mt-2 text-sm leading-6 text-[#6c675d]">
+              Select the button below to verify your email and finish creating your Honeylooms
+              account.
+            </p>
+          </div>
         )}
       </div>
 
@@ -283,7 +309,13 @@ export const CreateAccountForm: React.FC = () => {
           type="submit"
           variant="default"
         >
-          {loading ? 'Processing' : step === 'account' ? 'Create account' : 'Verify email'}
+          {loading
+            ? 'Processing'
+            : step === 'account'
+              ? 'Create account'
+              : step === 'link'
+                ? 'Confirm email'
+                : 'Verify email'}
         </Button>
         {step === 'verification' ? (
           <button

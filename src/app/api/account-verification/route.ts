@@ -31,6 +31,11 @@ type VerificationRequest = {
   otp?: unknown
 }
 
+type LinkVerificationRequest = {
+  action: 'verify-link'
+  token?: unknown
+}
+
 const getString = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
 
 const payloadSecret = process.env.PAYLOAD_SECRET
@@ -42,6 +47,58 @@ const encryptionKey = createHash('sha256').update(payloadSecret).digest()
 
 const hashOTP = (email: string, otp: string) =>
   createHmac('sha256', encryptionKey).update(`${email.toLowerCase()}:${otp}`).digest('hex')
+
+const signVerificationToken = (payload: string) =>
+  createHmac('sha256', encryptionKey).update(payload).digest('base64url')
+
+const createVerificationToken = (email: string, otp: string) => {
+  const payload = Buffer.from(
+    JSON.stringify({
+      email: email.toLowerCase(),
+      expiresAt: Date.now() + OTP_EXPIRY_MS,
+      otpHash: hashOTP(email, otp),
+    }),
+  ).toString('base64url')
+
+  return `${payload}.${signVerificationToken(payload)}`
+}
+
+const readVerificationToken = (token: string) => {
+  if (!token || token.length > 2048) return undefined
+
+  const [payload, providedSignature, extra] = token.split('.')
+  if (!payload || !providedSignature || extra) return undefined
+
+  const expectedSignature = signVerificationToken(payload)
+  const providedBuffer = Buffer.from(providedSignature)
+  const expectedBuffer = Buffer.from(expectedSignature)
+  if (
+    providedBuffer.length !== expectedBuffer.length ||
+    !timingSafeEqual(providedBuffer, expectedBuffer)
+  ) {
+    return undefined
+  }
+
+  try {
+    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as {
+      email?: unknown
+      expiresAt?: unknown
+      otpHash?: unknown
+    }
+    if (
+      typeof decoded.email !== 'string' ||
+      typeof decoded.expiresAt !== 'number' ||
+      typeof decoded.otpHash !== 'string' ||
+      decoded.expiresAt <= Date.now()
+    ) {
+      return undefined
+    }
+
+    return { email: decoded.email.toLowerCase(), otpHash: decoded.otpHash }
+  } catch {
+    return undefined
+  }
+}
 
 const createRegistrationToken = (email: string, encryptedPassword: string) =>
   createHmac('sha256', encryptionKey)
@@ -148,6 +205,8 @@ const sendVerificationEmail = async ({
   payload: Awaited<ReturnType<typeof getPayload>>
 }) => {
   const serverURL = getServerSideURL()
+  const verificationURL = new URL('/create-account', serverURL)
+  verificationURL.searchParams.set('verification', createVerificationToken(email, otp))
 
   await payload.sendEmail({
     to: email,
@@ -169,6 +228,9 @@ const sendVerificationEmail = async ({
             .code-card { margin: 28px 0; padding: 24px; border: 1px solid #f5f5f4; border-radius: 8px; background-color: #faf8f5; text-align: center; }
             .code-label { margin: 0 0 12px; color: #78716c; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
             .code { margin: 0; color: #1c1917; font-size: 30px; font-weight: 700; letter-spacing: 8px; }
+            .btn-container { margin: 28px 0; text-align: center; }
+            .btn { display: inline-block; border: 1px solid #D9A321; border-radius: 6px; background-color: #141414; padding: 14px 32px; color: #ffffff !important; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-decoration: none; }
+            .alternative { margin: 0 0 20px; color: #78716c; font-size: 13px; line-height: 1.6; text-align: center; }
             .notice { margin: 0; padding: 12px 16px; border-left: 3px solid #D9A321; border-radius: 0 6px 6px 0; background-color: #faf8f5; color: #44403c; font-size: 13px; line-height: 1.6; }
             .footer { padding: 30px; border-top: 1px solid #f5f5f4; background-color: #faf8f5; color: #78716c; font-size: 12px; line-height: 1.6; text-align: center; }
             .footer a { color: #D9A321; text-decoration: none; }
@@ -183,7 +245,9 @@ const sendVerificationEmail = async ({
               <div class="content">
                 <h1>Verify your email address</h1>
                 <p class="intro-text">Dear ${escapeHTML(name)},</p>
-                <p class="intro-text">Use the verification code below to finish creating your Honeylooms account.</p>
+                <p class="intro-text">Confirm your email address to finish creating your Honeylooms account.</p>
+                <div class="btn-container"><a href="${verificationURL.toString()}" class="btn">VERIFY EMAIL</a></div>
+                <p class="alternative">Or enter this verification code on the account page:</p>
                 <div class="code-card">
                   <p class="code-label">Your verification code</p>
                   <p class="code">${otp}</p>
@@ -503,10 +567,62 @@ const claimVerificationAttempt = async ({
   return account?.isMatch ? account : undefined
 }
 
+const completeVerification = async ({
+  email,
+  invalidMessage = 'That verification code is invalid or has expired.',
+  otpHash,
+  payload,
+}: {
+  email: string
+  invalidMessage?: string
+  otpHash: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}) => {
+  const account = await claimVerificationAttempt({ email, otpHash, payload })
+  if (!account) throw new APIError(invalidMessage, 400)
+
+  const existingUser = await payload.find({
+    collection: 'users',
+    where: { email: { equals: email } },
+    limit: 1,
+    overrideAccess: true,
+  })
+  if (existingUser.docs[0])
+    throw new APIError('An account already exists for this email address.', 409)
+
+  await payload.create({
+    collection: 'users',
+    data: { email, name: account.name, password: decryptPassword(account.encryptedPassword) },
+    overrideAccess: true,
+  })
+  await payload.delete({
+    collection: 'account-verifications',
+    id: account.id,
+    overrideAccess: true,
+  })
+  queueWelcomeEmail({ email, name: account.name, payload })
+}
+
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as RegistrationRequest | VerificationRequest
+    const body = (await request.json()) as
+      LinkVerificationRequest | RegistrationRequest | VerificationRequest
     const payload = await getPayload({ config: configPromise })
+
+    if (body.action === 'verify-link') {
+      const verification = readVerificationToken(getString(body.token))
+      if (!verification) {
+        throw new APIError('That verification link or code is invalid or has expired.', 400)
+      }
+
+      await completeVerification({
+        invalidMessage: 'That verification link is invalid or has expired.',
+        payload,
+        ...verification,
+      })
+      return Response.json({ email: verification.email })
+    }
+
     const email = getString(body.email).toLowerCase()
 
     if (!email || !email.includes('@'))
@@ -643,29 +759,7 @@ export async function POST(request: Request) {
       throw new APIError('That verification code is invalid or has expired.', 400)
     }
 
-    const account = await claimVerificationAttempt({ email, otpHash: hashOTP(email, otp), payload })
-    if (!account) throw new APIError('That verification code is invalid or has expired.', 400)
-
-    const existingUser = await payload.find({
-      collection: 'users',
-      where: { email: { equals: email } },
-      limit: 1,
-      overrideAccess: true,
-    })
-    if (existingUser.docs[0])
-      throw new APIError('An account already exists for this email address.', 409)
-
-    await payload.create({
-      collection: 'users',
-      data: { email, name: account.name, password: decryptPassword(account.encryptedPassword) },
-      overrideAccess: true,
-    })
-    await payload.delete({
-      collection: 'account-verifications',
-      id: account.id,
-      overrideAccess: true,
-    })
-    queueWelcomeEmail({ email, name: account.name, payload })
+    await completeVerification({ email, otpHash: hashOTP(email, otp), payload })
     return Response.json({ email })
   } catch (error) {
     const message =

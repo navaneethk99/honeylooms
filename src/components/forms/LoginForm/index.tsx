@@ -32,7 +32,9 @@ export const LoginForm: React.FC = () => {
     formState: { errors, isLoading },
     handleSubmit,
     register,
-  } = useForm<FormData>()
+  } = useForm<FormData>({
+    defaultValues: { email: searchParams.get('email') || '' },
+  })
 
   const onSubmit = useCallback(
     async (data: FormData) => {
