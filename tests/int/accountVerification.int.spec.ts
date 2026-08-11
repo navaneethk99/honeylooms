@@ -34,6 +34,13 @@ const registrationRequest = (cookie?: string) =>
     method: 'POST',
   })
 
+const statusRequest = (token: string) =>
+  new Request('http://localhost/api/account-verification', {
+    body: JSON.stringify({ action: 'status', token }),
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+  })
+
 describe('account verification registration capability', () => {
   beforeAll(async () => {
     process.env.PAYLOAD_SECRET ||= 'account-verification-test-secret'
@@ -69,15 +76,77 @@ describe('account verification registration capability', () => {
     getPayloadMock.mockResolvedValue(payload)
 
     const response = await POST(registrationRequest())
+    const result = await response.json()
 
     expect(response.status).toBe(200)
-    await expect(response.json()).resolves.toEqual({ email: 'victim@example.com' })
-    expect(response.headers.get('set-cookie')).toBeNull()
+    expect(result).toEqual({
+      email: 'victim@example.com',
+      verificationStatusToken: expect.any(String),
+    })
+    expect(response.headers.get('set-cookie')).not.toBeNull()
     expect(query).toHaveBeenCalledTimes(2)
     for (const [statement] of query.mock.calls) {
       expect(statement).not.toContain('encrypted_password')
       expect(statement).not.toContain('name =')
     }
+  })
+
+  it('does not expose an existing user through registration or status responses', async () => {
+    const existingUser = {
+      createdAt: new Date(Date.now() - 60_000).toISOString(),
+      email: 'victim@example.com',
+    }
+    const existingPayload = {
+      find: vi.fn().mockResolvedValue({ docs: [existingUser] }),
+      logger: { error: vi.fn() },
+    }
+    getPayloadMock.mockResolvedValue(existingPayload)
+
+    const existingResponse = await POST(registrationRequest())
+    const existingResult = await existingResponse.json()
+
+    const newPayload = {
+      create: vi.fn(),
+      find: vi.fn().mockResolvedValue({ docs: [] }),
+      logger: { error: vi.fn() },
+    }
+    getPayloadMock.mockResolvedValue(newPayload)
+
+    const newResponse = await POST(registrationRequest())
+    const newResult = await newResponse.json()
+
+    expect(Object.keys(existingResult).sort()).toEqual(Object.keys(newResult).sort())
+    expect(existingResult).toEqual({
+      email: 'victim@example.com',
+      verificationStatusToken: expect.any(String),
+    })
+    expect(existingResponse.headers.get('set-cookie')).toMatch(
+      /^honeylooms_pending_registration=[^;]+; Max-Age=600; Path=\/; HttpOnly; SameSite=Strict/,
+    )
+    expect(newResponse.headers.get('set-cookie')).toMatch(
+      /^honeylooms_pending_registration=[^;]+; Max-Age=600; Path=\/; HttpOnly; SameSite=Strict/,
+    )
+
+    existingPayload.find.mockImplementation(async ({ where }) => ({
+      docs:
+        new Date(existingUser.createdAt) > new Date(where.createdAt.greater_than)
+          ? [existingUser]
+          : [],
+    }))
+    getPayloadMock.mockResolvedValue(existingPayload)
+
+    const statusResponse = await POST(statusRequest(existingResult.verificationStatusToken))
+
+    await expect(statusResponse.json()).resolves.toEqual({ verified: false })
+    expect(existingPayload.find).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        collection: 'users',
+        where: {
+          createdAt: { greater_than: expect.any(String) },
+          email: { equals: 'victim@example.com' },
+        },
+      }),
+    )
   })
 
   it('binds an authorized expired restart to the previously stored credentials', async () => {

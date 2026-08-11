@@ -108,11 +108,29 @@ const readVerificationToken = (token: string) => {
   return { email: decoded.email.toLowerCase(), otpHash: decoded.otpHash }
 }
 
-const createVerificationStatusToken = (email: string) => {
+const createVerificationStatusProof = (email: string, createdAfter: number) =>
+  createHmac('sha256', encryptionKey)
+    .update(`verification-status:${email.toLowerCase()}:${createdAfter}`)
+    .digest('base64url')
+
+const createVerificationStatusToken = ({
+  canObserveVerification,
+  createdAfter,
+  email,
+}: {
+  canObserveVerification: boolean
+  createdAfter: number
+  email: string
+}) => {
   const payload = Buffer.from(
     JSON.stringify({
+      createdAfter,
       email: email.toLowerCase(),
-      expiresAt: Date.now() + OTP_EXPIRY_MS,
+      expiresAt: createdAfter + OTP_EXPIRY_MS,
+      // A decoy proof has the same shape but cannot authorize positive status polling.
+      proof: canObserveVerification
+        ? createVerificationStatusProof(email, createdAfter)
+        : randomBytes(32).toString('base64url'),
       purpose: 'verification-status',
     }),
   ).toString('base64url')
@@ -124,15 +142,25 @@ const readVerificationStatusToken = (token: string) => {
   const decoded = readSignedTokenPayload(token)
   if (
     !decoded ||
+    typeof decoded.createdAfter !== 'number' ||
     typeof decoded.email !== 'string' ||
     typeof decoded.expiresAt !== 'number' ||
+    typeof decoded.proof !== 'string' ||
     decoded.purpose !== 'verification-status' ||
     decoded.expiresAt <= Date.now()
   ) {
     return undefined
   }
 
-  return { email: decoded.email.toLowerCase() }
+  const email = decoded.email.toLowerCase()
+  const expectedProof = createVerificationStatusProof(email, decoded.createdAfter)
+  const providedBuffer = Buffer.from(decoded.proof)
+  const expectedBuffer = Buffer.from(expectedProof)
+  const canObserveVerification =
+    providedBuffer.length === expectedBuffer.length &&
+    timingSafeEqual(providedBuffer, expectedBuffer)
+
+  return { canObserveVerification, createdAfter: decoded.createdAfter, email }
 }
 
 const createRegistrationToken = (email: string, encryptedPassword: string) =>
@@ -174,17 +202,24 @@ const ownsPendingRegistration = ({
 }
 
 const registrationResponse = ({
+  canObserveVerification,
+  createdAfter,
   email,
   encryptedPassword,
 }: {
+  canObserveVerification: boolean
+  createdAfter: number
   email: string
-  encryptedPassword?: string
+  encryptedPassword: string
 }) => {
   const response = Response.json({
     email,
-    ...(encryptedPassword ? { verificationStatusToken: createVerificationStatusToken(email) } : {}),
+    verificationStatusToken: createVerificationStatusToken({
+      canObserveVerification,
+      createdAfter,
+      email,
+    }),
   })
-  if (!encryptedPassword) return response
 
   const cookie = [
     `${REGISTRATION_COOKIE}=${createRegistrationToken(email, encryptedPassword)}`,
@@ -660,11 +695,16 @@ export async function POST(request: Request) {
 
       const existingUser = await payload.find({
         collection: 'users',
-        where: { email: { equals: verification.email } },
+        where: {
+          createdAt: { greater_than: new Date(verification.createdAfter).toISOString() },
+          email: { equals: verification.email },
+        },
         limit: 1,
         overrideAccess: true,
       })
-      return Response.json({ verified: Boolean(existingUser.docs[0]) })
+      return Response.json({
+        verified: verification.canObserveVerification && Boolean(existingUser.docs[0]),
+      })
     }
 
     if (body.action === 'verify-link') {
@@ -687,6 +727,7 @@ export async function POST(request: Request) {
       throw new APIError('A valid email address is required.', 400)
 
     if (body.action === 'register') {
+      const createdAfter = Date.now()
       const name = getString(body.name)
       const password = getString(body.password)
       const passwordConfirm = getString(body.passwordConfirm)
@@ -694,6 +735,7 @@ export async function POST(request: Request) {
         throw new APIError('Please provide your name and matching passwords.', 400)
       }
 
+      const encryptedPassword = encryptPassword(password)
       const existingUser = await payload.find({
         collection: 'users',
         where: { email: { equals: email } },
@@ -701,10 +743,14 @@ export async function POST(request: Request) {
         overrideAccess: true,
       })
       if (existingUser.docs[0]) {
-        return Response.json({ email })
+        return registrationResponse({
+          canObserveVerification: false,
+          createdAfter,
+          email,
+          encryptedPassword,
+        })
       }
 
-      const encryptedPassword = encryptPassword(password)
       const existingVerification = await payload.find({
         collection: 'account-verifications',
         where: { email: { equals: email } },
@@ -736,14 +782,24 @@ export async function POST(request: Request) {
             }
 
             queueVerificationEmail({ email, name, otp, payload })
-            return registrationResponse({ email, encryptedPassword })
+            return registrationResponse({
+              canObserveVerification: true,
+              createdAfter,
+              email,
+              encryptedPassword,
+            })
           }
 
           const verificationEmail = await takeVerificationEmailSlot({ email, payload })
           if (verificationEmail) {
             queueVerificationEmail({ email, payload, ...verificationEmail })
           }
-          return registrationResponse({ email })
+          return registrationResponse({
+            canObserveVerification: false,
+            createdAfter,
+            email,
+            encryptedPassword,
+          })
         }
 
         if (existingAccount.otpAttempts >= MAX_OTP_ATTEMPTS) {
@@ -768,8 +824,10 @@ export async function POST(request: Request) {
           queueVerificationEmail({ email, payload, ...verificationEmail })
         }
         return registrationResponse({
+          canObserveVerification: mayReplaceCredentials,
+          createdAfter,
           email,
-          encryptedPassword: mayReplaceCredentials ? encryptedPassword : undefined,
+          encryptedPassword,
         })
       }
 
@@ -789,7 +847,12 @@ export async function POST(request: Request) {
       })
 
       queueVerificationEmail({ email, name, otp, payload })
-      return registrationResponse({ email, encryptedPassword })
+      return registrationResponse({
+        canObserveVerification: true,
+        createdAfter,
+        email,
+        encryptedPassword,
+      })
     }
 
     if (body.action === 'resend') {
