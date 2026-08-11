@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAddresses } from '@payloadcms/plugin-ecommerce/client/react'
-import { defaultCountries as supportedCountries } from '@payloadcms/plugin-ecommerce/client/react'
 import { Address, Config } from '@/payload-types'
 import {
   Select,
@@ -64,7 +63,10 @@ export const AddressForm: React.FC<Props> = ({
     setValue,
     watch,
   } = useForm<AddressFormValues>({
-    defaultValues: initialData,
+    defaultValues: {
+      ...initialData,
+      country: initialData?.country || 'IN',
+    },
   })
 
   const countryValue = watch('country')
@@ -200,27 +202,13 @@ export const AddressForm: React.FC<Props> = ({
               }}
               disabled={disabled}
               required
-              defaultValue={initialData?.country || ''}
+              defaultValue={initialData?.country || 'IN'}
             >
               <SelectTrigger id={fieldID('country')} className="w-full">
                 <SelectValue placeholder="Country" />
               </SelectTrigger>
               <SelectContent>
-                {supportedCountries.map((country) => {
-                  const value = typeof country === 'string' ? country : country.value
-                  const label =
-                    typeof country === 'string'
-                      ? country
-                      : typeof country.label === 'string'
-                        ? country.label
-                        : value
-
-                  return (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  )
-                })}
+                <SelectItem value="IN">India</SelectItem>
               </SelectContent>
             </Select>
             {errors.country && <FormError message={errors.country.message} />}

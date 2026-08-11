@@ -7,16 +7,22 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/providers/Auth'
+import { Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 type FormData = {
   email: string
+  name: string
   password: string
   passwordConfirm: string
+  otp: string
 }
+
+const INVALID_OTP_ERROR = 'That verification code is invalid or has expired.'
+const RESEND_COOLDOWN_MS = 60 * 1000
 
 export const CreateAccountForm: React.FC = () => {
   const searchParams = useSearchParams()
@@ -25,100 +31,249 @@ export const CreateAccountForm: React.FC = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
+  const [success, setSuccess] = useState<null | string>(null)
+  const [step, setStep] = useState<'account' | 'verification'>('account')
+  const [otpDigits, setOtpDigits] = useState<string[]>(Array(6).fill(''))
+  const [resendAvailableAt, setResendAvailableAt] = useState(0)
+  const [now, setNow] = useState(Date.now())
+  const [verificationEmail, setVerificationEmail] = useState('')
+  const otpInputRefs = useRef<Array<HTMLInputElement | null>>([])
 
   const {
     formState: { errors },
     handleSubmit,
     register,
+    setValue,
     watch,
   } = useForm<FormData>()
 
   const password = useRef({})
   password.current = watch('password', '')
+  const isInvalidOTPError = error === INVALID_OTP_ERROR
+  const resendSecondsRemaining = Math.max(0, Math.ceil((resendAvailableAt - now) / 1000))
+
+  useEffect(() => {
+    if (!resendSecondsRemaining) return
+
+    const timer = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(timer)
+  }, [resendSecondsRemaining])
 
   const onSubmit = useCallback(
     async (data: FormData) => {
-      const response = await fetch('/api/users', {
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-      })
-
-      if (!response.ok) {
-        const message = response.statusText || 'There was an error creating the account.'
-        setError(message)
-        return
-      }
-
-      const redirect = searchParams.get('redirect')
-
-      const timer = setTimeout(() => {
-        setLoading(true)
-      }, 1000)
-
+      setError(null)
+      setSuccess(null)
+      setLoading(true)
       try {
-        await login(data)
-        clearTimeout(timer)
+        const response = await fetch('/api/account-verification', {
+          body: JSON.stringify(
+            step === 'account'
+              ? {
+                  action: 'register',
+                  email: data.email,
+                  name: data.name,
+                  password: data.password,
+                  passwordConfirm: data.passwordConfirm,
+                }
+              : { action: 'verify', email: verificationEmail, otp: data.otp },
+          ),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        })
+        const result = await response.json()
+        if (!response.ok) throw new Error(result.message)
+
+        if (step === 'account') {
+          setVerificationEmail(result.email)
+          setResendAvailableAt(Date.now() + RESEND_COOLDOWN_MS)
+          setStep('verification')
+          return
+        }
+
+        await login({ email: verificationEmail, password: data.password })
+        const redirect = searchParams.get('redirect')
         if (redirect) router.push(redirect)
         else router.push(`/account?success=${encodeURIComponent('Account created successfully')}`)
-      } catch (_) {
-        clearTimeout(timer)
-        setError('There was an error with the credentials provided. Please try again.')
+      } catch (caughtError) {
+        setError(
+          caughtError instanceof Error
+            ? caughtError.message
+            : 'There was an error creating the account. Please try again.',
+        )
+      } finally {
+        setLoading(false)
       }
     },
-    [login, router, searchParams],
+    [login, router, searchParams, step, verificationEmail],
   )
+
+  const resendCode = useCallback(async () => {
+    if (resendSecondsRemaining) return
+
+    setError(null)
+    setSuccess(null)
+    setLoading(true)
+    try {
+      const response = await fetch('/api/account-verification', {
+        body: JSON.stringify({ action: 'resend', email: verificationEmail }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.message)
+      setSuccess('A new verification code has been sent.')
+      setResendAvailableAt(Date.now() + RESEND_COOLDOWN_MS)
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Unable to resend the verification code.',
+      )
+    } finally {
+      setLoading(false)
+    }
+  }, [resendSecondsRemaining, verificationEmail])
+
+  const updateOTP = (digits: string[]) => {
+    setOtpDigits(digits)
+    setValue('otp', digits.join(''), { shouldValidate: true })
+  }
+
+  const handleOTPChange = (index: number, value: string) => {
+    const enteredDigits = value
+      .replace(/\D/g, '')
+      .slice(0, 6 - index)
+      .split('')
+    const nextDigits = [...otpDigits]
+
+    if (enteredDigits.length > 1) {
+      enteredDigits.forEach((digit, offset) => {
+        nextDigits[index + offset] = digit
+      })
+      updateOTP(nextDigits)
+      otpInputRefs.current[Math.min(index + enteredDigits.length, 5)]?.focus()
+      return
+    }
+
+    nextDigits[index] = enteredDigits[0] || ''
+    updateOTP(nextDigits)
+    if (enteredDigits[0] && index < 5) otpInputRefs.current[index + 1]?.focus()
+  }
+
+  const handleOTPKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus()
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Message className="mb-6 mt-0" error={error} />
+      {isInvalidOTPError ? (
+        <div
+          className="mb-6 flex items-center gap-2 border-y border-[#24231f] bg-[#24231f] px-4 py-3 text-sm text-white"
+          role="status"
+        >
+          <Info aria-hidden="true" className="size-4 shrink-0 text-white/70" />
+          <p className="font-medium tracking-[0.01em]">{error}</p>
+        </div>
+      ) : (
+        <Message className="mb-6 mt-0" error={error} success={success} />
+      )}
       <div className="flex flex-col gap-5">
-        <FormItem>
-          <Label className="text-sm text-[#5d594f]" htmlFor="email">
-            Email
-          </Label>
-          <Input
-            autoComplete="email"
-            className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
-            id="email"
-            {...register('email', { required: 'Email is required.' })}
-            type="email"
-          />
-          {errors.email && <FormError message={errors.email.message} />}
-        </FormItem>
-
-        <FormItem>
-          <Label className="text-sm text-[#5d594f]" htmlFor="password">
-            Password
-          </Label>
-          <Input
-            autoComplete="new-password"
-            className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
-            id="password"
-            {...register('password', { required: 'Password is required.' })}
-            type="password"
-          />
-          {errors.password && <FormError message={errors.password.message} />}
-        </FormItem>
-
-        <FormItem>
-          <Label className="text-sm text-[#5d594f]" htmlFor="passwordConfirm">
-            Confirm password
-          </Label>
-          <Input
-            autoComplete="new-password"
-            className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
-            id="passwordConfirm"
-            {...register('passwordConfirm', {
-              required: 'Please confirm your password.',
-              validate: (value) => value === password.current || 'The passwords do not match',
-            })}
-            type="password"
-          />
-          {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
-        </FormItem>
+        {step === 'account' ? (
+          <>
+            <FormItem>
+              <Label className="text-sm text-[#5d594f]" htmlFor="name">
+                Name
+              </Label>
+              <Input
+                autoComplete="name"
+                className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
+                id="name"
+                {...register('name', { required: 'Name is required.' })}
+              />
+              {errors.name && <FormError message={errors.name.message} />}
+            </FormItem>
+            <FormItem>
+              <Label className="text-sm text-[#5d594f]" htmlFor="email">
+                Email
+              </Label>
+              <Input
+                autoComplete="email"
+                className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
+                id="email"
+                {...register('email', { required: 'Email is required.' })}
+                type="email"
+              />
+              {errors.email && <FormError message={errors.email.message} />}
+            </FormItem>
+            <FormItem>
+              <Label className="text-sm text-[#5d594f]" htmlFor="password">
+                Password
+              </Label>
+              <Input
+                autoComplete="new-password"
+                className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
+                id="password"
+                {...register('password', { required: 'Password is required.' })}
+                type="password"
+              />
+              {errors.password && <FormError message={errors.password.message} />}
+            </FormItem>
+            <FormItem>
+              <Label className="text-sm text-[#5d594f]" htmlFor="passwordConfirm">
+                Confirm password
+              </Label>
+              <Input
+                autoComplete="new-password"
+                className="h-11 rounded-none border-[#24231f]/25 bg-transparent px-3 text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
+                id="passwordConfirm"
+                {...register('passwordConfirm', {
+                  required: 'Please confirm your password.',
+                  validate: (value) => value === password.current || 'The passwords do not match',
+                })}
+                type="password"
+              />
+              {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
+            </FormItem>
+          </>
+        ) : (
+          <FormItem>
+            <Label className="text-sm text-[#5d594f]" htmlFor="otp">
+              Verification code
+            </Label>
+            <p className="mb-2 text-sm text-[#6c675d]">
+              Enter the six-digit code sent to {verificationEmail}.
+            </p>
+            <input
+              type="hidden"
+              {...register('otp', {
+                required: 'Enter the verification code.',
+                pattern: { value: /^\d{6}$/, message: 'Enter the six-digit verification code.' },
+              })}
+            />
+            <div className="grid grid-cols-6 gap-2" id="otp">
+              {otpDigits.map((digit, index) => (
+                <Input
+                  aria-label={`Verification code digit ${index + 1}`}
+                  autoComplete={index === 0 ? 'one-time-code' : 'off'}
+                  className="h-12 rounded-none border-[#24231f]/25 bg-transparent p-0 text-center text-lg text-[#24231f] shadow-none focus-visible:border-[#24231f] focus-visible:ring-0"
+                  inputMode="numeric"
+                  key={index}
+                  maxLength={6 - index}
+                  onChange={(event) => handleOTPChange(index, event.target.value)}
+                  onKeyDown={(event) => handleOTPKeyDown(index, event)}
+                  ref={(element) => {
+                    otpInputRefs.current[index] = element
+                  }}
+                  type="text"
+                  value={digit}
+                />
+              ))}
+            </div>
+            {errors.otp && <FormError message={errors.otp.message} />}
+          </FormItem>
+        )}
       </div>
 
       <div className="mt-7">
@@ -128,14 +283,30 @@ export const CreateAccountForm: React.FC = () => {
           type="submit"
           variant="default"
         >
-          {loading ? 'Processing' : 'Create account'}
+          {loading ? 'Processing' : step === 'account' ? 'Create account' : 'Verify email'}
         </Button>
-        <p className="mt-5 text-sm text-[#6c675d]">
-          Already have an account?{' '}
-          <Link className="text-[#24231f] underline underline-offset-4" href={`/login${allParams}`}>
-            Log in
-          </Link>
-        </p>
+        {step === 'verification' ? (
+          <button
+            className="mt-5 text-sm text-[#24231f] underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={loading || resendSecondsRemaining > 0}
+            onClick={resendCode}
+            type="button"
+          >
+            {resendSecondsRemaining
+              ? `Resend verification code in ${resendSecondsRemaining}s`
+              : 'Resend verification code'}
+          </button>
+        ) : (
+          <p className="mt-5 text-sm text-[#6c675d]">
+            Already have an account?{' '}
+            <Link
+              className="text-[#24231f] underline underline-offset-4"
+              href={`/login${allParams}`}
+            >
+              Log in
+            </Link>
+          </p>
+        )}
       </div>
     </form>
   )
