@@ -2,7 +2,6 @@ import type { Order } from '@/payload-types'
 import type { Metadata } from 'next'
 
 import { Price } from '@/components/Price'
-import { Button } from '@/components/ui/button'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import Link from 'next/link'
@@ -15,8 +14,6 @@ import { getPayload } from 'payload'
 import { OrderStatus } from '@/components/OrderStatus'
 import { AddressItem } from '@/components/addresses/AddressItem'
 import { formatOrderReference } from '@/utilities/orderReference'
-
-export const dynamic = 'force-dynamic'
 
 type PageProps = {
   params: Promise<{ id: string }>

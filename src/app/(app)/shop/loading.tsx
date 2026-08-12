@@ -1,7 +1,6 @@
 import React from 'react'
-import { LottieLoader } from '@/components/LottieLoader'
+import { ProductGridSkeleton } from '@/components/NavigationSkeletons'
 
 export default function Loading() {
-  return <LottieLoader size="full" />
+  return <ProductGridSkeleton />
 }
-

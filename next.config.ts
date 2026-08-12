@@ -1,9 +1,15 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import { withPostHogConfig } from '@posthog/nextjs-config'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { redirects } from './redirects'
 
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+const isProductionDeployment = process.env.VERCEL_ENV
+  ? process.env.VERCEL_ENV === 'production'
+  : process.env.NODE_ENV === 'production'
+const uploadPostHogSourceMaps =
+  isProductionDeployment && Boolean(process.env.POSTHOG_API_KEY && process.env.POSTHOG_PROJECT_ID)
 
 const imageRemoteURLs = [NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL].filter(
   Boolean,
@@ -20,6 +26,9 @@ const imageRemotePatterns = imageRemoteURLs.map((item) => {
 })
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
+  partialPrefetching: true,
+
   experimental: {
     globalNotFound: true,
     proxyClientMaxBodySize: '110mb',
@@ -71,4 +80,12 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withPayload(nextConfig)
+export default withPostHogConfig(withPayload(nextConfig), {
+  host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || 'https://eu.posthog.com',
+  personalApiKey: process.env.POSTHOG_API_KEY || '',
+  projectId: process.env.POSTHOG_PROJECT_ID,
+  sourcemaps: {
+    deleteAfterUpload: true,
+    enabled: uploadPostHogSourceMaps,
+  },
+})

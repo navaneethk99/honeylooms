@@ -2,13 +2,15 @@ import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { connection } from 'next/server'
 import React, { Suspense } from 'react'
 import { ChevronLeftIcon } from 'lucide-react'
 import { getPayload } from 'payload'
-import { unstable_cache } from 'next/cache'
+import { cacheLife, cacheTag } from 'next/cache'
 
 import configPromise from '@payload-config'
 import { Grid } from '@/components/Grid'
+import { CollectionPageSkeleton, ProductGridSkeleton } from '@/components/NavigationSkeletons'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { Media } from '@/components/Media'
 import type { Collection, Media as MediaType } from '@/payload-types'
@@ -38,13 +40,13 @@ const getCollectionBySlug = async (slug: string) => {
   return result.docs?.[0] || null
 }
 
-const getCachedCollectionBySlug = unstable_cache(
-  async (slug: string) => getCollectionBySlug(slug),
-  ['collections'],
-  {
-    tags: ['collections'],
-  },
-)
+async function getCachedCollectionBySlug(slug: string) {
+  'use cache'
+  cacheLife('days')
+  cacheTag('collections')
+
+  return getCollectionBySlug(slug)
+}
 
 const queryCollectionBySlug = async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
@@ -84,36 +86,19 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   }
 }
 
-export default async function CollectionSlugPage({ params }: Args) {
+export default function CollectionSlugPage({ params }: Args) {
+  return (
+    <Suspense fallback={<CollectionPageSkeleton />}>
+      <CollectionContent params={params} />
+    </Suspense>
+  )
+}
+
+async function CollectionContent({ params }: Args) {
   const { slug } = await params
   const collection = (await queryCollectionBySlug({ slug })) as Collection | null
 
   if (!collection) return notFound()
-
-  const payload = await getPayload({ config: configPromise })
-
-  // Find products associated with this collection
-  const products = await payload.find({
-    collection: 'products',
-    depth: 1,
-    draft: false,
-    overrideAccess: false,
-    limit: 100,
-    where: {
-      and: [
-        {
-          _status: {
-            equals: 'published',
-          },
-        },
-        {
-          collections: {
-            equals: collection.id,
-          },
-        },
-      ],
-    },
-  })
 
   const banner = collection.banner as MediaType | null | undefined
   const spotifyPlaylistUrl = collection.spotifyPlaylistUrl?.trim()
@@ -121,7 +106,7 @@ export default async function CollectionSlugPage({ params }: Args) {
   const hasPlaylistLinks = Boolean(spotifyPlaylistUrl || appleMusicPlaylistUrl)
 
   return (
-    <div>
+    <div data-testid="collection-page-shell">
       {/* Banner / Hero Section */}
       <div className="relative aspect-[1983/793] w-full bg-neutral-900 overflow-hidden">
         {banner && (
@@ -163,37 +148,16 @@ export default async function CollectionSlugPage({ params }: Args) {
           <span>Back to collections</span>
         </Link>
 
-        {products.docs.length === 0 ? (
-          <div className="border border-dashed border-neutral-200 dark:border-neutral-800 rounded-lg p-16 text-center my-8">
-            <p className="text-neutral-500 dark:text-neutral-400 mb-4">
-              No products found in the "{collection.title}" collection.
-            </p>
-            <Link
-              href="/shop"
-              className="inline-flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-50 dark:hover:bg-neutral-100 dark:text-neutral-950 px-6 py-2.5 text-xs font-mono uppercase tracking-widest transition-colors duration-300"
-            >
-              Browse All Products
-            </Link>
-          </div>
-        ) : (
-          <div>
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-neutral-100 dark:border-neutral-900">
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 font-mono">
-                Showing {products.docs.length} {products.docs.length === 1 ? 'product' : 'products'}
-              </p>
-            </div>
-
-            <Grid className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.docs.map((product) => (
-                <ProductGridItem key={product.id} product={product} />
-              ))}
-            </Grid>
-          </div>
-        )}
+        <Suspense fallback={<ProductGridSkeleton />}>
+          <CollectionProducts collection={collection} />
+        </Suspense>
 
         {hasPlaylistLinks && (
           <div className="mt-14 border-t border-neutral-100 dark:border-neutral-900 pt-8">
-            <h1 className='text-center mb-5 text-xl font-medium'>Immerse yourself in the sound of {collection.title} with our carefully curated playlist :)</h1>
+            <h1 className="text-center mb-5 text-xl font-medium">
+              Immerse yourself in the sound of {collection.title} with our carefully curated
+              playlist :)
+            </h1>
 
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
               {spotifyPlaylistUrl && (
@@ -207,12 +171,7 @@ export default async function CollectionSlugPage({ params }: Args) {
                   <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.22em] text-white">
                     Listen on
                   </span>
-                  <img
-                    src="/Spotify_logo_with_text.svg.webp"
-                    alt=""
-                    width={110}
-                    height={26}
-                  />
+                  <img src="/Spotify_logo_with_text.svg.webp" alt="" width={110} height={26} />
                 </Link>
               )}
 
@@ -245,6 +204,64 @@ export default async function CollectionSlugPage({ params }: Args) {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+async function CollectionProducts({ collection }: { collection: Collection }) {
+  await connection()
+  const payload = await getPayload({ config: configPromise })
+  const products = await payload.find({
+    collection: 'products',
+    depth: 1,
+    draft: false,
+    overrideAccess: false,
+    limit: 100,
+    where: {
+      and: [
+        {
+          _status: {
+            equals: 'published',
+          },
+        },
+        {
+          collections: {
+            equals: collection.id,
+          },
+        },
+      ],
+    },
+  })
+
+  if (products.docs.length === 0) {
+    return (
+      <div className="my-8 rounded-lg border border-dashed border-neutral-200 p-16 text-center dark:border-neutral-800">
+        <p className="mb-4 text-neutral-500 dark:text-neutral-400">
+          No products found in the &quot;{collection.title}&quot; collection.
+        </p>
+        <Link
+          className="inline-flex items-center justify-center bg-neutral-900 px-6 py-2.5 font-mono text-xs tracking-widest text-white uppercase transition-colors duration-300 hover:bg-neutral-800 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-100"
+          href="/shop"
+        >
+          Browse All Products
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="mb-8 flex items-center justify-between border-b border-neutral-100 pb-4 dark:border-neutral-900">
+        <p className="font-mono text-sm text-neutral-500 dark:text-neutral-400">
+          Showing {products.docs.length} {products.docs.length === 1 ? 'product' : 'products'}
+        </p>
+      </div>
+
+      <Grid className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {products.docs.map((product) => (
+          <ProductGridItem key={product.id} product={product} />
+        ))}
+      </Grid>
     </div>
   )
 }

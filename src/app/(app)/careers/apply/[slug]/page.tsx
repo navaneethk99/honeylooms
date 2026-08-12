@@ -7,8 +7,6 @@ import { type ApplicationQuestion, CareerApplicationForm } from '@/components/Ca
 import { RichText } from '@/components/RichText'
 import { getJobSlug } from '@/utilities/getJobSlug'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'Apply',
 }

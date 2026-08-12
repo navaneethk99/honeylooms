@@ -1,9 +1,14 @@
 import clsx from 'clsx'
+import { cacheLife, cacheTag } from 'next/cache'
 import React, { Suspense } from 'react'
 
 import { CollectionItem, CollectionSelect } from './Collections.client'
 
 async function CollectionList() {
+  'use cache'
+  cacheLife('days')
+  cacheTag('collections')
+
   const { getPayload } = await import('payload')
   const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })

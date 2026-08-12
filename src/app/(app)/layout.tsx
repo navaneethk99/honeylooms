@@ -2,9 +2,8 @@ import type { ReactNode } from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/components/Footer'
-import { Header } from '@/components/Header'
+import { Header, HeaderFallback } from '@/components/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
-import { ensureStartsWith } from '@/utilities/ensureStartsWith'
 import { Providers } from '@/providers'
 import { defaultTheme } from '@/providers/Theme/shared'
 import { GeistSans } from 'geist/font/sans'
@@ -86,7 +85,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       className={[GeistSans.variable, GeistMono.variable, editorialFont.variable]
@@ -104,14 +103,22 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body>
         <Providers>
-          <SmoothScroll />
-          <AdminBar />
+          <React.Suspense fallback={null}>
+            <SmoothScroll />
+          </React.Suspense>
+          <React.Suspense fallback={null}>
+            <AdminBar />
+          </React.Suspense>
           <LivePreviewListener />
           <LottiePrefetcher />
 
-          <Header />
+          <React.Suspense fallback={<HeaderFallback />}>
+            <Header />
+          </React.Suspense>
           <main className="flex-1 bg-white text-black">{children}</main>
-          <Footer />
+          <React.Suspense fallback={null}>
+            <Footer />
+          </React.Suspense>
         </Providers>
         <Analytics />
       </body>

@@ -1,10 +1,14 @@
 import clsx from 'clsx'
+import { cacheLife, cacheTag } from 'next/cache'
 import React, { Suspense } from 'react'
 
-import { FilterList } from './filter'
 import { CategoryItem, CategorySelect } from './Categories.client'
 
 async function CategoryList() {
+  'use cache'
+  cacheLife('days')
+  cacheTag('categories')
+
   const { getPayload } = await import('payload')
   const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })

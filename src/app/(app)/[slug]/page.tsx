@@ -1,44 +1,18 @@
 import type { Metadata } from 'next'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
+import { StorefrontPageSkeleton } from '@/components/NavigationSkeletons'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import { homeStaticData } from '@/endpoints/seed/home-static'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 import type { Page } from '@/payload-types'
 import { notFound } from 'next/navigation'
 import { getCachedDocument } from '@/utilities/getDocument'
-
-// CMS pages inspect request-scoped draft mode, including for unknown slugs.
-export const dynamic = 'force-dynamic'
-
-export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const pages = await payload.find({
-    collection: 'pages',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
-  })
-
-  const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== 'home'
-    })
-    .map(({ slug }) => {
-      return { slug }
-    })
-
-  return params
-}
 
 type Args = {
   params: Promise<{
@@ -46,9 +20,16 @@ type Args = {
   }>
 }
 
-export default async function Page({ params }: Args) {
+export default function Page({ params }: Args) {
+  return (
+    <Suspense fallback={<StorefrontPageSkeleton />}>
+      <CMSPage params={params} />
+    </Suspense>
+  )
+}
+
+async function CMSPage({ params }: Args) {
   const { slug = 'home' } = await params
-  const url = '/' + slug
 
   let page = await queryPageBySlug({
     slug,
@@ -109,5 +90,5 @@ const queryPageBySlug = async ({ slug }: { slug: string }): Promise<Page | null>
     return (result.docs?.[0] as Page) || null
   }
 
-  return ((await getCachedDocument('pages', slug)()) as Page) || null
+  return ((await getCachedDocument('pages', slug)) as Page) || null
 }

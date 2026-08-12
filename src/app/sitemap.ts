@@ -1,12 +1,10 @@
 import type { MetadataRoute } from 'next'
 
 import configPromise from '@payload-config'
+import { cacheLife, cacheTag } from 'next/cache'
 import { getPayload } from 'payload'
 
 import { getServerSideURL } from '@/utilities/getURL'
-
-/* eslint-disable no-restricted-exports */
-export const revalidate = 3600
 
 const staticRoutes = [
   '',
@@ -23,6 +21,10 @@ const staticRoutes = [
 const normalizeURL = (baseUrl: string, path: string) => `${baseUrl}${path}`
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  'use cache'
+  cacheLife('hours')
+  cacheTag('pages', 'products', 'collections')
+
   const baseUrl = getServerSideURL()
   const payload = await getPayload({ config: configPromise })
 

@@ -1,5 +1,5 @@
 import configPromise from '@payload-config'
-import { unstable_cache } from 'next/cache'
+import { cacheLife } from 'next/cache'
 import { getPayload } from 'payload'
 import sharp from 'sharp'
 
@@ -7,25 +7,29 @@ import { bannerImagePresets } from '@/utilities/bannerImagePresets'
 
 const CACHE_CONTROL = 'public, max-age=31536000, s-maxage=31536000, immutable'
 
-const getCachedPreview = unstable_cache(
-  async (sourceUrl: string, _version: string, dimension: number, quality: number) => {
-    const source = await fetch(sourceUrl)
+async function getCachedPreview(
+  sourceUrl: string,
+  _version: string,
+  dimension: number,
+  quality: number,
+) {
+  'use cache'
+  cacheLife('max')
 
-    if (!source.ok) {
-      throw new Error(`Unable to fetch source image: ${source.status}`)
-    }
+  const source = await fetch(sourceUrl)
 
-    const sourceBuffer = Buffer.from(await source.arrayBuffer())
-    const preview = await sharp(sourceBuffer)
-      .resize({ fit: 'inside', height: dimension, width: dimension, withoutEnlargement: true })
-      .webp({ quality })
-      .toBuffer()
+  if (!source.ok) {
+    throw new Error(`Unable to fetch source image: ${source.status}`)
+  }
 
-    return preview.toString('base64')
-  },
-  ['homepage-banner-preview-v2'],
-  { revalidate: false },
-)
+  const sourceBuffer = Buffer.from(await source.arrayBuffer())
+  const preview = await sharp(sourceBuffer)
+    .resize({ fit: 'inside', height: dimension, width: dimension, withoutEnlargement: true })
+    .webp({ quality })
+    .toBuffer()
+
+  return preview.toString('base64')
+}
 
 type RouteContext = {
   params: Promise<{ id: string }>

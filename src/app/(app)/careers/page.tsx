@@ -1,13 +1,12 @@
 import { ChevronDown } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { connection } from 'next/server'
 import React from 'react'
 
 import { RichText } from '@/components/RichText'
 import { getJobSlug } from '@/utilities/getJobSlug'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-
-export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   description:
@@ -27,6 +26,7 @@ const employmentLabels: Record<string, string> = {
 }
 
 export default async function CareersPage() {
+  await connection()
   const { getPayload } = await import('payload')
   const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })
