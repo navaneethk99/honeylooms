@@ -26,6 +26,9 @@ const imageRemotePatterns = imageRemoteURLs.map((item) => {
 })
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
+  partialPrefetching: true,
+
   experimental: {
     globalNotFound: true,
     proxyClientMaxBodySize: '110mb',

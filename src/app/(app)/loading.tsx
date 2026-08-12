@@ -1,6 +1,6 @@
 import React from 'react'
-import { LottieLoader } from '@/components/LottieLoader'
+import { StorefrontPageSkeleton } from '@/components/NavigationSkeletons'
 
 export default function RootLoading() {
-  return <LottieLoader size="full" />
+  return <StorefrontPageSkeleton />
 }

@@ -3,6 +3,7 @@ import type { Footer as FooterType } from '@/payload-types'
 import { FooterMenu } from '@/components/Footer/menu'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { ArrowUpRight } from 'lucide-react'
+import { cacheLife } from 'next/cache'
 import { cookies } from 'next/headers'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -47,13 +48,22 @@ const SocialLinks = () => (
   </div>
 )
 
+async function getCurrentYear() {
+  'use cache'
+  cacheLife('days')
+
+  return new Date().getFullYear()
+}
+
 export async function Footer() {
-  const footer: FooterType = await getCachedGlobal('footer', 1)()
-  const cookieStore = await cookies()
+  const [footer, currentYear, cookieStore]: [
+    FooterType,
+    number,
+    Awaited<ReturnType<typeof cookies>>,
+  ] = await Promise.all([getCachedGlobal('footer', 1), getCurrentYear(), cookies()])
   const storedTheme = cookieStore.get('honeylooms-theme')?.value
   const footerTheme = isFooterTheme(storedTheme) ? storedTheme : 'navy'
   const menu = footer.navItems || []
-  const currentYear = new Date().getFullYear()
 
   return (
     <footer

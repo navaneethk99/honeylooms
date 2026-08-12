@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { connection } from 'next/server'
 import React from 'react'
 
 import { GalleryBentoGrid } from '@/components/GalleryBentoGrid'
@@ -6,8 +7,6 @@ import { GalleryUploadDialog } from '@/components/GalleryUploadDialog'
 import type { Product } from '@/payload-types'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-
-export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   description: 'A collection of Honeylooms pieces, worn and shared by our community.',
@@ -19,6 +18,7 @@ export const metadata: Metadata = {
 }
 
 export default async function GalleryPage() {
+  await connection()
   const { getPayload } = await import('payload')
   const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })

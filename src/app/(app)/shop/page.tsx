@@ -1,7 +1,9 @@
 import { Grid } from '@/components/Grid'
+import { ProductGridSkeleton } from '@/components/NavigationSkeletons'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { ShopProductReveal } from '@/components/ShopProductReveal'
-import React from 'react'
+import { connection } from 'next/server'
+import React, { Suspense } from 'react'
 
 export const metadata = {
   description: 'Search for products in the store.',
@@ -14,7 +16,16 @@ type Props = {
   searchParams: Promise<SearchParams>
 }
 
-export default async function ShopPage({ searchParams }: Props) {
+export default function ShopPage({ searchParams }: Props) {
+  return (
+    <Suspense fallback={<ProductGridSkeleton />}>
+      <ShopProducts searchParams={searchParams} />
+    </Suspense>
+  )
+}
+
+async function ShopProducts({ searchParams }: Props) {
+  await connection()
   const { q: searchValue, sort, category, collection } = await searchParams
   const { getPayload } = await import('payload')
   const configPromise = (await import('@payload-config')).default

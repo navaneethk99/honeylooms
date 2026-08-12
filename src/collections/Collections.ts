@@ -1,3 +1,4 @@
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { slugField } from 'payload'
 import type { CollectionConfig } from 'payload'
 
@@ -19,9 +20,8 @@ export const Collections: CollectionConfig = {
     afterChange: [
       ({ doc, req: { payload } }) => {
         try {
-          const { revalidateTag, revalidatePath } = require('next/cache')
           payload.logger.info(`Revalidating collections cache: ${doc.slug}`)
-          revalidateTag('collections')
+          revalidateTag('collections', 'max')
           revalidatePath('/collections')
           if (doc.slug) {
             revalidatePath(`/collections/${doc.slug}`)
@@ -35,9 +35,8 @@ export const Collections: CollectionConfig = {
     afterDelete: [
       ({ doc, req: { payload } }) => {
         try {
-          const { revalidateTag, revalidatePath } = require('next/cache')
           payload.logger.info(`Revalidating deleted collections cache: ${doc?.slug}`)
-          revalidateTag('collections')
+          revalidateTag('collections', 'max')
           revalidatePath('/collections')
           if (doc?.slug) {
             revalidatePath(`/collections/${doc.slug}`)

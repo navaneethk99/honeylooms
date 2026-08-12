@@ -1,8 +1,8 @@
 import type { Config } from 'src/payload-types'
 
 import configPromise from '@payload-config'
+import { cacheLife, cacheTag } from 'next/cache'
 import { getPayload } from 'payload'
-import { unstable_cache } from 'next/cache'
 
 type Global = keyof Config['globals']
 
@@ -17,10 +17,10 @@ export async function getGlobal<T extends Global>(slug: T, depth = 0) {
   return global
 }
 
-/**
- * Returns a unstable_cache function mapped with the cache tag for the slug
- */
-export const getCachedGlobal = <T extends Global>(slug: T, depth = 0) =>
-  unstable_cache(async () => getGlobal<T>(slug, depth), [slug], {
-    tags: [`global_${slug}`],
-  })
+export async function getCachedGlobal<T extends Global>(slug: T, depth = 0) {
+  'use cache'
+  cacheLife('days')
+  cacheTag(`global_${slug}`)
+
+  return getGlobal<T>(slug, depth)
+}

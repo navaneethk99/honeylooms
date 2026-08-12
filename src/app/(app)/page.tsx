@@ -3,14 +3,16 @@ import { ArrowUpRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import { cookies, draftMode } from 'next/headers'
 import Link from 'next/link'
+import { connection } from 'next/server'
 import { getPayload } from 'payload'
-import { cache } from 'react'
+import { cache, Suspense } from 'react'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
 import { HomepageMasthead, type MastheadVariant } from '@/components/HomepageMasthead'
 import { HomepageScrollControl } from '@/components/HomepageScrollControl'
 import { InstagramReels } from '@/components/InstagramReels'
 import { Media } from '@/components/Media'
+import { HomePageSkeleton } from '@/components/NavigationSkeletons'
 import { PromoPopup } from '@/components/PromoPopup'
 import type {
   Category,
@@ -46,7 +48,7 @@ const getHomepageData = async (): Promise<PageType | null> => {
     return (result.docs?.[0] as PageType) || null
   }
 
-  return ((await getCachedDocument('pages', 'home', 2)()) as PageType) || null
+  return ((await getCachedDocument('pages', 'home', 2)) as PageType) || null
 }
 
 const getProductMedia = (product?: Product | null): MediaType | null => {
@@ -76,7 +78,16 @@ const getRandomMastheadVariant = cache((): MastheadVariant => {
   return 'brown'
 })
 
-export default async function HomePage({ searchParams }: HomePageProps) {
+export default function HomePage({ searchParams }: HomePageProps) {
+  return (
+    <Suspense fallback={<HomePageSkeleton />}>
+      <HomePageContent searchParams={searchParams} />
+    </Suspense>
+  )
+}
+
+async function HomePageContent({ searchParams }: HomePageProps) {
+  await connection()
   const payload = await getPayload({ config: configPromise })
   const { theme } = await searchParams
   const cookieStore = await cookies()
@@ -113,7 +124,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         overrideAccess: false,
         sort: '-createdAt',
       }),
-      getCachedGlobal('instagram-reels', 0)().catch(() => null),
+      getCachedGlobal('instagram-reels', 0).catch(() => null),
     ])
 
   const products = productsResult.docs as Product[]

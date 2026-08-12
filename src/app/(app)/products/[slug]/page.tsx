@@ -1,6 +1,7 @@
 import type { Media, Product } from '@/payload-types'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
+import { ProductPageSkeleton } from '@/components/NavigationSkeletons'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { Gallery } from '@/components/product/Gallery'
 import { ProductDescription } from '@/components/product/ProductDescription'
@@ -9,11 +10,10 @@ import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import React, { Suspense } from 'react'
-import { Button } from '@/components/ui/button'
+import { connection } from 'next/server'
+import React, { cache, Suspense } from 'react'
 import { ChevronLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
-import { unstable_cache } from 'next/cache'
 
 type Args = {
   params: Promise<{
@@ -60,7 +60,15 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   }
 }
 
-export default async function ProductPage({ params }: Args) {
+export default function ProductPage({ params }: Args) {
+  return (
+    <Suspense fallback={<ProductPageSkeleton />}>
+      <ProductContent params={params} />
+    </Suspense>
+  )
+}
+
+async function ProductContent({ params }: Args) {
   const { slug } = await params
   const product = await queryProductBySlug({ slug })
 
@@ -118,9 +126,9 @@ export default async function ProductPage({ params }: Args) {
         }}
         type="application/ld+json"
       />
-      <div className="container max-w-7xl pt-10 pb-20">
-        <Link 
-          href="/shop" 
+      <div className="container max-w-7xl pt-10 pb-20" data-testid="product-page-shell">
+        <Link
+          href="/shop"
           className="group inline-flex items-center gap-2 text-[10px] uppercase tracking-widest text-neutral-500 hover:text-neutral-950 dark:hover:text-neutral-50 transition-colors duration-300 mb-8 font-mono"
         >
           <ChevronLeftIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
@@ -177,7 +185,8 @@ function RelatedProducts({ products }: { products: Product[] }) {
   )
 }
 
-const getProductBySlug = async (slug: string) => {
+const getProductBySlug = cache(async (slug: string) => {
+  await connection()
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
@@ -212,20 +221,13 @@ const getProductBySlug = async (slug: string) => {
   })
 
   return result.docs?.[0] || null
-}
-
-const getCachedProductBySlug = unstable_cache(
-  async (slug: string) => getProductBySlug(slug),
-  ['products'],
-  {
-    tags: ['products'],
-  }
-)
+})
 
 const queryProductBySlug = async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
 
   if (draft) {
+    await connection()
     const payload = await getPayload({ config: configPromise })
 
     const result = await payload.find({
@@ -257,5 +259,5 @@ const queryProductBySlug = async ({ slug }: { slug: string }) => {
     return result.docs?.[0] || null
   }
 
-  return getCachedProductBySlug(slug)
+  return getProductBySlug(slug)
 }

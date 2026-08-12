@@ -8,8 +8,6 @@ import { ChevronLeftIcon } from 'lucide-react'
 import { RefundForm } from '@/components/forms/RefundForm'
 import { formatOrderReference } from '@/utilities/orderReference'
 
-export const dynamic = 'force-dynamic'
-
 type PageProps = {
   searchParams: Promise<{ orderId?: string; email?: string; accessToken?: string }>
 }
