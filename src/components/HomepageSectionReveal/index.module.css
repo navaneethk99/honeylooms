@@ -1,0 +1,122 @@
+.root [data-reveal-heading],
+.root [data-reveal-action],
+.root [data-reveal-card] {
+  will-change: transform, opacity, filter, clip-path;
+}
+
+.root [data-reveal-card] {
+  --section-delay: 180ms;
+}
+
+.root [data-reveal-card]:nth-child(2) {
+  --section-delay: 300ms;
+}
+
+.root [data-reveal-card]:nth-child(3) {
+  --section-delay: 420ms;
+}
+
+.root [data-reveal-card]:nth-child(4) {
+  --section-delay: 540ms;
+}
+
+.root[data-reveal='pending'] [data-reveal-heading],
+.root[data-reveal='pending'] [data-reveal-action] {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+}
+
+.root[data-reveal='visible'] [data-reveal-heading] {
+  animation: section-copy-enter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.root[data-reveal='visible'] [data-reveal-action] {
+  animation: section-copy-enter 700ms 100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.root[data-motion='collections'][data-reveal='pending'] [data-reveal-card] {
+  opacity: 0;
+  clip-path: inset(100% 0 0 0);
+  transform: translate3d(0, 4rem, 0) scale(0.96);
+}
+
+.root[data-motion='collections'][data-reveal='visible'] [data-reveal-card] {
+  animation: collection-card-enter 950ms var(--section-delay) cubic-bezier(0.16, 1, 0.3, 1)
+    both;
+}
+
+.root[data-motion='reels'] [data-reveal-card] {
+  --reel-rotation: -2.5deg;
+}
+
+.root[data-motion='reels'] [data-reveal-card]:nth-child(even) {
+  --reel-rotation: 2.5deg;
+}
+
+.root[data-motion='reels'][data-reveal='pending'] [data-reveal-card] {
+  opacity: 0;
+  filter: blur(7px);
+  transform: translate3d(0, 4rem, 0) rotate(var(--reel-rotation)) scale(0.94);
+}
+
+.root[data-motion='reels'][data-reveal='visible'] [data-reveal-card] {
+  animation: reel-card-enter 800ms var(--section-delay) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes section-copy-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes collection-card-enter {
+  from {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    transform: translate3d(0, 4rem, 0) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes reel-card-enter {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translate3d(0, 4rem, 0) rotate(var(--reel-rotation)) scale(0.94);
+  }
+
+  72% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, -0.35rem, 0) rotate(0) scale(1.006);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) rotate(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-reveal] [data-reveal-heading],
+  .root[data-reveal] [data-reveal-action],
+  .root[data-reveal] [data-reveal-card] {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    clip-path: none;
+    transform: none;
+  }
+}
