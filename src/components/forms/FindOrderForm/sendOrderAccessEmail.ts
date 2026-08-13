@@ -49,7 +49,7 @@ export async function sendOrderAccessEmail({
 
     const emailBody = `
         <div style="padding: 32px 24px; background-color: #141414; text-align: center;">
-          <img src="${serverURL}/full_logo.png" alt="Honeylooms" width="240" style="display: block; width: 240px; max-width: 100%; height: auto; margin: 0 auto;" />
+          <img src="${serverURL}/full_logo.png?v=20260813" alt="Honeylooms" width="240" style="display: block; width: 240px; max-width: 100%; height: auto; margin: 0 auto;" />
         </div>
         <h1>View Your Order</h1>
         <p>Click the link below to view your order details:</p>
