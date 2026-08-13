@@ -11,6 +11,7 @@ import { GeistMono } from 'geist/font/mono'
 import { Fraunces } from 'next/font/google'
 import React from 'react'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { LottiePrefetcher } from '@/components/LottiePrefetcher'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import './globals.css'
@@ -121,6 +122,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </React.Suspense>
         </Providers>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
