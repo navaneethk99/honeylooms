@@ -23,7 +23,7 @@ export default async function CreateAccount() {
     <section className="container py-16 sm:py-24">
       <div className="mx-auto max-w-md">
         <RenderParams />
-        <h1 className="mb-10 font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">
+        <h1 className="mb-10 font-dream-orphanage text-4xl tracking-[-0.03em] text-[#24231f]">
           Create account
         </h1>
         <CreateAccountForm />

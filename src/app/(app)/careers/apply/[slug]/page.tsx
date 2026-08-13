@@ -61,7 +61,7 @@ export default async function CareerApplicationPage({ params }: Props) {
           Back to careers
         </Link>
 
-        <header className="mt-10 border-b border-neutral-300 pb-7 font-editorial">
+        <header className="mt-10 border-b border-neutral-300 pb-7 font-dream-orphanage">
           <p className="text-sm text-neutral-600">Apply for</p>
           <h1 className="mt-2 text-3xl tracking-tight md:text-4xl">{job.title}</h1>
           <RichText

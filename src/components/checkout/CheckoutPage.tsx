@@ -389,7 +389,7 @@ export const CheckoutPage: React.FC = () => {
     <div className="my-8 flex grow flex-col items-stretch justify-stretch gap-10 bg-white md:flex-row md:gap-6 lg:gap-8">
       {(isInitiatingPayment || isProcessingPayment) && <LottieLoader size="full" />}
       <div className="order-2 flex basis-full flex-col justify-stretch gap-8 md:order-1 lg:basis-2/3">
-        <h2 className="font-editorial text-4xl font-normal tracking-[-0.03em] text-[#24231f]">
+        <h2 className="font-dream-orphanage text-4xl font-normal tracking-[-0.03em] text-[#24231f]">
           Contact
         </h2>
         {!user && (

@@ -26,7 +26,9 @@ async function ShopFilterHeader() {
     <header
       className={`relative hidden px-4 pb-4 pt-5 text-white md:block ${shopThemeClasses[shopTheme]}`}
     >
-      <h2 className="font-editorial text-[1.7rem] leading-none tracking-[-0.035em]">Filters</h2>
+      <h2 className="font-dream-orphanage text-[1.7rem] leading-none tracking-[-0.035em]">
+        Filters
+      </h2>
     </header>
   )
 }
@@ -39,7 +41,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
           <Suspense
             fallback={
               <header className="relative hidden bg-[#24336f] px-4 pt-5 pb-4 text-white md:block">
-                <h2 className="font-editorial text-[1.7rem] leading-none tracking-[-0.035em]">
+                <h2 className="font-dream-orphanage text-[1.7rem] leading-none tracking-[-0.035em]">
                   Filters
                 </h2>
               </header>

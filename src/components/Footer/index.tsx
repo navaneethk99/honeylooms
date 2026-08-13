@@ -5,7 +5,7 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import { ArrowUpRight } from 'lucide-react'
 import { cacheLife } from 'next/cache'
 import { cookies } from 'next/headers'
-import Image from 'next/image'
+// import Image from 'next/image'
 import Link from 'next/link'
 
 const socialLinks = [
@@ -29,8 +29,8 @@ const footerThemeClasses: Record<FooterTheme, string> = {
 
 const SocialLinks = () => (
   <div className="min-w-0">
-    <h3 className="mb-4 text-[9px] uppercase tracking-[0.22em] text-white/60">Social</h3>
-    <ul className="space-y-2">
+    <h3 className="mb-3 text-[9px] uppercase tracking-[0.22em] text-white/60">Social</h3>
+    <ul className="space-y-1.5">
       {socialLinks.map((link) => (
         <li key={link.href}>
           <Link
@@ -70,24 +70,23 @@ export async function Footer() {
       className={`site-footer border-t-4 border-white text-white ${footerThemeClasses[footerTheme]}`}
     >
       <div className="mx-auto max-w-[1500px] px-5 md:px-10 lg:px-14">
-        <div className="grid gap-12 py-12 md:grid-cols-12 md:py-16">
+        <div className="grid gap-8 py-8 md:grid-cols-12 md:py-10">
           <div className="md:col-span-4">
-            <Link className="inline-block" href="/" aria-label="Honeylooms home">
+            {/* <Link className="inline-block" href="/" aria-label="Honeylooms home">
               <Image
                 alt="Honeylooms"
-                className="h-auto w-44 md:w-52"
+                className="h-auto w-36 md:w-44"
                 height={393}
                 src="/hlms.svg"
                 width={1800}
               />
-            </Link>
-            <p className="mt-8 max-w-xs font-editorial text-3xl leading-[0.95] tracking-[-0.025em] md:text-4xl">
-              Rooted in craft.
-              <br />
-              Ready for now.
-            </p>
+            </Link> */}
+            <div className="mt-5 max-w-xs font-dream-orphanage text-2xl leading-[0.95] tracking-[-0.025em] md:text-3xl">
+              <p>Honeylooms Says</p>
+              <p className="pl-5 font-chopin text-[50px]">Wear the buzz</p>
+            </div>
             <Link
-              className="group mt-7 inline-flex items-center gap-2 border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] transition-colors hover:border-white"
+              className="group mt-5 inline-flex items-center gap-2 border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] transition-colors hover:border-white"
               href="/shop?sort=-createdAt"
             >
               Shop new arrivals
@@ -102,7 +101,7 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-white/15 py-5 text-[9px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 border-t border-white/15 py-4 text-[9px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <p>&copy; {currentYear} Honeylooms</p>
           {/*<p>India / Worldwide</p>*/}
         </div>

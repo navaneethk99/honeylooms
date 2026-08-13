@@ -12,6 +12,7 @@
   align-items: center;
   margin-inline: auto;
   padding-inline: clamp(1.25rem, 3vw, 3.5rem);
+  font-family: var(--font-dream-orphanage-face), sans-serif;
 }
 
 .header-brand {
@@ -39,7 +40,6 @@
   border-radius: 0;
   padding: 0.35rem 0;
   color: #5d594f;
-  font-family: var(--font-fraunces);
   font-size: 15px;
   font-weight: 450;
   letter-spacing: 0.02em;
@@ -86,7 +86,6 @@
   border-radius: 0;
   padding: 0 1rem;
   color: #24231f;
-  font-family: var(--font-fraunces);
   font-size: 14px;
   font-weight: 450;
   letter-spacing: 0.02em;
@@ -125,6 +124,7 @@
 .mobile-menu-panel {
   background: #fff;
   color: #24231f;
+  font-family: var(--font-dream-orphanage-face), sans-serif;
 }
 
 @media (max-width: 767px) {

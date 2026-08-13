@@ -71,6 +71,14 @@ type HomePageProps = {
 const isMastheadVariant = (value?: string): value is MastheadVariant =>
   value === 'red' || value === 'blue' || value === 'pink' || value === 'navy' || value === 'brown'
 
+const collectionBorderClasses: Record<MastheadVariant, string> = {
+  blue: 'border-[#5b8ee9]',
+  brown: 'border-[#ed9478]',
+  navy: 'border-[#6376bd]',
+  pink: 'border-[#ffb2d6]',
+  red: 'border-[#f76b5e]',
+}
+
 const getRandomMastheadVariant = cache((): MastheadVariant => {
   const randomVariant = Math.random()
 
@@ -168,7 +176,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                 {/*<p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-[#6d685f]">
                   Fresh from the studio
                 </p>*/}
-                <h2 className="font-editorial text-4xl leading-none tracking-[-0.03em] md:text-6xl">
+                <h2 className="font-dream-orphanage text-sm leading-none md:text-6xl">
                   Latest arrivals
                 </h2>
               </div>
@@ -212,7 +220,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
           className="pointer-events-none absolute inset-0 bg-[#D9A322]/45 md:bg-[linear-gradient(90deg,rgba(217,163,34,0.96)_0%,rgba(217,163,34,0.88)_43%,rgba(217,163,34,0.38)_66%,rgba(217,163,34,0.08)_100%)]"
         />
         <div className="relative z-10 mx-auto flex h-full max-w-[1500px] items-center px-5 py-10 md:px-10 md:py-14 lg:px-14">
-          <p className="max-w-[100rem] font-editorial text-[1.75rem] leading-[1.03] tracking-[-0.025em] sm:text-4xl md:w-[70%] md:text-5xl xl:text-6xl">
+          <p className="max-w-[100rem] font-dream-orphanage text-[1.75rem] leading-[1.03] tracking-[-0.025em] sm:text-4xl md:w-[70%] md:text-5xl xl:text-6xl">
             Tradition doesn’t have to stay traditional. India’s rich heritage of handcrafted
             textiles deserves to evolve with every generation.
           </p>
@@ -239,7 +247,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                 {/*<p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-[#6d685f]">
                   Find your silhouette
                 </p>*/}
-                <h2 className="font-editorial text-4xl leading-none tracking-[-0.03em] md:text-6xl">
+                <h2 className="font-dream-orphanage text-4xl leading-none tracking-[-0.03em] md:text-6xl">
                   Shop by category
                 </h2>
               </div>
@@ -282,7 +290,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 text-white md:p-6">
-                    <h3 className="font-editorial text-2xl leading-none md:text-3xl lg:text-4xl">
+                    <h3 className="font-dream-orphanage text-2xl leading-none md:text-3xl lg:text-4xl">
                       {category.title}
                     </h3>
                     <ArrowUpRight className="size-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -305,7 +313,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
           }}
         />
         <div className="relative z-10 mx-auto grid max-w-[1500px] gap-8 md:grid-cols-12 md:items-end">
-          <p className="font-editorial text-3xl leading-[1.05] tracking-[-0.02em] sm:text-4xl md:col-span-8 md:text-5xl lg:text-6xl">
+          <p className="font-dream-orphanage text-3xl leading-[1.05] tracking-[-0.02em] sm:text-4xl md:col-span-8 md:text-5xl lg:text-6xl">
             Rooted in Indian craft. Made with a modern ease. Pieces that feel considered, never
             overdone.
           </p>
@@ -320,7 +328,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                 {/*<p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-[#6d685f]">
                   Stories in cloth
                 </p>*/}
-                <h2 className="font-editorial text-4xl leading-none tracking-[-0.03em] md:text-6xl">
+                <h2 className="font-dream-orphanage text-4xl leading-none tracking-[-0.03em] md:text-6xl">
                   Shop collections
                 </h2>
               </div>
@@ -345,7 +353,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                 const poster = collection.poster as MediaType | null
                 return (
                   <Link
-                    className="group relative aspect-[2/3] w-full max-w-[20rem] self-start overflow-hidden bg-[#ded8cc]"
+                    className={`group relative aspect-[2/3] w-full max-w-[20rem] self-start overflow-hidden border-8 bg-[#ded8cc] ${collectionBorderClasses[mastheadVariant]}`}
                     data-reveal-card
                     href={`/collections/${collection.slug}`}
                     key={collection.id}
@@ -363,18 +371,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                         }
                       />
                     ) : null}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/5" />
-                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-white md:p-7">
-                      <div>
-                        <span className="text-[9px] uppercase tracking-[0.2em] text-white/65">
-                          Collection {String(index + 1).padStart(2, '0')}
-                        </span>
-                        <h3 className="mt-2 font-editorial text-3xl leading-none md:text-4xl">
-                          {collection.title}
-                        </h3>
-                      </div>
-                      <ArrowUpRight className="size-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </div>
+                    <div className="absolute inset-0 " />
                   </Link>
                 )
               })}
@@ -396,7 +393,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
             key={number}
           >
             <span className="text-[9px] tracking-[0.18em] text-[#777166]">{number}</span>
-            <h2 className="mt-6 font-editorial text-2xl">{title}</h2>
+            <h2 className="mt-6 font-dream-orphanage text-2xl">{title}</h2>
             <p className="mt-2 text-xs leading-relaxed text-[#6d685f]">{copy}</p>
           </div>
         ))}

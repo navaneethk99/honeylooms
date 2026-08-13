@@ -139,7 +139,7 @@ export default async function Order({ params, searchParams }: PageProps) {
 
       <header className="border-b border-[#24231f]/20 pb-8">
         <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-[#8a682f]">Order details</p>
-        <h1 className="font-editorial text-[clamp(2rem,8vw,3.75rem)] leading-none font-normal tracking-[-0.04em] whitespace-nowrap text-[#24231f]">
+        <h1 className="font-dream-orphanage text-[clamp(2rem,8vw,3.75rem)] leading-none font-normal tracking-[-0.04em] whitespace-nowrap text-[#24231f]">
           {orderReference}
         </h1>
       </header>
@@ -190,7 +190,7 @@ export default async function Order({ params, searchParams }: PageProps) {
       <div className="grid gap-12 py-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
         {order.items ? (
           <section>
-            <h2 className="mb-5 font-editorial text-3xl font-normal text-[#24231f]">Items</h2>
+            <h2 className="mb-5 font-dream-orphanage text-3xl font-normal text-[#24231f]">Items</h2>
             <ul className="border-t border-[#24231f]/20">
               {order.items.map((item, index) => {
                 if (typeof item.product === 'string') {
@@ -228,7 +228,7 @@ export default async function Order({ params, searchParams }: PageProps) {
 
         {order.shippingAddress ? (
           <aside>
-            <h2 className="mb-5 font-editorial text-3xl font-normal text-[#24231f]">
+            <h2 className="mb-5 font-dream-orphanage text-3xl font-normal text-[#24231f]">
               Shipping address
             </h2>
             <div className="border-y border-[#24231f]/20 py-5">

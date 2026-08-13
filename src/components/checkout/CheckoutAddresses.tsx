@@ -134,7 +134,7 @@ export const AddressSelectionModal: React.FC<AddressSelectionModalProps> = ({
         data-lenis-prevent
       >
         <DialogHeader className="border-b border-[#24231f]/20 px-6 py-6 pr-14">
-          <DialogTitle className="font-editorial text-3xl font-normal tracking-[-0.03em]">
+          <DialogTitle className="font-dream-orphanage text-3xl font-normal tracking-[-0.03em]">
             Select an address
           </DialogTitle>
         </DialogHeader>

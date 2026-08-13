@@ -9,6 +9,7 @@ import { defaultTheme } from '@/providers/Theme/shared'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { Fraunces } from 'next/font/google'
+import localFont from 'next/font/local'
 import React from 'react'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -22,6 +23,34 @@ const editorialFont = Fraunces({
   subsets: ['latin'],
   variable: '--font-fraunces',
   weight: 'variable',
+})
+
+const chopinFont = localFont({
+  display: 'swap',
+  src: '../../../public/fonts/ChopinScript.ttf',
+  variable: '--font-chopin-script',
+  weight: '400',
+})
+
+const coolveticaFont = localFont({
+  display: 'swap',
+  src: '../../../public/fonts/Coolvetica Rg.otf',
+  variable: '--font-coolvetica-face',
+  weight: '400',
+})
+
+const dreamOrphanageFont = localFont({
+  display: 'swap',
+  src: '../../../public/fonts/dream orphanage rg.otf',
+  variable: '--font-dream-orphanage-face',
+  weight: '400',
+})
+
+const rosehotFont = localFont({
+  display: 'swap',
+  src: '../../../public/fonts/Rosehot.ttf',
+  variable: '--font-rosehot-face',
+  weight: '400',
 })
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
@@ -89,7 +118,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      className={[GeistSans.variable, GeistMono.variable, editorialFont.variable]
+      className={[
+        GeistSans.variable,
+        GeistMono.variable,
+        editorialFont.variable,
+        chopinFont.variable,
+        coolveticaFont.variable,
+        dreamOrphanageFont.variable,
+        rosehotFont.variable,
+      ]
         .filter(Boolean)
         .join(' ')}
       data-scroll-behavior="smooth"

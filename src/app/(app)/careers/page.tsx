@@ -53,18 +53,18 @@ export default async function CareersPage() {
     <div className="bg-white text-neutral-900">
       <section className="container py-14 md:py-20">
         <div className="max-w-2xl">
-          <h1 className="text-3xl font-editorial tracking-tight md:text-4xl">Careers</h1>
-          <p className="mt-4 text-sm leading-6 text-neutral-600 md:text-base font-editorial">
+          <h1 className="text-3xl font-dream-orphanage tracking-tight md:text-4xl">Careers</h1>
+          <p className="mt-4 text-sm leading-6 text-neutral-600 md:text-base font-dream-orphanage">
             Join Honeylooms and help us create thoughtful, contemporary Indian clothing.
           </p>
         </div>
       </section>
 
       <section className="container pb-16 md:pb-24">
-        <h2 className="mb-5 text-xl font-editorial">Open positions</h2>
+        <h2 className="mb-5 text-xl font-dream-orphanage">Open positions</h2>
 
         {openPositions.length ? (
-          <div className="divide-y divide-neutral-300 border-y border-neutral-300 font-editorial">
+          <div className="divide-y divide-neutral-300 border-y border-neutral-300 font-dream-orphanage">
             {openPositions.map((job) => {
               const roleDetails = [
                 job.department,
