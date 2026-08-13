@@ -2,6 +2,8 @@
 
 import { Button } from '@/components/ui/button'
 import { SVG3D } from '@/lib/SVG3D'
+import { cn } from '@/utilities/cn'
+import { ShoppingCartIcon, type ShoppingCartIconHandle } from '@animateicons/react/lucide'
 import React from 'react'
 
 const cartBagSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 640" width="512" height="640">
@@ -47,15 +49,21 @@ export function OpenCartButton({
   className?: string
   quantity?: number
 }) {
+  const cartIconRef = React.useRef<ShoppingCartIconHandle>(null)
+
   return (
     <Button
       aria-label={quantity ? `Open cart with ${quantity} items` : 'Open cart'}
       variant="nav"
       size="clear"
-      className="navLink relative items-end hover:cursor-pointer"
+      className={cn('navLink relative items-end hover:cursor-pointer', className)}
       {...rest}
+      onBlur={() => cartIconRef.current?.stopAnimation()}
+      onFocus={() => cartIconRef.current?.startAnimation()}
+      onMouseEnter={() => cartIconRef.current?.startAnimation()}
+      onMouseLeave={() => cartIconRef.current?.stopAnimation()}
     >
-      <CartBagModel height={48} width={42} className="pointer-events-none shrink-0" />
+      <ShoppingCartIcon ref={cartIconRef} className="pointer-events-none shrink-0" size={18} />
 
       {quantity ? <span aria-hidden="true">{quantity}</span> : null}
     </Button>

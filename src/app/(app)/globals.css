@@ -53,8 +53,12 @@ html.lenis.lenis-stopped {
 @source inline("bg-success/30");
 @source inline("border-warning");
 @source inline("bg-warning/30");
+@source inline("font-chopin");
+@source inline("font-coolvetica");
+@source inline("font-dream-orphanage");
+@source inline("font-rosehot");
 
-@theme {
+@theme inline {
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;

@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Search, X, Sparkles, ArrowRight } from 'lucide-react'
+import { SearchIcon, type SearchIconHandle } from '@animateicons/react/lucide'
+import { X, Sparkles, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -23,6 +24,7 @@ export function SearchModal() {
   const [products, setProducts] = useState<SearchableProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const searchIconRef = useRef<SearchIconHandle>(null)
   const pathname = usePathname()
 
   // Close the search sidebar when path changes
@@ -115,8 +117,17 @@ export function SearchModal() {
           size="clear"
           className="navLink relative items-end hover:cursor-pointer flex mb-[2px]"
           aria-label="Search Catalog"
+          onBlur={() => searchIconRef.current?.stopAnimation()}
+          onFocus={() => searchIconRef.current?.startAnimation()}
+          onMouseEnter={() => searchIconRef.current?.startAnimation()}
+          onMouseLeave={() => searchIconRef.current?.stopAnimation()}
         >
-          <Search className="h-[18px] w-[18px] text-neutral-700 dark:text-neutral-300" />
+          <SearchIcon
+            ref={searchIconRef}
+            className="pointer-events-none text-neutral-700 dark:text-neutral-300"
+            color="currentColor"
+            size={18}
+          />
         </Button>
       </SheetTrigger>
 
@@ -135,7 +146,11 @@ export function SearchModal() {
 
         {/* Premium Search Input */}
         <div className="relative my-6">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <SearchIcon
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+            color="currentColor"
+            size={20}
+          />
           <input
             ref={inputRef}
             type="text"
@@ -166,7 +181,7 @@ export function SearchModal() {
             /* Initial Empty State */
             <div className="flex flex-col items-center justify-center py-20 text-center px-4 text-muted-foreground">
               <div className="h-12 w-12 flex items-center justify-center text-muted-foreground mb-4">
-                <Search className="h-6 w-6" />
+                <SearchIcon color="currentColor" size={24} />
               </div>
               <p className="text-sm font-medium text-foreground">Start typing to search...</p>
               <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
@@ -177,7 +192,7 @@ export function SearchModal() {
             /* Empty State */
             <div className="flex flex-col items-center justify-center py-20 text-center px-4">
               <div className="h-12 w-12 rounded-none bg-[#D9A322]/10 flex items-center justify-center text-muted-foreground mb-4">
-                <Search className="h-6 w-6" />
+                <SearchIcon color="currentColor" size={24} />
               </div>
               <p className="text-base font-semibold text-foreground">No results found</p>
               <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">

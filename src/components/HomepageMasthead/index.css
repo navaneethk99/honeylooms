@@ -122,15 +122,17 @@ body:has(.homepage-masthead--brown) .site-footer {
 
   .homepage-masthead__model {
     bottom: -1px;
-    width: 76vw;
+    width: auto;
     height: auto;
-    max-width: none;
-    object-fit: initial;
+    max-width: 76vw;
+    max-height: calc(100dvh - 99px);
+    object-fit: contain;
   }
 
   .homepage-masthead--blue .homepage-masthead__model {
-    width: 64vw;
+    width: auto;
     height: auto;
+    max-width: 64vw;
   }
 }
 

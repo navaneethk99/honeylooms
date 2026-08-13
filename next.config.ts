@@ -32,7 +32,6 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
     proxyClientMaxBodySize: '110mb',
-    turbopackFileSystemCacheForBuild: true,
   },
 
   serverExternalPackages: ['pdfkit'],

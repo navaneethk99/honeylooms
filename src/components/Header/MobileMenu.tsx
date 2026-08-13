@@ -13,9 +13,9 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useAuth } from '@/providers/Auth'
-import { MenuIcon } from 'lucide-react'
+import { MenuIcon, type MenuIconHandle } from '@animateicons/react/lucide'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface Props {
   menu: Header['navItems']
@@ -25,6 +25,7 @@ export function MobileMenu({ menu }: Props) {
   const { user } = useAuth()
 
   const [isOpen, setIsOpen] = useState(false)
+  const menuIconRef = useRef<MenuIconHandle>(null)
 
   const closeMobileMenu = () => setIsOpen(false)
 
@@ -40,8 +41,15 @@ export function MobileMenu({ menu }: Props) {
 
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
-      <SheetTrigger aria-label="Open navigation menu" className="header-menu-trigger">
-        <MenuIcon className="h-4" />
+      <SheetTrigger
+        aria-label="Open navigation menu"
+        className="header-menu-trigger"
+        onBlur={() => menuIconRef.current?.stopAnimation()}
+        onFocus={() => menuIconRef.current?.startAnimation()}
+        onMouseEnter={() => menuIconRef.current?.startAnimation()}
+        onMouseLeave={() => menuIconRef.current?.stopAnimation()}
+      >
+        <MenuIcon ref={menuIconRef} className="pointer-events-none" size={16} />
       </SheetTrigger>
 
       <SheetContent side="left" className="mobile-menu-panel px-6">
