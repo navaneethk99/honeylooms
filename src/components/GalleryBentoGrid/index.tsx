@@ -71,6 +71,7 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
   )
   const [columnCount, setColumnCount] = useState(1)
   const [fullImagesLoaded, setFullImagesLoaded] = useState<Record<number, boolean>>({})
+  const [isLookFlipped, setIsLookFlipped] = useState(false)
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
 
   useEffect(() => {
@@ -123,7 +124,10 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
                 <button
                   aria-label={`View ${item.alt}`}
                   className="relative block w-full cursor-pointer overflow-hidden bg-[#ddd5c5] text-left"
-                  onClick={() => setSelectedItem(item)}
+                  onClick={() => {
+                    setIsLookFlipped(false)
+                    setSelectedItem(item)
+                  }}
                   style={{ aspectRatio: ratio }}
                   type="button"
                 >
@@ -225,6 +229,14 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
           >
             <div
               className="relative size-full"
+              onAnimationEnd={(event) => {
+                if (
+                  event.currentTarget === event.target &&
+                  event.animationName === 'gallery-look-flip'
+                ) {
+                  setIsLookFlipped(true)
+                }
+              }}
               style={{
                 animation:
                   'gallery-look-flip 700ms cubic-bezier(0.22, 0.61, 0.36, 1) 420ms forwards',
@@ -232,7 +244,7 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
               }}
             >
               <div
-                className="absolute inset-0 overflow-hidden bg-background"
+                className={`absolute inset-0 overflow-hidden bg-background ${isLookFlipped ? 'pointer-events-none' : ''}`}
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <button
@@ -262,7 +274,7 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
                 )}
               </div>
               <div
-                className="absolute inset-0 flex flex-col overflow-hidden bg-background p-5 text-foreground sm:p-6"
+                className={`absolute inset-0 flex flex-col overflow-hidden bg-background p-5 text-foreground sm:p-6 ${isLookFlipped ? '' : 'pointer-events-none'}`}
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 <p className="font-mono text-[10px] tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
