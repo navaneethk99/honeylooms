@@ -5,6 +5,8 @@ import type { AnimationEvent } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
+import { HOMEPAGE_INTRO_COMPLETE_EVENT } from '@/lib/homepageIntro'
+
 import './index.css'
 
 export type MastheadVariant = 'blue' | 'brown' | 'navy' | 'pink' | 'red'
@@ -54,12 +56,46 @@ export function HomepageMasthead({ variant }: { variant: MastheadVariant }) {
   const [isReversing, setIsReversing] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isThemeSwitcherVisible, setIsThemeSwitcherVisible] = useState(true)
+  const [modelEntrance, setModelEntrance] = useState<'entering' | 'ready' | 'waiting'>('waiting')
+
+  useEffect(() => {
+    const root = document.documentElement
+
+    if (modelEntrance === 'ready') {
+      root.classList.remove('homepage-entry-locked')
+      return
+    }
+
+    root.classList.add('homepage-entry-locked')
+    return () => root.classList.remove('homepage-entry-locked')
+  }, [modelEntrance])
 
   useEffect(() => {
     sessionStorage.setItem('honeylooms-theme', variant)
     document.cookie = `honeylooms-theme=${variant}; Path=/; SameSite=Lax`
     router.refresh()
   }, [router, variant])
+
+  useEffect(() => {
+    let revealTimer: ReturnType<typeof setTimeout> | undefined
+
+    const revealModel = () => {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      if (prefersReducedMotion) {
+        setModelEntrance('ready')
+        return
+      }
+
+      revealTimer = setTimeout(() => setModelEntrance('entering'), 180)
+    }
+
+    window.addEventListener(HOMEPAGE_INTRO_COMPLETE_EVENT, revealModel, { once: true })
+    return () => {
+      window.removeEventListener(HOMEPAGE_INTRO_COMPLETE_EVENT, revealModel)
+      if (revealTimer) clearTimeout(revealTimer)
+    }
+  }, [])
 
   useEffect(() => {
     if (!isDevelopment) return
@@ -83,6 +119,11 @@ export function HomepageMasthead({ variant }: { variant: MastheadVariant }) {
       const blockScroll = () => {
         event.preventDefault()
         event.stopPropagation()
+      }
+
+      if (modelEntrance !== 'ready') {
+        blockScroll()
+        return
       }
 
       if (isAnimatingRef.current) {
@@ -109,7 +150,7 @@ export function HomepageMasthead({ variant }: { variant: MastheadVariant }) {
 
     masthead.addEventListener('wheel', handleWheel, { passive: false })
     return () => masthead.removeEventListener('wheel', handleWheel)
-  }, [isReversing, isWordmarkForeground])
+  }, [isReversing, isWordmarkForeground, modelEntrance])
 
   const completeAnimation = (event: AnimationEvent<HTMLHeadingElement>) => {
     if (event.animationName === 'masthead-wordmark-advance') {
@@ -126,10 +167,14 @@ export function HomepageMasthead({ variant }: { variant: MastheadVariant }) {
     setIsAnimating(false)
   }
 
+  const completeModelEntrance = (event: AnimationEvent<HTMLImageElement>) => {
+    if (event.animationName === 'masthead-model-enter') setModelEntrance('ready')
+  }
+
   return (
     <section
       ref={mastheadRef}
-      data-lenis-prevent-wheel={isAnimating ? '' : undefined}
+      data-lenis-prevent-wheel={isAnimating || modelEntrance !== 'ready' ? '' : undefined}
       className={`homepage-masthead homepage-masthead--${variant} ${
         isWordmarkForeground ? 'homepage-masthead--wordmark-foreground' : ''
       } ${isReversing ? 'homepage-masthead--wordmark-reversing' : ''}`}
@@ -153,8 +198,9 @@ export function HomepageMasthead({ variant }: { variant: MastheadVariant }) {
       ) : null}
       <Image
         alt={model.alt}
-        className="homepage-masthead__model"
+        className={`homepage-masthead__model homepage-masthead__model--${modelEntrance}`}
         height={model.height}
+        onAnimationEnd={completeModelEntrance}
         priority
         sizes="(max-width: 767px) 68vw, 44vw"
         src={model.src}

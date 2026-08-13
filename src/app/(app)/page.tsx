@@ -8,9 +8,12 @@ import { getPayload } from 'payload'
 import { cache, Suspense } from 'react'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
+import { HomepageProductReveal } from '@/components/HomepageProductReveal'
 import { HomepageMasthead, type MastheadVariant } from '@/components/HomepageMasthead'
+import { HomepageCategoryReveal } from '@/components/HomepageCategoryReveal'
 import { HomepageIntro, HomepageIntroFadeOut } from '@/components/HomepageIntro'
 import { HomepageScrollControl } from '@/components/HomepageScrollControl'
+import { HomepageSectionReveal } from '@/components/HomepageSectionReveal'
 import { InstagramReels } from '@/components/InstagramReels'
 import { Media } from '@/components/Media'
 import { PromoPopup } from '@/components/PromoPopup'
@@ -78,17 +81,8 @@ const getRandomMastheadVariant = cache((): MastheadVariant => {
   return 'brown'
 })
 
-export default function HomePage({ searchParams }: HomePageProps) {
-  return (
-    <Suspense fallback={<HomepageIntro />}>
-      <HomePageContent searchParams={searchParams} />
-    </Suspense>
-  )
-}
-
-async function HomePageContent({ searchParams }: HomePageProps) {
+export default async function HomePage({ searchParams }: HomePageProps) {
   await connection()
-  const payload = await getPayload({ config: configPromise })
   const { theme } = await searchParams
   const cookieStore = await cookies()
   const storedTheme = cookieStore.get('honeylooms-theme')?.value
@@ -98,6 +92,16 @@ async function HomePageContent({ searchParams }: HomePageProps) {
       : isMastheadVariant(storedTheme)
         ? storedTheme
         : getRandomMastheadVariant()
+
+  return (
+    <Suspense fallback={<HomepageIntro variant={mastheadVariant} />}>
+      <HomePageContent mastheadVariant={mastheadVariant} />
+    </Suspense>
+  )
+}
+
+async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadVariant }) {
+  const payload = await getPayload({ config: configPromise })
 
   const [productsResult, categoriesResult, collectionsResult, instagramReelsGlobal] =
     await Promise.all([
@@ -152,7 +156,7 @@ async function HomePageContent({ searchParams }: HomePageProps) {
 
   return (
     <article className="home-page overflow-hidden bg-white text-[#24231f]">
-      <HomepageIntroFadeOut />
+      <HomepageIntroFadeOut variant={mastheadVariant} />
       <HomepageScrollControl />
       <HomepageMasthead variant={mastheadVariant} />
 
@@ -177,11 +181,11 @@ async function HomePageContent({ searchParams }: HomePageProps) {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 md:gap-x-5 lg:grid-cols-4 lg:gap-y-14">
+            <HomepageProductReveal>
               {latestProducts.map((product) => (
                 <HomepageProductCard key={product.id} product={product} />
               ))}
-            </div>
+            </HomepageProductReveal>
 
             <Link
               className="mt-10 inline-flex items-center gap-2 border-b border-[#24231f]/40 pb-1 text-[10px] uppercase tracking-[0.18em] sm:hidden"
@@ -229,9 +233,9 @@ async function HomePageContent({ searchParams }: HomePageProps) {
                     : 'bg-[linear-gradient(135deg,#ed9478_0%,#c65b40_52%,#9f442f_100%)] text-white'
           }`}
         >
-          <div className="mx-auto max-w-[1500px]">
+          <HomepageCategoryReveal>
             <div className="mb-9 md:mb-12 md:flex md:items-end md:justify-between">
-              <div>
+              <div data-category-heading>
                 {/*<p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-[#6d685f]">
                   Find your silhouette
                 </p>*/}
@@ -239,7 +243,10 @@ async function HomePageContent({ searchParams }: HomePageProps) {
                   Shop by category
                 </h2>
               </div>
-              <p className="mt-5 max-w-sm text-sm leading-relaxed text-white md:mt-0">
+              <p
+                className="mt-5 max-w-sm text-sm leading-relaxed text-white md:mt-0"
+                data-category-description
+              >
                 Everyday forms, expressive details, and silhouettes designed for repeat wear.
               </p>
             </div>
@@ -262,6 +269,7 @@ async function HomePageContent({ searchParams }: HomePageProps) {
                   className={`group relative aspect-[2/3] w-full max-w-[20rem] overflow-hidden border-4 border-white bg-[#c9c2b6] ${
                     index % 2 === 1 ? 'lg:mt-12' : ''
                   }`}
+                  data-category-card
                   href={`/shop?category=${category.id}`}
                   key={category.id}
                 >
@@ -282,7 +290,7 @@ async function HomePageContent({ searchParams }: HomePageProps) {
                 </Link>
               ))}
             </div>
-          </div>
+          </HomepageCategoryReveal>
         </section>
       ) : null}
 
@@ -306,9 +314,9 @@ async function HomePageContent({ searchParams }: HomePageProps) {
 
       {collections.length > 0 ? (
         <section className="px-5 py-16 md:px-10 md:py-24 lg:px-14">
-          <div className="mx-auto max-w-[1500px]">
+          <HomepageSectionReveal motion="collections">
             <div className="mb-9 flex items-end justify-between gap-5 md:mb-12">
-              <div>
+              <div data-reveal-heading>
                 {/*<p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-[#6d685f]">
                   Stories in cloth
                 </p>*/}
@@ -318,6 +326,7 @@ async function HomePageContent({ searchParams }: HomePageProps) {
               </div>
               <Link
                 className="group hidden items-center gap-2 border-b border-[#24231f]/40 pb-1 text-[10px] uppercase tracking-[0.18em] hover:border-[#24231f] sm:inline-flex"
+                data-reveal-action
                 href="/collections"
               >
                 View all
@@ -337,6 +346,7 @@ async function HomePageContent({ searchParams }: HomePageProps) {
                 return (
                   <Link
                     className="group relative aspect-[2/3] w-full max-w-[20rem] self-start overflow-hidden bg-[#ded8cc]"
+                    data-reveal-card
                     href={`/collections/${collection.slug}`}
                     key={collection.id}
                   >
@@ -369,7 +379,7 @@ async function HomePageContent({ searchParams }: HomePageProps) {
                 )
               })}
             </div>
-          </div>
+          </HomepageSectionReveal>
         </section>
       ) : null}
 

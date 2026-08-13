@@ -1,6 +1,7 @@
 import { ArrowUpRight, Instagram } from 'lucide-react'
 
 import type { MastheadVariant } from '@/components/HomepageMasthead'
+import { HomepageSectionReveal } from '@/components/HomepageSectionReveal'
 
 type InstagramReelsProps = {
   urls: string[]
@@ -26,9 +27,9 @@ export const InstagramReels = ({ urls, variant }: InstagramReelsProps) => {
                 : 'bg-[linear-gradient(135deg,#ed9478_0%,#c65b40_52%,#9f442f_100%)]'
       }`}
     >
-      <div className="mx-auto max-w-[1500px]">
+      <HomepageSectionReveal motion="reels">
         <div className="mb-9 flex items-end justify-between gap-5 md:mb-12">
-          <div>
+          <div data-reveal-heading>
             <p className="mb-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-white/65">
               <Instagram className="size-3.5" />
               @thehoneylooms
@@ -39,6 +40,7 @@ export const InstagramReels = ({ urls, variant }: InstagramReelsProps) => {
           </div>
           <a
             className="group hidden items-center gap-2 border-b border-white/40 pb-1 text-[10px] uppercase tracking-[0.18em] transition-colors hover:border-white sm:inline-flex"
+            data-reveal-action
             href="https://www.instagram.com/thehoneylooms/"
             rel="noreferrer"
             target="_blank"
@@ -53,6 +55,7 @@ export const InstagramReels = ({ urls, variant }: InstagramReelsProps) => {
             <a
               aria-label={`Watch Honeylooms reel ${index + 1} on Instagram`}
               className="group relative aspect-[2/3] min-w-[78vw] snap-center overflow-hidden bg-[#c9c2b6] sm:min-w-[45vw] md:min-w-0"
+              data-reveal-card
               href={reel}
               key={`${reel}-${index}`}
               rel="noreferrer"
@@ -81,7 +84,7 @@ export const InstagramReels = ({ urls, variant }: InstagramReelsProps) => {
           Follow along
           <ArrowUpRight className="size-3.5" />
         </a>
-      </div>
+      </HomepageSectionReveal>
     </section>
   )
 }

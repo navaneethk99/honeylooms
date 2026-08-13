@@ -14,11 +14,7 @@ export function ShopProductReveal({ children }: Props) {
   useEffect(() => {
     const item = itemRef.current
 
-    if (
-      !item ||
-      !window.matchMedia('(max-width: 47.999rem)').matches ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
+    if (!item || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return
     }
 
