@@ -17,7 +17,7 @@ const DeleteAddressButton: React.FC<{ addressID: DefaultDocumentIDType }> = ({ a
 
     setIsDeleting(true)
     try {
-      const res = await fetch(`/api/addresses/${addressID}`, {
+      const res = await fetch(`/api/account-addresses/${addressID}`, {
         method: 'DELETE',
       })
 
@@ -27,7 +27,7 @@ const DeleteAddressButton: React.FC<{ addressID: DefaultDocumentIDType }> = ({ a
 
       toast.success('Address deleted successfully.')
       window.location.reload()
-    } catch (error) {
+    } catch (_error) {
       toast.error('Could not delete address. Please try again.')
       setIsDeleting(false)
     }

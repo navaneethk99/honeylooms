@@ -15,6 +15,9 @@ export const Providers: React.FC<{
   return (
     <ThemeProvider>
       <EcommerceProvider
+        // Storefront address requests use an owner-scoped API. Payload Admin
+        // continues to use the regular `addresses` collection with admin access.
+        addressesSlug={'account-addresses' as 'addresses'}
         enableVariants={true}
         api={{
           cartsFetchQuery: {

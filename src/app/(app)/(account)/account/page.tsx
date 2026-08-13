@@ -10,8 +10,20 @@ import { Order } from '@/payload-types'
 import { OrderItem } from '@/components/OrderItem'
 import { getPayload } from 'payload'
 import { redirect } from 'next/navigation'
+import { connection } from 'next/server'
+import { Suspense } from 'react'
 
-export default async function AccountPage() {
+export default function AccountPage() {
+  return (
+    <Suspense fallback={<AccountPageSkeleton />}>
+      <AccountPageContent />
+    </Suspense>
+  )
+}
+
+async function AccountPageContent() {
+  await connection()
+
   const headers = await getHeaders()
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers })
@@ -80,6 +92,30 @@ export default async function AccountPage() {
             ))}
           </ul>
         )}
+      </section>
+    </div>
+  )
+}
+
+function AccountPageSkeleton() {
+  return (
+    <div className="flex w-full animate-pulse flex-col gap-12" aria-busy="true">
+      <section className="border-b border-[#24231f]/20 pb-10">
+        <h1 className="mb-8 font-dream-orphanage text-4xl tracking-[-0.03em] text-[#24231f]">
+          Account
+        </h1>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="h-16 bg-[#24231f]/10" />
+          <div className="h-16 bg-[#24231f]/10" />
+        </div>
+        <div className="mt-7 h-11 w-40 bg-[#24231f]/15" />
+      </section>
+
+      <section>
+        <div className="mb-5 border-b border-[#24231f]/20 pb-4">
+          <h2 className="font-dream-orphanage text-2xl text-[#24231f]">Recent orders</h2>
+        </div>
+        <div className="h-16 bg-[#24231f]/10" />
       </section>
     </div>
   )
