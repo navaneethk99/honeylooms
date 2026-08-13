@@ -34,6 +34,7 @@ import { FeaturedOutfits } from '@/globals/FeaturedOutfits'
 import { InstagramReels } from '@/globals/InstagramReels'
 import { PromoBanner } from '@/globals/PromoBanner'
 import { getDatabaseURL } from '@/utilities/getDatabaseURL'
+import { createEmailTransport } from '@/utilities/createEmailTransport'
 import { plugins } from './plugins'
 
 const filename = fileURLToPath(import.meta.url)
@@ -128,19 +129,21 @@ export default buildConfig({
   ...(process.env.SMTP_HOST
     ? (() => {
         const port = Number(process.env.SMTP_PORT) || 587
+        const transportOptions = {
+          host: process.env.SMTP_HOST,
+          port,
+          secure: port === 465,
+          auth: {
+            user: process.env.SMTP_USER || '',
+            pass: process.env.SMTP_PASS || '',
+          },
+        }
+
         return {
           email: nodemailerAdapter({
             defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'contact@honeylooms.in',
             defaultFromName: process.env.SMTP_FROM_NAME || 'Honeylooms',
-            transportOptions: {
-              host: process.env.SMTP_HOST,
-              port,
-              secure: port === 465,
-              auth: {
-                user: process.env.SMTP_USER || '',
-                pass: process.env.SMTP_PASS || '',
-              },
-            },
+            transport: createEmailTransport(transportOptions),
           }),
         }
       })()

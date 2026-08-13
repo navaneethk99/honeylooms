@@ -71,7 +71,7 @@ export async function Footer() {
     >
       <div className="mx-auto max-w-[1500px] px-5 md:px-10 lg:px-14">
         <div className="grid gap-8 py-8 md:grid-cols-12 md:py-10">
-          <div className="md:col-span-4">
+          <div className="md:col-span-4 flex items-center">
             {/* <Link className="inline-block" href="/" aria-label="Honeylooms home">
               <Image
                 alt="Honeylooms"
@@ -85,13 +85,13 @@ export async function Footer() {
               <p>Honeylooms Says</p>
               <p className="pl-5 font-chopin text-[50px]">Wear the buzz</p>
             </div>
-            <Link
+            {/*<Link
               className="group mt-5 inline-flex items-center gap-2 border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] transition-colors hover:border-white"
               href="/shop?sort=-createdAt"
             >
               Shop new arrivals
               <ArrowUpRight className="size-3 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </Link>
+            </Link>*/}
           </div>
 
           <div className="md:col-span-7 md:col-start-6 md:pt-1">
@@ -101,8 +101,8 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-white/15 py-4 text-[9px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {currentYear} Honeylooms</p>
+        <div className="flex flex-col gap-2 border-t border-white/15 py-4 text-[9px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center justify-center">
+          <p>&copy; {currentYear} All Rights Reserved</p>
           {/*<p>India / Worldwide</p>*/}
         </div>
       </div>

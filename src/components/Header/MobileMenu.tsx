@@ -105,14 +105,18 @@ export function MobileMenu({ menu }: Props) {
               <h2 className="mb-4 text-[10px] uppercase tracking-[0.2em] text-[#6d685f]">
                 My account
               </h2>
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-                <Button asChild className="w-full sm:flex-1" variant="outline">
+              <div className="mt-4 flex flex-col gap-2">
+                <Button asChild className="w-full" variant="outline">
+                  <Link href="/find-order" onClick={closeMobileMenu}>
+                    Track order
+                  </Link>
+                </Button>
+                <Button asChild className="w-full" variant="outline">
                   <Link href="/login" onClick={closeMobileMenu}>
                     Log in
                   </Link>
                 </Button>
-                <span className="text-center text-sm text-muted-foreground sm:text-base">or</span>
-                <Button asChild className="w-full sm:flex-1">
+                <Button asChild className="w-full">
                   <Link href="/create-account" onClick={closeMobileMenu}>
                     Create an account
                   </Link>

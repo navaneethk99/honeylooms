@@ -14,7 +14,6 @@ const columnTitles = ['Information', 'Explore', 'Collections']
 export function FooterMenu({ children, menu }: Props) {
   const items = menu ?? []
   const chunks = []
-  const hasCareersLink = items.some((item) => item.link?.url === '/careers')
 
   for (let index = 0; index < items.length; index += 4) {
     chunks.push(items.slice(index, index + 4))
@@ -32,11 +31,20 @@ export function FooterMenu({ children, menu }: Props) {
           <ul className="space-y-1.5">
             {chunk.map((item) => (
               <li key={item.id}>
-                <CMSLink
-                  appearance="link"
-                  {...item.link}
-                  className="h-auto justify-start p-0 text-left text-xs font-normal text-white/65 no-underline transition-colors hover:text-white hover:no-underline"
-                />
+                {item.link?.url === '/collections' ? (
+                  <Link
+                    className="text-xs font-normal text-white/65 transition-colors hover:text-white"
+                    href="/find-order"
+                  >
+                    Track order
+                  </Link>
+                ) : (
+                  <CMSLink
+                    appearance="link"
+                    {...item.link}
+                    className="h-auto justify-start p-0 text-left text-xs font-normal text-white/65 no-underline transition-colors hover:text-white hover:no-underline"
+                  />
+                )}
               </li>
             ))}
             {/*{chunkIndex === 0 && !hasCareersLink && (
