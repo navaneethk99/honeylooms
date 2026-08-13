@@ -313,7 +313,7 @@ const sendVerificationEmail = async ({
           <div class="wrapper">
             <div class="container">
               <div class="header">
-                <img src="${serverURL}/logo.svg" alt="Honeylooms" style="display:block;height:auto;max-width:240px;margin:0 auto;" />
+                <img src="${serverURL}/full_logo.png" alt="Honeylooms" width="240" style="display:block;width:240px;max-width:100%;height:auto;margin:0 auto;" />
               </div>
               <div class="content">
                 <h1>Verify your email address</h1>
@@ -431,7 +431,7 @@ const queueWelcomeEmail = ({
               <div class="wrapper">
                 <div class="container">
                   <div class="header">
-                    <img src="${serverURL}/logo.svg" alt="Honeylooms" style="display:block;height:auto;max-width:240px;margin:0 auto;" />
+                    <img src="${serverURL}/full_logo.png" alt="Honeylooms" width="240" style="display:block;width:240px;max-width:100%;height:auto;margin:0 auto;" />
                   </div>
                   <div class="content">
                     <h1>Welcome to Honeylooms, ${escapeHTML(name)}.</h1>

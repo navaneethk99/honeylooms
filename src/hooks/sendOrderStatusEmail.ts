@@ -344,7 +344,7 @@ export const sendOrderStatusEmail: CollectionAfterChangeHook = async ({
         <div class="container">
           <div class="header">
             <div class="logo-container">
-              <img src="${serverURL}/logo.svg" alt="Honeylooms" style="max-width: 240px; height: auto; display: block; margin: 0 auto;" />
+              <img src="${serverURL}/full_logo.png" alt="Honeylooms" width="240" style="width: 240px; max-width: 100%; height: auto; display: block; margin: 0 auto;" />
             </div>
           </div>
           <div class="content">
