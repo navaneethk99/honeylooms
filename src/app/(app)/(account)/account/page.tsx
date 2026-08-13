@@ -49,13 +49,15 @@ export default async function AccountPage() {
   return (
     <div className="flex w-full flex-col gap-12">
       <section className="border-b border-[#24231f]/20 pb-10">
-        <h1 className="mb-8 font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">Account</h1>
+        <h1 className="mb-8 font-dream-orphanage text-4xl tracking-[-0.03em] text-[#24231f]">
+          Account
+        </h1>
         <AccountForm />
       </section>
 
       <section>
         <div className="mb-5 flex items-center justify-between border-b border-[#24231f]/20 pb-4">
-          <h2 className="font-editorial text-2xl text-[#24231f]">Recent orders</h2>
+          <h2 className="font-dream-orphanage text-2xl text-[#24231f]">Recent orders</h2>
           <Button
             asChild
             variant="link"

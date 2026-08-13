@@ -123,7 +123,7 @@ export function CareerApplicationForm({ jobId, questions, turnstileSiteKey }: Pr
     return (
       <div className="border-y border-neutral-300 py-14 text-center">
         <CheckCircle2 className="mx-auto mb-4 size-9 text-[#9b7012]" />
-        <h2 className="font-editorial text-2xl">Application received.</h2>
+        <h2 className="font-dream-orphanage text-2xl">Application received.</h2>
         <p className="mt-3 text-sm text-neutral-600">
           Our team will review your response and contact you via email or mobile very soon!
         </p>

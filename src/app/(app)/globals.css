@@ -62,7 +62,10 @@ html.lenis.lenis-stopped {
   --breakpoint-2xl: 86rem;
   --font-mono: var(--font-geist-sans);
   --font-sans: var(--font-geist-sans);
-  --font-editorial: var(--font-fraunces);
+  --font-chopin: var(--font-chopin-script), cursive;
+  --font-coolvetica: var(--font-coolvetica-face), sans-serif;
+  --font-dream-orphanage: var(--font-dream-orphanage-face), sans-serif;
+  --font-rosehot: var(--font-rosehot-face), cursive;
 }
 
 @layer utilities {
@@ -275,13 +278,6 @@ html[data-theme='light'] {
 
 .home-hero-media {
   animation: home-hero-fade 900ms ease-out both;
-}
-
-.font-editorial {
-  font-variation-settings:
-    'opsz' 96,
-    'SOFT' 35,
-    'WONK' 1;
 }
 
 @keyframes home-hero-fade {

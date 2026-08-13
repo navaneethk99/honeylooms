@@ -120,7 +120,10 @@ export function SearchModal() {
         </Button>
       </SheetTrigger>
 
-      <SheetContent className="flex flex-col p-6">
+      <SheetContent
+        className="flex h-dvh max-h-dvh flex-col overflow-hidden p-6"
+        data-lenis-prevent
+      >
         <SheetHeader className="pb-4 border-b border-border">
           <SheetTitle className="text-2xl font-bold tracking-tight text-foreground">
             Search Catalog
@@ -153,7 +156,7 @@ export function SearchModal() {
         </div>
 
         {/* Dynamic Area */}
-        <div className="flex-1 overflow-y-auto min-h-0 pr-1 -mr-3 scrollbar-thin">
+        <div className="-mr-3 min-h-0 flex-1 touch-pan-y overscroll-contain overflow-y-auto pr-1 scrollbar-thin">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-foreground" />

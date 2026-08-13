@@ -39,7 +39,7 @@ export default async function Orders() {
 
   return (
     <div className="w-full">
-      <h1 className="mb-8 border-b border-[#24231f]/20 pb-4 font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">
+      <h1 className="mb-8 border-b border-[#24231f]/20 pb-4 font-dream-orphanage text-4xl tracking-[-0.03em] text-[#24231f]">
         Orders
       </h1>
 

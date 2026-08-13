@@ -22,7 +22,9 @@ export default async function AddressesPage() {
   return (
     <div className="w-full">
       <div className="mb-8 flex items-center justify-between border-b border-[#24231f]/20 pb-4">
-        <h1 className="font-editorial text-4xl tracking-[-0.03em] text-[#24231f]">Addresses</h1>
+        <h1 className="font-dream-orphanage text-4xl tracking-[-0.03em] text-[#24231f]">
+          Addresses
+        </h1>
         <CreateAddressModal />
       </div>
 

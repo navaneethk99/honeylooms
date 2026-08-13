@@ -34,7 +34,7 @@ export const InstagramReels = ({ urls, variant }: InstagramReelsProps) => {
               <Instagram className="size-3.5" />
               @thehoneylooms
             </p>
-            <h2 className="font-editorial text-4xl leading-none tracking-[-0.03em] md:text-6xl">
+            <h2 className="font-dream-orphanage text-4xl leading-none tracking-[-0.03em] md:text-6xl">
               From our Instagram
             </h2>
           </div>

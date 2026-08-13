@@ -23,13 +23,13 @@ export function FooterMenu({ children, menu }: Props) {
   if (chunks.length === 0) chunks.push([])
 
   return (
-    <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-7 gap-y-9 sm:grid-cols-4">
+    <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-7 gap-y-6 sm:grid-cols-4">
       {chunks.map((chunk, chunkIndex) => (
         <div className="min-w-0" key={chunkIndex}>
-          <h3 className="mb-4 text-[9px] uppercase tracking-[0.22em] text-white/60">
+          <h3 className="mb-3 text-[9px] uppercase tracking-[0.22em] text-white/60">
             {columnTitles[chunkIndex] || `More ${chunkIndex + 1}`}
           </h3>
-          <ul className="space-y-2">
+          <ul className="space-y-1.5">
             {chunk.map((item) => (
               <li key={item.id}>
                 <CMSLink

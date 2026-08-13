@@ -64,7 +64,9 @@ export const CreateAddressModal: React.FC<Props> = ({
         data-lenis-prevent
       >
         <DialogHeader>
-          <DialogTitle className="font-editorial text-3xl font-normal">{modalTitle}</DialogTitle>
+          <DialogTitle className="font-dream-orphanage text-3xl font-normal">
+            {modalTitle}
+          </DialogTitle>
           <DialogDescription>This address will be connected to your account.</DialogDescription>
         </DialogHeader>
 
