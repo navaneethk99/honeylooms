@@ -7,7 +7,7 @@ import { redirects } from './redirects'
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 const isProductionDeployment = process.env.VERCEL_ENV
   ? process.env.VERCEL_ENV === 'production'
-  : process.env.NODE_ENV === 'production'
+  : process.env.CI === 'true' && process.env.NODE_ENV === 'production'
 const uploadPostHogSourceMaps =
   isProductionDeployment && Boolean(process.env.POSTHOG_API_KEY && process.env.POSTHOG_PROJECT_ID)
 
@@ -32,6 +32,7 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
     proxyClientMaxBodySize: '110mb',
+    turbopackFileSystemCacheForBuild: true,
   },
 
   serverExternalPackages: ['pdfkit'],
