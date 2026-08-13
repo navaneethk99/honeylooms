@@ -34,10 +34,10 @@ export default async function CollectionsPage() {
   return (
     <div className="container py-16">
       <div className="mb-16 max-w-2xl">
-        <h1 className="mb-4 font-sans text-4xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-5xl">
+        <h1 className="font-dream-orphanage mb-4 text-4xl font-semibold text-neutral-900 dark:text-neutral-50 md:text-5xl">
           Curated Collections
         </h1>
-        <p className="text-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
+        <p className="font-dream-orphanage text-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
           Explore our handpicked selections of premium products, designed to bring style, quality,
           and functionality to your everyday life.
         </p>
@@ -85,7 +85,7 @@ async function CollectionCards({ borderClass }: { borderClass: string }) {
             key={collection.id}
           >
             <div
-              className={`relative aspect-[2/3] overflow-hidden border-8 bg-neutral-100 dark:bg-neutral-900 ${borderClass}`}
+              className={`relative aspect-[2/3] shadow-[0_0_10px_rgba(0,0,0,0.2)] overflow-hidden bg-neutral-100 dark:bg-neutral-900 ${borderClass}`}
             >
               {poster ? (
                 <Media

@@ -118,22 +118,22 @@ async function CollectionContent({ params }: Args) {
             size="100vw"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
+        <div className="absolute inset-0" />
 
         <div className="absolute inset-0 flex flex-col justify-end container pb-12">
           <div className="max-w-3xl">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-neutral-300 uppercase mb-3">
+            {/*<div className="flex items-center gap-2 text-xs font-mono tracking-widest text-neutral-300 uppercase mb-3">
               <Link href="/collections" className="hover:text-white transition-colors duration-300">
                 Collections
               </Link>
               <span>/</span>
               <span className="text-white font-medium">{collection.title}</span>
-            </div>
+            </div>*/}
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white font-sans">
+            {/*<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white font-sans">
               {collection.title}
-            </h1>
+            </h1>*/}
           </div>
         </div>
       </div>

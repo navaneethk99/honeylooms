@@ -4,6 +4,7 @@ import React from 'react'
 
 import { GalleryBentoGrid } from '@/components/GalleryBentoGrid'
 import { GalleryUploadDialog } from '@/components/GalleryUploadDialog'
+import { GalleryUploadShortcut } from '@/components/GalleryUploadShortcut'
 import type { Product } from '@/payload-types'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
@@ -78,15 +79,17 @@ export default async function GalleryPage() {
 
   return (
     <div className="bg-[#D9A322] text-foreground">
+      <GalleryUploadShortcut />
+
       <section className="container placeholder-yellow-100 py-15 md:py-15">
         <div className="max-w-2xl">
           {/*<p className="mb-4 font-mono text-xs tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
             Honeylooms in the wild
           </p>*/}
-          <h1 className="text-4xl font-semibold tracking-tight text-neutral-50 dark:text-neutral-50 md:text-5xl">
+          <div className="text-4xl font-dream-orphanage font-semibold tracking-[0.035em] md:text-6xl text-white">
             Honeylooms in the wild!
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-neutral-100 dark:text-neutral-400">
+          </div>
+          <p className="mt-5 text-xl font-dream-orphanage text-white">
             A living collage of the people, places, and little moments that make Honeylooms yours.
           </p>
         </div>
@@ -107,13 +110,13 @@ export default async function GalleryPage() {
         )}
       </section>
 
-      <section className="border-t border-neutral-100 bg-neutral-50 dark:border-neutral-900 dark:bg-neutral-950">
+      <section
+        className="scroll-mt-6 border-t border-neutral-100 bg-neutral-50 dark:border-neutral-900 dark:bg-neutral-950"
+        id="gallery-upload"
+      >
         <div className="container flex flex-col items-start justify-between gap-7 py-14 md:flex-row md:items-center md:py-[4.5rem]">
           <div>
-            <p className="font-mono text-xs tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
-              Your turn
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-4xl">
+            <h2 className="mt-3 text-3xl font-dream-orphanage font-semibold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-4xl">
               Add your piece to the story.
             </h2>
           </div>
