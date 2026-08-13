@@ -1,0 +1,38 @@
+.intro {
+  opacity: 1;
+  transition: opacity 800ms ease;
+}
+
+.introExiting {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.wordmark {
+  animation: breathe 2.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.97);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    transition-duration: 1ms;
+  }
+
+  .wordmark {
+    animation: none;
+    opacity: 1;
+  }
+}

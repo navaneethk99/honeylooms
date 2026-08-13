@@ -9,10 +9,10 @@ import { cache, Suspense } from 'react'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
 import { HomepageMasthead, type MastheadVariant } from '@/components/HomepageMasthead'
+import { HomepageIntro, HomepageIntroFadeOut } from '@/components/HomepageIntro'
 import { HomepageScrollControl } from '@/components/HomepageScrollControl'
 import { InstagramReels } from '@/components/InstagramReels'
 import { Media } from '@/components/Media'
-import { HomePageSkeleton } from '@/components/NavigationSkeletons'
 import { PromoPopup } from '@/components/PromoPopup'
 import type {
   Category,
@@ -80,7 +80,7 @@ const getRandomMastheadVariant = cache((): MastheadVariant => {
 
 export default function HomePage({ searchParams }: HomePageProps) {
   return (
-    <Suspense fallback={<HomePageSkeleton />}>
+    <Suspense fallback={<HomepageIntro />}>
       <HomePageContent searchParams={searchParams} />
     </Suspense>
   )
@@ -152,6 +152,7 @@ async function HomePageContent({ searchParams }: HomePageProps) {
 
   return (
     <article className="home-page overflow-hidden bg-white text-[#24231f]">
+      <HomepageIntroFadeOut />
       <HomepageScrollControl />
       <HomepageMasthead variant={mastheadVariant} />
 

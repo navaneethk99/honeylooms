@@ -20,27 +20,6 @@ export function ProductGridSkeleton({ count = 6 }: { count?: number }) {
   )
 }
 
-export function HomePageSkeleton() {
-  return (
-    <article aria-busy="true" data-testid="home-page-shell" className="bg-white text-[#24231f]">
-      <section className="flex min-h-[68svh] items-end bg-[#24336f] px-5 py-14 text-white md:px-10 lg:px-14">
-        <div className="mx-auto w-full max-w-[1500px]">
-          <p className="font-editorial text-6xl leading-none tracking-[-0.05em] md:text-8xl">
-            Honeylooms
-          </p>
-          <div className="mt-7 h-3 w-52 animate-pulse bg-white/35" />
-        </div>
-      </section>
-      <section className="px-5 py-16 md:px-10 md:py-24 lg:px-14">
-        <div className="mx-auto max-w-[1500px]">
-          <div className="mb-10 h-10 w-64 animate-pulse bg-neutral-100 md:h-14 md:w-96" />
-          <ProductGridSkeleton count={8} />
-        </div>
-      </section>
-    </article>
-  )
-}
-
 export function CollectionsGridSkeleton() {
   return (
     <div
