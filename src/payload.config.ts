@@ -138,12 +138,27 @@ export default buildConfig({
             pass: process.env.SMTP_PASS || '',
           },
         }
+        const imapPort = Number(process.env.IMAP_PORT) || 993
+        const sentMailboxOptions = {
+          host:
+            process.env.IMAP_HOST ||
+            (process.env.SMTP_HOST === 'smtpout.secureserver.net'
+              ? 'imap.secureserver.net'
+              : 'imap.titan.email'),
+          port: imapPort,
+          secure: imapPort === 993,
+          auth: {
+            user: process.env.IMAP_USER || process.env.SMTP_USER || '',
+            pass: process.env.IMAP_PASS || process.env.SMTP_PASS || '',
+          },
+        }
 
         return {
           email: nodemailerAdapter({
             defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'contact@honeylooms.in',
             defaultFromName: process.env.SMTP_FROM_NAME || 'Honeylooms',
-            transport: createEmailTransport(transportOptions),
+            skipVerify: true,
+            transport: createEmailTransport(transportOptions, sentMailboxOptions),
           }),
         }
       })()

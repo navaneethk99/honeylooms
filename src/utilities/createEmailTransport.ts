@@ -7,14 +7,25 @@ type RawMessageCapture = {
   chunks: Buffer[]
 }
 
+type SentMailboxOptions = {
+  auth: {
+    pass: string
+    user: string
+  }
+  host: string
+  port: number
+  secure: boolean
+}
+
 const rawMessageCapture = Symbol('rawMessageCapture')
 
-const appendToTitanSent = async (rawMessage: Buffer, user: string, pass: string) => {
+const appendToSentMailbox = async (rawMessage: Buffer, options: SentMailboxOptions) => {
+  if (rawMessage.length === 0) {
+    throw new Error('The sent message could not be captured for IMAP append')
+  }
+
   const client = new ImapFlow({
-    host: 'imap.titan.email',
-    port: 993,
-    secure: true,
-    auth: { user, pass },
+    ...options,
     logger: false,
   })
 
@@ -30,13 +41,13 @@ const appendToTitanSent = async (rawMessage: Buffer, user: string, pass: string)
       mailboxes.find(({ path }) => path.toLocaleLowerCase() === 'sent')
 
     if (!sentMailbox) {
-      throw new Error('Titan Sent mailbox was not found')
+      throw new Error('The IMAP Sent mailbox was not found')
     }
 
     const appended = await client.append(sentMailbox.path, rawMessage, ['\\Seen'], new Date())
 
     if (!appended) {
-      throw new Error('Titan IMAP connection closed before the message was appended')
+      throw new Error('The IMAP connection closed before the message was appended')
     }
   } finally {
     if (connected) {
@@ -45,8 +56,11 @@ const appendToTitanSent = async (rawMessage: Buffer, user: string, pass: string)
   }
 }
 
-export const createEmailTransport = (options: SMTPConnection.Options) => {
-  const transport = nodemailer.createTransport(options)
+export const createEmailTransport = (
+  smtpOptions: SMTPConnection.Options,
+  sentMailboxOptions: SentMailboxOptions,
+) => {
+  const transport = nodemailer.createTransport(smtpOptions)
   const smtpSendMail = transport.sendMail.bind(transport)
 
   transport.use('stream', (mail, done) => {
@@ -58,7 +72,9 @@ export const createEmailTransport = (options: SMTPConnection.Options) => {
       mail.message.processFunc((input: Readable) => {
         const tee = new Transform({
           transform(chunk: Buffer | string, encoding, callback) {
-            capture.chunks.push(Buffer.isBuffer(chunk) ? Buffer.from(chunk) : Buffer.from(chunk, encoding))
+            capture.chunks.push(
+              Buffer.isBuffer(chunk) ? Buffer.from(chunk) : Buffer.from(chunk, encoding),
+            )
             callback(null, chunk)
           },
         })
@@ -75,19 +91,20 @@ export const createEmailTransport = (options: SMTPConnection.Options) => {
     const capture: RawMessageCapture = { chunks: [] }
     const messageWithCapture = Object.assign({}, message, { [rawMessageCapture]: capture })
     const result = await smtpSendMail(messageWithCapture)
-    const imapUser = options.auth && 'user' in options.auth ? options.auth.user || '' : ''
-    const imapPass = options.auth && 'pass' in options.auth ? options.auth.pass || '' : ''
 
     try {
-      await appendToTitanSent(Buffer.concat(capture.chunks), imapUser, imapPass)
+      await appendToSentMailbox(Buffer.concat(capture.chunks), sentMailboxOptions)
     } catch (error) {
-      console.error('Email was sent, but it could not be saved to the Titan Sent folder.', error)
+      console.error('Email was sent, but it could not be saved to the IMAP Sent folder.', error)
     }
 
     return result
   }
 
-  transport.sendMail = ((message: SendMailOptions, callback?: (error: Error | null, info: SentMessageInfo) => void) => {
+  transport.sendMail = ((
+    message: SendMailOptions,
+    callback?: (error: Error | null, info: SentMessageInfo) => void,
+  ) => {
     const promise = sendAndSave(message)
 
     if (callback) {
