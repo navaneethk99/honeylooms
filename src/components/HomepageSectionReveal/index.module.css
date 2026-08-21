@@ -36,12 +36,11 @@
 
 .root[data-motion='collections'][data-reveal='pending'] [data-reveal-card] {
   opacity: 0;
-  clip-path: inset(100% 0 0 0);
-  transform: translate3d(0, 4rem, 0) scale(0.96);
+  transform: translate3d(0, 2rem, 0) scale(0.82);
 }
 
 .root[data-motion='collections'][data-reveal='visible'] [data-reveal-card] {
-  animation: collection-card-enter 950ms var(--section-delay) cubic-bezier(0.16, 1, 0.3, 1)
+  animation: collection-card-enter 700ms var(--section-delay) cubic-bezier(0.22, 1, 0.36, 1)
     both;
 }
 
@@ -78,13 +77,16 @@
 @keyframes collection-card-enter {
   from {
     opacity: 0;
-    clip-path: inset(100% 0 0 0);
-    transform: translate3d(0, 4rem, 0) scale(0.96);
+    transform: translate3d(0, 2rem, 0) scale(0.82);
+  }
+
+  68% {
+    opacity: 1;
+    transform: translate3d(0, -0.5rem, 0) scale(1.035);
   }
 
   to {
     opacity: 1;
-    clip-path: inset(0 0 0 0);
     transform: translate3d(0, 0, 0) scale(1);
   }
 }

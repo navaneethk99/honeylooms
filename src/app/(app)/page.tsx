@@ -71,14 +71,6 @@ type HomePageProps = {
 const isMastheadVariant = (value?: string): value is MastheadVariant =>
   value === 'red' || value === 'blue' || value === 'pink' || value === 'navy' || value === 'brown'
 
-const collectionBorderClasses: Record<MastheadVariant, string> = {
-  blue: 'border-[#5b8ee9]',
-  brown: 'border-[#ed9478]',
-  navy: 'border-[#6376bd]',
-  pink: 'border-[#ffb2d6]',
-  red: 'border-[#f76b5e]',
-}
-
 const getRandomMastheadVariant = cache((): MastheadVariant => {
   const randomVariant = Math.random()
 
@@ -353,7 +345,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                 const poster = collection.poster as MediaType | null
                 return (
                   <Link
-                    className={`group relative aspect-[2/3] w-full max-w-[20rem] self-start overflow-hidden border-8 bg-[#ded8cc] ${collectionBorderClasses[mastheadVariant]}`}
+                    className="group relative aspect-[2/3] w-full max-w-[20rem] self-start overflow-hidden bg-[#ded8cc] shadow-[8px_8px_0_#24231f]"
                     data-reveal-card
                     href={`/collections/${collection.slug}`}
                     key={collection.id}

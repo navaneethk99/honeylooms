@@ -50,10 +50,8 @@ const packItems = (items: GalleryItem[], ratios: Record<number, number>, columnC
   const columns = Array.from({ length: columnCount }, () => [] as GalleryItem[])
   const columnHeights = Array.from({ length: columnCount }, () => 0)
 
-  // Place tall pieces first, then continuously fill the shortest column.
-  const sortedItems = [...items].sort((a, b) => getRatio(a, ratios) - getRatio(b, ratios))
-
-  for (const item of sortedItems) {
+  // Preserve the shuffled input order while continuously filling the shortest column.
+  for (const item of items) {
     const shortestColumn = columnHeights.indexOf(Math.min(...columnHeights))
     columns[shortestColumn].push(item)
     columnHeights[shortestColumn] += 1 / getRatio(item, ratios) + 0.04

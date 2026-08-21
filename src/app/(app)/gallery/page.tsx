@@ -18,6 +18,19 @@ export const metadata: Metadata = {
   }),
 }
 
+const shuffle = <T,>(items: T[]) => {
+  const shuffledItems = [...items]
+
+  for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1))
+    const currentItem = shuffledItems[index]
+    shuffledItems[index] = shuffledItems[randomIndex]
+    shuffledItems[randomIndex] = currentItem
+  }
+
+  return shuffledItems
+}
+
 export default async function GalleryPage() {
   await connection()
   const { getPayload } = await import('payload')
@@ -55,27 +68,29 @@ export default async function GalleryPage() {
     id: product.id,
     title: product.title || 'Untitled product',
   }))
-  const galleryItems = gallery.docs.flatMap((item) => {
-    const url = getMediaUrl(item.url)
-    if (!url) return []
+  const galleryItems = shuffle(
+    gallery.docs.flatMap((item) => {
+      const url = getMediaUrl(item.url)
+      if (!url) return []
 
-    return [
-      {
-        alt: item.alt || item.filename || 'Honeylooms gallery submission',
-        height: item.height,
-        id: item.id,
-        mimeType: item.mimeType,
-        previewUrl: getMediaUrl(item.sizes?.preview?.url),
-        products: (item.products || []).filter(
-          (product): product is Product =>
-            Boolean(product) && typeof product === 'object' && 'slug' in product,
-        ),
-        submittedBy: item.submittedBy,
-        url,
-        width: item.width,
-      },
-    ]
-  })
+      return [
+        {
+          alt: item.alt || item.filename || 'Honeylooms gallery submission',
+          height: item.height,
+          id: item.id,
+          mimeType: item.mimeType,
+          previewUrl: getMediaUrl(item.sizes?.preview?.url),
+          products: (item.products || []).filter(
+            (product): product is Product =>
+              Boolean(product) && typeof product === 'object' && 'slug' in product,
+          ),
+          submittedBy: item.submittedBy,
+          url,
+          width: item.width,
+        },
+      ]
+    }),
+  )
 
   return (
     <div className="bg-[#D9A322] text-foreground">
