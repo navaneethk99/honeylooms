@@ -28,6 +28,7 @@ import { Users } from '@/collections/Users'
 import { AccountVerifications } from '@/collections/AccountVerifications'
 import { PromoCodes } from '@/collections/PromoCodes'
 import { Refunds } from '@/collections/Refunds'
+import { Reviews } from '@/collections/Reviews'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { FeaturedOutfits } from '@/globals/FeaturedOutfits'
@@ -77,6 +78,7 @@ export default buildConfig({
     Gallery,
     PromoCodes,
     Refunds,
+    Reviews,
     JobPostings,
     CareerApplications,
   ],

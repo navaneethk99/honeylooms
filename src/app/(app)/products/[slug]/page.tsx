@@ -117,6 +117,24 @@ async function ProductContent({ params }: Args) {
 
   const relatedProducts =
     product.relatedProducts?.filter((relatedProduct) => typeof relatedProduct === 'object') ?? []
+  const payload = await getPayload({ config: configPromise })
+  const reviews = await payload.find({
+    collection: 'reviews',
+    depth: 0,
+    limit: 1000,
+    overrideAccess: true,
+    pagination: false,
+    select: { rating: true },
+    where: {
+      product: {
+        equals: product.id,
+      },
+    },
+  })
+  const reviewCount = reviews.docs.length
+  const averageRating = reviewCount
+    ? reviews.docs.reduce((total, review) => total + review.rating, 0) / reviewCount
+    : undefined
 
   return (
     <React.Fragment>
@@ -147,7 +165,11 @@ async function ProductContent({ params }: Args) {
           </div>
 
           <div className="lg:col-span-7 lg:sticky lg:top-24 h-fit">
-            <ProductDescription product={product} />
+            <ProductDescription
+              product={product}
+              averageRating={averageRating}
+              reviewCount={reviewCount}
+            />
           </div>
         </div>
       </div>

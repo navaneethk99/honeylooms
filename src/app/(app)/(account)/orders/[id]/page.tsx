@@ -14,6 +14,7 @@ import { getPayload } from 'payload'
 import { OrderStatus } from '@/components/OrderStatus'
 import { AddressItem } from '@/components/addresses/AddressItem'
 import { formatOrderReference } from '@/utilities/orderReference'
+import { ProductReviewForm } from '@/components/forms/ProductReviewForm'
 
 type PageProps = {
   params: Promise<{ id: string }>
@@ -122,6 +123,32 @@ export default async function Order({ params, searchParams }: PageProps) {
   }
 
   const orderReference = formatOrderReference(order)
+  const reviewedProductIDs = new Set<string>()
+
+  if (order.status === 'completed' && order.items) {
+    const productIDs = order.items
+      .map((item) => (typeof item.product === 'object' ? item.product?.id : item.product))
+      .filter((productID): productID is number => typeof productID === 'number')
+
+    if (productIDs.length) {
+      const reviews = await payload.find({
+        collection: 'reviews',
+        depth: 0,
+        limit: productIDs.length,
+        overrideAccess: true,
+        where: {
+          and: [
+            { order: { equals: order.id } },
+            { product: { in: productIDs } },
+          ],
+        },
+      })
+      reviews.docs.forEach((review) => {
+        const productID = typeof review.product === 'object' ? review.product.id : review.product
+        if (productID) reviewedProductIDs.add(String(productID))
+      })
+    }
+  }
 
   return (
     <div className="w-full">
@@ -210,6 +237,7 @@ export default async function Order({ params, searchParams }: PageProps) {
 
                 const variant =
                   item.variant && typeof item.variant === 'object' ? item.variant : undefined
+                const productID = String(item.product.id)
 
                 return (
                   <li key={item.id} className="border-b border-[#24231f]/20 py-6">
@@ -219,6 +247,20 @@ export default async function Order({ params, searchParams }: PageProps) {
                       quantity={item.quantity}
                       variant={variant}
                     />
+                    {order.status === 'completed' ? (
+                      reviewedProductIDs.has(productID) ? (
+                        <p className="mt-5 border-t border-[#24231f]/15 pt-5 text-sm text-[#38624a]">
+                          You have reviewed this product.
+                        </p>
+                      ) : (
+                        <ProductReviewForm
+                          accessToken={accessToken || undefined}
+                          email={email || undefined}
+                          orderId={String(order.id)}
+                          productId={productID}
+                        />
+                      )
+                    ) : null}
                   </li>
                 )
               })}

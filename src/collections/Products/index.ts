@@ -203,6 +203,15 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               hasMany: true,
               relationTo: 'products',
             },
+            {
+              name: 'productReviews',
+              type: 'ui',
+              admin: {
+                components: {
+                  Field: '@/components/admin/ProductReviewsManager#ProductReviewsManager',
+                },
+              },
+            },
           ],
           label: 'Product Details',
         },

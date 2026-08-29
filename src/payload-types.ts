@@ -94,6 +94,7 @@ export interface Config {
     gallery: Gallery;
     'promo-codes': PromoCode;
     refunds: Refund;
+    reviews: Review;
     'job-postings': JobPosting;
     'career-applications': CareerApplication;
     forms: Form;
@@ -135,6 +136,7 @@ export interface Config {
     gallery: GallerySelect<false> | GallerySelect<true>;
     'promo-codes': PromoCodesSelect<false> | PromoCodesSelect<true>;
     refunds: RefundsSelect<false> | RefundsSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
     'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -1222,6 +1224,22 @@ export interface Refund {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  order: number | Order;
+  product: number | Product;
+  customer?: (number | null) | User;
+  customerEmail: string;
+  rating: number;
+  review: string;
+  images?: (number | Media)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "job-postings".
  */
 export interface JobPosting {
@@ -1382,6 +1400,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'refunds';
         value: number | Refund;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
       } | null)
     | ({
         relationTo: 'job-postings';
@@ -1844,6 +1866,21 @@ export interface RefundsSelect<T extends boolean = true> {
   resolution?: T;
   images?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  order?: T;
+  product?: T;
+  customer?: T;
+  customerEmail?: T;
+  rating?: T;
+  review?: T;
+  images?: T;
   updatedAt?: T;
   createdAt?: T;
 }

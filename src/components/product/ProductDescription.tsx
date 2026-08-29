@@ -4,14 +4,22 @@ import type { Product, Variant } from '@/payload-types'
 import { RichText } from '@/components/RichText'
 import { AddToCart } from '@/components/Cart/AddToCart'
 import { Price } from '@/components/Price'
+import Image from 'next/image'
 import React, { Suspense } from 'react'
 
 import { VariantSelector } from './VariantSelector'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { StockIndicator } from '@/components/product/StockIndicator'
 import { isProductOnSale } from '@/utilities/pricing'
+import { Star } from 'lucide-react'
 
-export function ProductDescription({ product }: { product: Product }) {
+type Props = {
+  averageRating?: number
+  product: Product
+  reviewCount: number
+}
+
+export function ProductDescription({ averageRating, product, reviewCount }: Props) {
   const { currency } = useCurrency()
   const productOnSale = isProductOnSale(product)
   const salePrice = productOnSale ? (product.salePrice ?? 0) : 0
@@ -20,6 +28,8 @@ export function ProductDescription({ product }: { product: Product }) {
     highestAmount = 0
   const priceField = `priceIn${currency.code}` as keyof Product
   const hasVariants = product.enableVariants && Boolean(product.variants?.docs?.length)
+  const fullStars = averageRating === undefined ? 0 : Math.floor(averageRating)
+  const hasPartialStar = averageRating !== undefined && averageRating > fullStars
 
   if (hasVariants) {
     const priceField = `priceIn${currency.code}` as keyof Variant
@@ -73,6 +83,42 @@ export function ProductDescription({ product }: { product: Product }) {
         <h1 className="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
           {product.title}
         </h1>
+        {averageRating !== undefined ? (
+          <div
+            className="flex items-center gap-1.5 text-sm text-neutral-700 dark:text-neutral-300"
+            aria-label={`${averageRating.toFixed(1)} out of 5 stars from ${reviewCount} ${reviewCount === 1 ? 'review' : 'reviews'}`}
+          >
+            <span className="flex gap-0.5" aria-hidden="true">
+              {Array.from({ length: 5 }, (_, index) => {
+                const starNumber = index + 1
+                const fill =
+                  starNumber <= fullStars
+                    ? 100
+                    : starNumber === fullStars + 1 && hasPartialStar
+                      ? 50
+                      : 0
+
+                return (
+                  <span key={starNumber} className="relative inline-flex size-4">
+                    <Star className="size-4 text-[#b8b2a8]" />
+                    {fill ? (
+                      <span
+                        className="absolute inset-y-0 left-0 overflow-hidden"
+                        style={{ width: `${fill}%` }}
+                      >
+                        <Star className="size-4 shrink-0 fill-[#c79b46] text-[#c79b46]" />
+                      </span>
+                    ) : null}
+                  </span>
+                )
+              })}
+            </span>
+            <span className="font-medium">{averageRating.toFixed(1)}</span>
+            <span className="text-neutral-500">
+              ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+            </span>
+          </div>
+        ) : null}
         <div className="font-mono text-xl font-bold text-neutral-800 dark:text-neutral-200">
           {hasVariants ? (
             productOnSale ? (
@@ -111,6 +157,33 @@ export function ProductDescription({ product }: { product: Product }) {
             <Price amount={amount} />
           )}
         </div>
+      </div>
+
+      <div className="grid max-w-lg grid-cols-3 gap-2" aria-label="Honeylooms product qualities">
+        <Image
+          src="/cotton.webp"
+          alt="Made with cotton"
+          width={1628}
+          height={662}
+          sizes="300px"
+          className="h-auto w-full"
+        />
+        <Image
+          src="/handmade.webp"
+          alt="Handmade"
+          width={1641}
+          height={662}
+          sizes="300px"
+          className="h-auto w-full"
+        />
+        <Image
+          src="/india.webp"
+          alt="Made in India"
+          width={1641}
+          height={662}
+          sizes="300px"
+          className="h-auto w-full"
+        />
       </div>
 
       {/* Description block */}
