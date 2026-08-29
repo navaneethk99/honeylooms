@@ -1,8 +1,9 @@
 'use client'
 
-import type { Media as MediaType, Product } from '@/payload-types'
+import type { Product } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
 import clsx from 'clsx'
@@ -18,12 +19,12 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
   const searchParams = useSearchParams()
   const [current, setCurrent] = React.useState(0)
   const [api, setApi] = React.useState<CarouselApi>()
-
-  useEffect(() => {
-    if (!api) {
-      return
-    }
-  }, [api])
+  const [isZoomPreviewVisible, setIsZoomPreviewVisible] = React.useState(false)
+  const [zoomOrigin, setZoomOrigin] = React.useState('50% 50%')
+  const [zoomPreviewPosition, setZoomPreviewPosition] = React.useState({ left: 0, top: 0 })
+  const activeImage = gallery[current]?.image
+  const activeImageURL =
+    activeImage && typeof activeImage === 'object' ? getMediaUrl(activeImage.url) : undefined
 
   useEffect(() => {
     const values = Array.from(searchParams.values())
@@ -41,21 +42,64 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
         return Boolean(values.find((value) => value === String(variantID)))
       })
       if (index !== -1) {
-        setCurrent(index)
-        api.scrollTo(index, true)
+        const animationFrame = window.requestAnimationFrame(() => {
+          setCurrent(index)
+          api.scrollTo(index, true)
+        })
+        return () => window.cancelAnimationFrame(animationFrame)
       }
     }
   }, [searchParams, api, gallery])
 
+  const updateZoomOrigin = (event: React.MouseEvent<HTMLDivElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const x = ((event.clientX - bounds.left) / bounds.width) * 100
+    const y = ((event.clientY - bounds.top) / bounds.height) * 100
+    setZoomOrigin(`${x}% ${y}%`)
+
+    const previewSize = 384
+    const offset = 20
+    const left =
+      event.clientX + offset + previewSize > window.innerWidth
+        ? event.clientX - previewSize - offset
+        : event.clientX + offset
+    const top = Math.min(event.clientY + offset, window.innerHeight - previewSize - 16)
+    setZoomPreviewPosition({ left: Math.max(16, left), top: Math.max(16, top) })
+  }
+
   return (
     <div>
-      <div className="relative w-full aspect-[2/3] overflow-hidden bg-neutral-50 dark:bg-neutral-900 mb-4">
-        <Media
-          resource={gallery[current].image}
-          fill
-          className="absolute inset-0"
-          imgClassName="w-full h-full object-cover rounded-none"
-        />
+      <div className="relative mb-4">
+        <div
+          className="relative aspect-[2/3] w-full cursor-zoom-in overflow-hidden bg-neutral-50 dark:bg-neutral-900"
+          onMouseEnter={(event) => {
+            setIsZoomPreviewVisible(true)
+            updateZoomOrigin(event)
+          }}
+          onMouseLeave={() => setIsZoomPreviewVisible(false)}
+          onMouseMove={updateZoomOrigin}
+        >
+          <Media
+            resource={gallery[current].image}
+            fill
+            className="absolute inset-0"
+            imgClassName="h-full w-full rounded-none object-cover"
+          />
+        </div>
+        {isZoomPreviewVisible && activeImageURL ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed z-50 hidden aspect-square w-96 rounded-full border border-neutral-200 bg-neutral-50 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 lg:block"
+            style={{
+              backgroundImage: `url(${activeImageURL})`,
+              backgroundPosition: zoomOrigin,
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: '400%',
+              left: zoomPreviewPosition.left,
+              top: zoomPreviewPosition.top,
+            }}
+          />
+        ) : null}
       </div>
 
       <Carousel setApi={setApi} className="w-full" opts={{ align: 'start', loop: false }}>
