@@ -1,5 +1,6 @@
 import type { GroupField } from 'payload'
 import type { PaymentAdapter, PaymentAdapterArgs } from '@payloadcms/plugin-ecommerce/types'
+import { assertGuestCheckoutEmailIsAvailable } from '@/utilities/guestCheckoutEmail'
 import { calculateCartSubtotalFromStoredItems, calculatePromoDiscount } from '@/utilities/pricing'
 
 export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
@@ -38,7 +39,7 @@ export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
       const payload = req.payload
       const billingAddress = data.billingAddress
       const cart = data.cart
-      const customerEmail = data.customerEmail
+      let customerEmail = data.customerEmail
       const shippingAddress = data.shippingAddress
       const currency = data.cart?.currency === 'USD' ? 'USD' : 'USD'
 
@@ -49,6 +50,8 @@ export const codAdapter = (props: PaymentAdapterArgs): PaymentAdapter => {
       if (!customerEmail || typeof customerEmail !== 'string') {
         throw new Error('A valid customer email is required to make a purchase.')
       }
+
+      customerEmail = await assertGuestCheckoutEmailIsAvailable({ email: customerEmail, req })
 
       // Cash on Delivery adds Rs. 25 charge (2500 paise)
       const codFee = 2500

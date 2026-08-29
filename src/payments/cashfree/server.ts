@@ -2,6 +2,7 @@ import type { GroupField } from 'payload'
 import type { PaymentAdapter, PaymentAdapterArgs } from '@payloadcms/plugin-ecommerce/types'
 
 import type { Order, Transaction } from '@/payload-types'
+import { assertGuestCheckoutEmailIsAvailable } from '@/utilities/guestCheckoutEmail'
 import { getServerSideURL } from '@/utilities/getURL'
 import { calculateCartSubtotalFromStoredItems, calculatePromoDiscount } from '@/utilities/pricing'
 
@@ -201,7 +202,7 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
       }
       const billingAddress = data.billingAddress as CashfreeAddress | undefined
       const cart = data.cart
-      const customerEmail = data.customerEmail
+      let customerEmail = data.customerEmail
       const shippingAddress = data.shippingAddress as CashfreeAddress | undefined
       const currency = data.cart?.currency === 'USD' ? 'USD' : 'USD'
 
@@ -212,6 +213,8 @@ export const cashfreeAdapter = (props: CashfreeAdapterArgs): PaymentAdapter => {
       if (!customerEmail || typeof customerEmail !== 'string') {
         throw new Error('A valid customer email is required to make a purchase.')
       }
+
+      customerEmail = await assertGuestCheckoutEmailIsAvailable({ email: customerEmail, req })
 
       const subtotal = await calculateCartSubtotalFromStoredItems(req, cart.items)
       let discountAmount = 0

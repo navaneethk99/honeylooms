@@ -102,6 +102,8 @@ export const CheckoutPage: React.FC = () => {
    */
   const [email, setEmail] = useState('')
   const [emailEditable, setEmailEditable] = useState(true)
+  const [guestEmailError, setGuestEmailError] = useState<string | null>(null)
+  const [checkingGuestEmail, setCheckingGuestEmail] = useState(false)
   const { initiatePayment, confirmOrder } = usePayments()
   const { addresses } = useAddresses()
   const [shippingAddress, setShippingAddress] = useState<Partial<Address>>()
@@ -447,7 +449,10 @@ export const CheckoutPage: React.FC = () => {
                   disabled={!emailEditable}
                   id="email"
                   name="email"
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    setGuestEmailError(null)
+                  }}
                   required
                   type="email"
                 />
@@ -455,14 +460,54 @@ export const CheckoutPage: React.FC = () => {
 
               <Button
                 className="h-11 rounded-none bg-[#24231f] px-6 text-sm text-white shadow-none hover:bg-[#3b3933]"
-                disabled={!email || !emailEditable}
-                onClick={(e) => {
+                disabled={!email || !emailEditable || checkingGuestEmail}
+                onClick={async (e) => {
                   e.preventDefault()
-                  setEmailEditable(false)
+                  setCheckingGuestEmail(true)
+                  setGuestEmailError(null)
+
+                  try {
+                    const response = await fetch('/api/checkout/guest-email', {
+                      body: JSON.stringify({ email }),
+                      headers: { 'Content-Type': 'application/json' },
+                      method: 'POST',
+                    })
+                    const result = (await response.json()) as {
+                      error?: string
+                      registered?: boolean
+                    }
+
+                    if (!response.ok) {
+                      setGuestEmailError(result.error || 'Unable to validate this email address.')
+                      return
+                    }
+
+                    if (result.registered) {
+                      setGuestEmailError('An account already exists for this email address.')
+                      return
+                    }
+
+                    setEmail(email.trim().toLowerCase())
+                    setEmailEditable(false)
+                  } catch {
+                    setGuestEmailError('Unable to validate this email address. Please try again.')
+                  } finally {
+                    setCheckingGuestEmail(false)
+                  }
                 }}
               >
-                Continue as guest
+                {checkingGuestEmail ? 'Checking email...' : 'Continue as guest'}
               </Button>
+              {guestEmailError && (
+                <p className="mt-3 text-sm text-destructive" role="alert">
+                  {guestEmailError}{' '}
+                  {guestEmailError.startsWith('An account already exists') && (
+                    <Link className="font-medium underline underline-offset-4" href="/login">
+                      Sign in instead
+                    </Link>
+                  )}
+                </p>
+              )}
             </div>
           </div>
         )}

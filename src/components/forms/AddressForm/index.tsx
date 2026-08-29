@@ -115,13 +115,12 @@ export const AddressForm: React.FC<Props> = ({
             </FormItem>
 
             <FormItem className="flex-1">
-              <Label htmlFor={fieldID('lastName')}>Last name*</Label>
+              <Label htmlFor={fieldID('lastName')}>Last name</Label>
               <Input
                 autoComplete="family-name"
                 id={fieldID('lastName')}
-                {...register('lastName', { required: 'Last name is required.' })}
+                {...register('lastName')}
               />
-              {errors.lastName && <FormError message={errors.lastName.message} />}
             </FormItem>
           </div>
 
