@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Permanent_Marker } from 'next/font/google'
 import React, { useEffect, useRef, useState } from 'react'
+import { Repeat2 } from 'lucide-react'
 
 import { ProductGridItem } from '@/components/ProductGridItem'
 import type { Product } from '@/payload-types'
@@ -96,6 +97,17 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [selectedItem])
 
+  useEffect(() => {
+    if (!selectedItem) return
+
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [selectedItem])
+
   const columns = packItems(items, ratios, columnCount)
 
   return (
@@ -125,6 +137,7 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
                   onClick={() => {
                     setIsLookFlipped(false)
                     setSelectedItem(item)
+                    window.setTimeout(() => setIsLookFlipped(true), 420)
                   }}
                   style={{ aspectRatio: ratio }}
                   type="button"
@@ -227,18 +240,10 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
           >
             <div
               className="relative size-full"
-              onAnimationEnd={(event) => {
-                if (
-                  event.currentTarget === event.target &&
-                  event.animationName === 'gallery-look-flip'
-                ) {
-                  setIsLookFlipped(true)
-                }
-              }}
               style={{
-                animation:
-                  'gallery-look-flip 700ms cubic-bezier(0.22, 0.61, 0.36, 1) 420ms forwards',
+                transform: isLookFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
                 transformStyle: 'preserve-3d',
+                transition: 'transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1)',
               }}
             >
               <div
@@ -275,45 +280,62 @@ export const GalleryBentoGrid: React.FC<Props> = ({ items }) => {
                 className={`absolute inset-0 flex flex-col overflow-hidden bg-background p-5 text-foreground sm:p-6 ${isLookFlipped ? '' : 'pointer-events-none'}`}
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
-                <p className="font-mono text-[10px] tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
-                  Worn by
-                </p>
-                <h2 className="mt-2 text-3xl font-semibold tracking-tight">
-                  {selectedItem.submittedBy || 'The Honeylooms community'}
-                </h2>
-                <div className="mt-5 min-h-0 flex-1 overflow-y-auto border-y border-neutral-200 py-4 dark:border-neutral-800">
+                <div
+                  className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain pr-1 [scrollbar-gutter:stable]"
+                  onTouchMove={(event) => event.stopPropagation()}
+                  onWheel={(event) => event.stopPropagation()}
+                >
                   <p className="font-mono text-[10px] tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
-                    Wearing
+                    Worn by
                   </p>
-                  {selectedItem.products.length ? (
-                    <div className="mt-3 grid grid-cols-2 gap-3">
-                      {selectedItem.products.map((product) => (
-                        <div key={product.id}>
-                          <ProductGridItem product={product} />
-                          <Link
-                            className="mt-2 inline-flex w-full items-center justify-center border border-neutral-900 px-2 py-2 font-mono text-[9px] tracking-wider text-neutral-900 uppercase transition-colors hover:bg-neutral-900 hover:text-white dark:border-neutral-50 dark:text-neutral-50 dark:hover:bg-neutral-50 dark:hover:text-neutral-950"
-                            href={`/products/${product.slug}`}
-                          >
-                            Shop this look
-                          </Link>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
-                      Honeylooms pieces
+                  <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+                    {selectedItem.submittedBy || 'The Honeylooms community'}
+                  </h2>
+                  <div className="justify-center items-center mt-5 border-t border-neutral-200 py-4 dark:border-neutral-800">
+                    <p className="font-mono text-[10px] tracking-widest text-neutral-500 uppercase dark:text-neutral-400">
+                      Wearing
                     </p>
-                  )}
+                    {selectedItem.products.length ? (
+                      <div className="mt-3 grid grid-cols-2 gap-3">
+                        {selectedItem.products.map((product) => (
+                          <div className="[&>a:first-child]:h-auto" key={product.id}>
+                            <ProductGridItem product={product} showShopCta />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-3">
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                          Honeylooms pieces
+                        </p>
+                        <Link
+                          className="mt-3 inline-flex w-full items-center justify-center bg-[#D9A322] px-3 py-2.5 font-mono text-[10px] font-semibold tracking-wider text-[#24231f] uppercase transition-colors hover:bg-[#bf8d16]"
+                          href="/shop"
+                        >
+                          Shop this look
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <button
+                {/*<button
                   className="mt-4 w-full shrink-0 text-xs text-neutral-500 underline underline-offset-4"
                   onClick={() => setSelectedItem(null)}
                   type="button"
                 >
                   Back to gallery
-                </button>
+                </button>*/}
               </div>
             </div>
+            <button
+              aria-label={isLookFlipped ? 'Flip to image' : 'Flip to shopping details'}
+              className="absolute left-1/2 top-[calc(100%+0.75rem)] z-20 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/20 bg-black/50 px-3 py-1.5 text-xs text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/65"
+              onClick={() => setIsLookFlipped((current) => !current)}
+              type="button"
+            >
+              <Repeat2 className="size-3.5" aria-hidden="true" />
+              Flip
+            </button>
           </div>
         </div>
       )}

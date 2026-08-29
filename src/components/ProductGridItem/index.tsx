@@ -9,9 +9,10 @@ import { getEffectiveProductPrice, getOriginalProductPrice, isProductOnSale } fr
 
 type Props = {
   product: Partial<Product>
+  showShopCta?: boolean
 }
 
-export const ProductGridItem: React.FC<Props> = ({ product }) => {
+export const ProductGridItem: React.FC<Props> = ({ product, showShopCta = false }) => {
   const { gallery, title } = product
   const salePrice = isProductOnSale(product) ? product.salePrice ?? 0 : 0
 
@@ -133,6 +134,11 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
             </div>
           )}
         </div>
+        {showShopCta ? (
+          <span className="mt-2 inline-flex w-full items-center justify-center bg-[#24231f] px-2 py-2 font-mono text-[10px] font-semibold tracking-wider text-white uppercase transition-colors group-hover:bg-[#3a3934]">
+            Shop this look
+          </span>
+        ) : null}
       </div>
     </Link>
   )
