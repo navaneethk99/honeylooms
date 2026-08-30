@@ -5,6 +5,7 @@ import * as migration_20260811_121000_add_account_verifications from './20260811
 import * as migration_20260811_122000_preserve_pending_verification_otp from './20260811_122000_preserve_pending_verification_otp'
 import * as migration_20260811_123000_limit_verification_otp_attempts from './20260811_123000_limit_verification_otp_attempts'
 import * as migration_20260829_120000_add_reviews from './20260829_120000_add_reviews'
+import * as migration_20260830_195406_add_product_custom_order from './20260830_195406_add_product_custom_order'
 
 export const migrations = [
   {
@@ -41,5 +42,10 @@ export const migrations = [
     down: migration_20260811_123000_limit_verification_otp_attempts.down,
     name: '20260811_123000_limit_verification_otp_attempts',
     up: migration_20260811_123000_limit_verification_otp_attempts.up,
+  },
+  {
+    down: migration_20260830_195406_add_product_custom_order.down,
+    name: '20260830_195406_add_product_custom_order',
+    up: migration_20260830_195406_add_product_custom_order.up,
   },
 ]

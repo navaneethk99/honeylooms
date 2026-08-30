@@ -305,6 +305,7 @@ export interface Order {
  */
 export interface Product {
   id: number;
+  _order?: string | null;
   title: string;
   description?: {
     root: {
@@ -2150,6 +2151,7 @@ export interface VariantOptionsSelect<T extends boolean = true> {
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
+  _order?: T;
   title?: T;
   description?: T;
   gallery?:

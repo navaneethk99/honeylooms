@@ -23,6 +23,7 @@ import { applyCosmeticCurrencyAdminOverrides } from '@/utilities/adminCurrencyOv
 
 export const ProductsCollection: CollectionOverride = ({ defaultCollection }) => ({
   ...defaultCollection,
+  orderable: true,
   admin: {
     ...defaultCollection?.admin,
     defaultColumns: ['title', 'enableVariants', '_status', 'variants.variants'],

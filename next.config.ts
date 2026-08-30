@@ -47,6 +47,9 @@ const nextConfig: NextConfig = {
         pathname: '/inverted_honeylooms.png',
       },
       {
+        pathname: '/aarna*.webp',
+      },
+      {
         pathname: '/api/media/file/**',
       },
     ],
