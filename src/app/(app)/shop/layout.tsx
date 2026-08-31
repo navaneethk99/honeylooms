@@ -1,31 +1,11 @@
 import { Categories } from '@/components/layout/search/Categories'
 import { Collections } from '@/components/layout/search/Collections'
 import { ClearFilters } from '@/components/layout/search/ClearFilters'
-import { cookies } from 'next/headers'
 import React, { Suspense } from 'react'
 
-type ShopTheme = 'blue' | 'brown' | 'navy' | 'pink' | 'red'
-
-const isShopTheme = (value: string | undefined): value is ShopTheme =>
-  value === 'blue' || value === 'brown' || value === 'navy' || value === 'pink' || value === 'red'
-
-const shopThemeClasses: Record<ShopTheme, string> = {
-  blue: 'bg-[#1d469f]',
-  brown: 'bg-[#9f442f]',
-  navy: 'bg-[#24336f]',
-  pink: 'bg-[#df4d91]',
-  red: 'bg-[#c51c25]',
-}
-
-async function ShopFilterHeader() {
-  const cookieStore = await cookies()
-  const storedTheme = cookieStore.get('honeylooms-theme')?.value
-  const shopTheme = isShopTheme(storedTheme) ? storedTheme : 'navy'
-
+function ShopFilterHeader() {
   return (
-    <header
-      className={`relative hidden px-4 pb-4 pt-5 text-white md:block ${shopThemeClasses[shopTheme]}`}
-    >
+    <header className="relative hidden bg-[#D9A322] px-4 pb-4 pt-5 text-white md:block">
       <h2 className="font-dream-orphanage text-[1.7rem] leading-none tracking-[-0.035em]">
         Filters
       </h2>
@@ -40,7 +20,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
         <aside className="relative flex w-full flex-none flex-col gap-4 md:top-0 md:z-10 md:w-48 md:basis-48 md:self-start md:gap-0 md:border md:border-[#24231f]/30 md:bg-white lg:w-56 lg:basis-56">
           <Suspense
             fallback={
-              <header className="relative hidden bg-[#24336f] px-4 pt-5 pb-4 text-white md:block">
+              <header className="relative hidden bg-[#D9A322] px-4 pb-4 pt-5 text-white md:block">
                 <h2 className="font-dream-orphanage text-[1.7rem] leading-none tracking-[-0.035em]">
                   Filters
                 </h2>

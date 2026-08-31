@@ -1,18 +1,14 @@
 import configPromise from '@payload-config'
 import { ArrowUpRight } from 'lucide-react'
 import type { Metadata } from 'next'
-import { cookies, draftMode } from 'next/headers'
+import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { connection } from 'next/server'
 import { getPayload } from 'payload'
-import { cache, Suspense } from 'react'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
 import { HomepageProductReveal } from '@/components/HomepageProductReveal'
-import { HomepageMasthead, type MastheadVariant } from '@/components/HomepageMasthead'
 import { HomepageCategoryReveal } from '@/components/HomepageCategoryReveal'
-import { HomepageIntro, HomepageIntroFadeOut } from '@/components/HomepageIntro'
-import { HomepageScrollControl } from '@/components/HomepageScrollControl'
 import { HomepageSectionReveal } from '@/components/HomepageSectionReveal'
 import { InstagramReels } from '@/components/InstagramReels'
 import { Media } from '@/components/Media'
@@ -54,53 +50,13 @@ const getHomepageData = async (): Promise<PageType | null> => {
   return ((await getCachedDocument('pages', 'home', 2)) as PageType) || null
 }
 
-const getProductMedia = (product?: Product | null): MediaType | null => {
-  const image = product?.gallery?.[0]?.image
-  return image && typeof image === 'object' ? image : null
-}
-
-const productHasCategory = (product: Product, categoryID: Category['id']) =>
-  product.categories?.some((category) =>
-    typeof category === 'object' ? category.id === categoryID : category === categoryID,
-  ) ?? false
-
-type HomePageProps = {
-  searchParams: Promise<{ theme?: string }>
-}
-
-const isMastheadVariant = (value?: string): value is MastheadVariant =>
-  value === 'red' || value === 'blue' || value === 'pink' || value === 'navy' || value === 'brown'
-
-const getRandomMastheadVariant = cache((): MastheadVariant => {
-  const randomVariant = Math.random()
-
-  if (randomVariant < 0.2) return 'red'
-  if (randomVariant < 0.4) return 'blue'
-  if (randomVariant < 0.6) return 'pink'
-  if (randomVariant < 0.8) return 'navy'
-  return 'brown'
-})
-
-export default async function HomePage({ searchParams }: HomePageProps) {
+export default async function HomePage() {
   await connection()
-  const { theme } = await searchParams
-  const cookieStore = await cookies()
-  const storedTheme = cookieStore.get('honeylooms-theme')?.value
-  const mastheadVariant =
-    process.env.NODE_ENV === 'development' && isMastheadVariant(theme)
-      ? theme
-      : isMastheadVariant(storedTheme)
-        ? storedTheme
-        : getRandomMastheadVariant()
 
-  return (
-    <Suspense fallback={<HomepageIntro variant={mastheadVariant} />}>
-      <HomePageContent mastheadVariant={mastheadVariant} />
-    </Suspense>
-  )
+  return <HomePageContent />
 }
 
-async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadVariant }) {
+async function HomePageContent() {
   const payload = await getPayload({ config: configPromise })
 
   const [productsResult, categoriesResult, collectionsResult, instagramReelsGlobal] =
@@ -116,7 +72,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
       }),
       payload.find({
         collection: 'categories',
-        depth: 0,
+        depth: 1,
         limit: 12,
         overrideAccess: false,
         sort: 'title',
@@ -134,11 +90,10 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
   const products = productsResult.docs as Product[]
   const latestProducts = products.slice(0, 8)
   const categories = categoriesResult.docs
-    .map((category) => ({
-      category,
-      image: getProductMedia(products.find((product) => productHasCategory(product, category.id))),
-    }))
-    .filter((item): item is { category: Category; image: MediaType } => Boolean(item.image))
+    .map((category) => ({ category, image: category.image }))
+    .filter((item): item is { category: Category; image: MediaType } =>
+      Boolean(item.image && typeof item.image === 'object'),
+    )
     .slice(0, 4)
 
   const homepageCollections = collectionsResult.docs.filter(
@@ -156,10 +111,6 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
 
   return (
     <article className="home-page overflow-hidden bg-white text-[#24231f]">
-      <HomepageIntroFadeOut variant={mastheadVariant} />
-      <HomepageScrollControl />
-      <HomepageMasthead variant={mastheadVariant} />
-
       {latestProducts.length > 0 ? (
         <section id="latest-arrivals" className="px-5 py-16 md:px-10 md:py-24 lg:px-14">
           <div className="mx-auto max-w-[1500px]">
@@ -220,19 +171,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
       </section> */}
 
       {categories.length > 0 ? (
-        <section
-          className={`px-5 py-6 md:px-10 md:py-8 lg:px-14 ${
-            mastheadVariant === 'red'
-              ? 'bg-[linear-gradient(135deg,#f76b5e_0%,#e44042_52%,#ba2632_100%)] text-white'
-              : mastheadVariant === 'blue'
-                ? 'bg-[linear-gradient(135deg,#5b8ee9_0%,#3970cf_52%,#2452ab_100%)] text-white'
-                : mastheadVariant === 'pink'
-                  ? 'bg-[linear-gradient(135deg,#ffb2d6_0%,#f477af_52%,#c83d7a_100%)] text-white'
-                  : mastheadVariant === 'navy'
-                    ? 'bg-[linear-gradient(135deg,#6376bd_0%,#3d5193_52%,#263870_100%)] text-white'
-                    : 'bg-[linear-gradient(135deg,#ed9478_0%,#c65b40_52%,#9f442f_100%)] text-white'
-          }`}
-        >
+        <section className="bg-white px-5 py-6 text-[#24231f] md:px-10 md:py-8 lg:px-14">
           <HomepageCategoryReveal>
             <div className="mb-9 md:mb-12 md:flex md:items-end md:justify-between">
               <div data-category-heading>
@@ -244,7 +183,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                 </h2>
               </div>
               <p
-                className="mt-5 max-w-sm text-sm leading-relaxed text-white md:mt-0"
+                className="mt-5 max-w-sm text-sm leading-relaxed text-[#6d685f] md:mt-0"
                 data-category-description
               >
                 Everyday forms, expressive details, and silhouettes designed for repeat wear.
@@ -255,7 +194,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
               className={
                 categories.length === 1
                   ? 'flex justify-center'
-                  : `mx-auto grid grid-cols-2 items-start justify-items-center gap-x-3 gap-y-8 ${
+                  : `mx-auto grid grid-cols-2 items-start justify-items-center gap-x-6 gap-y-12 ${
                       categories.length === 2
                         ? 'max-w-2xl'
                         : categories.length === 3
@@ -266,7 +205,8 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
             >
               {categories.map(({ category, image }, index) => (
                 <Link
-                  className={`group relative aspect-[2/3] w-full max-w-[20rem] overflow-hidden border-4 border-white bg-[#c9c2b6] ${
+                  aria-label={`Shop ${category.title}`}
+                  className={`group relative aspect-[2/3] w-full max-w-[20rem] self-start overflow-hidden bg-[#ded8cc] shadow-[8px_8px_0_#24231f] ${
                     index % 2 === 1 ? 'lg:mt-12' : ''
                   }`}
                   data-category-card
@@ -280,13 +220,9 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
                     resource={image}
                     size="(max-width: 768px) 50vw, 25vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 text-white md:p-6">
-                    <h3 className="font-dream-orphanage text-2xl leading-none md:text-3xl lg:text-4xl">
-                      {category.title}
-                    </h3>
-                    <ArrowUpRight className="size-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </div>
+                  <span className="absolute inset-x-0 top-0 bg-[#302F29] px-4 py-3 font-dream-orphanage text-xl leading-none text-white md:px-5 md:py-4 md:text-2xl">
+                    {category.title}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -372,7 +308,7 @@ async function HomePageContent({ mastheadVariant }: { mastheadVariant: MastheadV
         </section>
       ) : null}
 
-      <InstagramReels urls={instagramReelUrls} variant={mastheadVariant} />
+      <InstagramReels urls={instagramReelUrls} />
 
       {/* <section className="grid border-y border-[#24231f]/15 bg-[#ebe5da] sm:grid-cols-3">
         {[

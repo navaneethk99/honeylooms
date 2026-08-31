@@ -4,7 +4,6 @@ import { FooterMenu } from '@/components/Footer/menu'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { ArrowUpRight } from 'lucide-react'
 import { cacheLife } from 'next/cache'
-import { cookies } from 'next/headers'
 // import Image from 'next/image'
 import Link from 'next/link'
 
@@ -13,19 +12,6 @@ const socialLinks = [
   { href: 'https://x.com/honeylooms', label: 'X / Twitter' },
   { href: 'https://www.linkedin.com/company/honeylooms/', label: 'LinkedIn' },
 ]
-
-type FooterTheme = 'blue' | 'brown' | 'navy' | 'pink' | 'red'
-
-const isFooterTheme = (value?: string): value is FooterTheme =>
-  value === 'red' || value === 'blue' || value === 'pink' || value === 'navy' || value === 'brown'
-
-const footerThemeClasses: Record<FooterTheme, string> = {
-  blue: 'bg-[#1d469f]',
-  brown: 'bg-[#9f442f]',
-  navy: 'bg-[#24336f]',
-  pink: 'bg-[#df4d91]',
-  red: 'bg-[#c51c25]',
-}
 
 const SocialLinks = () => (
   <div className="min-w-0">
@@ -56,19 +42,14 @@ async function getCurrentYear() {
 }
 
 export async function Footer() {
-  const [footer, currentYear, cookieStore]: [
-    FooterType,
-    number,
-    Awaited<ReturnType<typeof cookies>>,
-  ] = await Promise.all([getCachedGlobal('footer', 1), getCurrentYear(), cookies()])
-  const storedTheme = cookieStore.get('honeylooms-theme')?.value
-  const footerTheme = isFooterTheme(storedTheme) ? storedTheme : 'navy'
+  const [footer, currentYear]: [FooterType, number] = await Promise.all([
+    getCachedGlobal('footer', 1),
+    getCurrentYear(),
+  ])
   const menu = footer.navItems || []
 
   return (
-    <footer
-      className={`site-footer border-t-4 border-white text-white ${footerThemeClasses[footerTheme]}`}
-    >
+    <footer className="site-footer border-t-4 border-white bg-[#D9A322] text-white">
       <div className="mx-auto max-w-[1500px] px-5 md:px-10 lg:px-14">
         <div className="grid gap-8 py-8 md:grid-cols-12 md:py-10">
           <div className="md:col-span-4 flex items-center">

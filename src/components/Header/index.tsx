@@ -17,7 +17,7 @@ export function HeaderFallback() {
             className="header-logo"
             height={75}
             priority
-            src="/logo.svg"
+            src="/Honeylooms Full.svg"
             width={1000}
           />
         </Link>
@@ -47,8 +47,8 @@ export async function Header() {
 
   return (
     <>
-      <HeaderClient header={header} />
       <PromoBanner promoBanner={promoBanner} />
+      <HeaderClient header={header} />
     </>
   )
 }

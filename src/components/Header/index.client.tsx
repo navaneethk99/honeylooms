@@ -36,7 +36,7 @@ export function HeaderClient({ header }: Props) {
             className="header-logo"
             height={75}
             priority
-            src="/logo.svg"
+            src="/Honeylooms Full Logo.png"
             width={1000}
           />
         </Link>

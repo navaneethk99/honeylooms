@@ -1,36 +1,17 @@
 import configPromise from '@payload-config'
 import { cacheLife, cacheTag } from 'next/cache'
-import { cookies } from 'next/headers'
 import { getPayload } from 'payload'
 import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { Media } from '@/components/Media'
 import { CollectionsGridSkeleton } from '@/components/NavigationSkeletons'
 import type { Media as MediaType } from '@/payload-types'
-import type { MastheadVariant } from '@/components/HomepageMasthead'
-
-const isMastheadVariant = (value?: string): value is MastheadVariant =>
-  value === 'red' || value === 'blue' || value === 'pink' || value === 'navy' || value === 'brown'
-
-const collectionBorderClasses: Record<MastheadVariant, string> = {
-  blue: 'border-[#5b8ee9]',
-  brown: 'border-[#ed9478]',
-  navy: 'border-[#6376bd]',
-  pink: 'border-[#ffb2d6]',
-  red: 'border-[#f76b5e]',
-}
-
 export const metadata = {
   description: 'Browse our curated product collections.',
   title: 'Collections',
 }
 
 export default async function CollectionsPage() {
-  const cookieStore = await cookies()
-  const storedTheme = cookieStore.get('honeylooms-theme')?.value
-  const collectionBorderClass =
-    collectionBorderClasses[isMastheadVariant(storedTheme) ? storedTheme : 'navy']
-
   return (
     <div className="container py-16">
       <div className="mb-16 max-w-2xl">
@@ -44,13 +25,13 @@ export default async function CollectionsPage() {
       </div>
 
       <Suspense fallback={<CollectionsGridSkeleton />}>
-        <CollectionCards borderClass={collectionBorderClass} />
+        <CollectionCards />
       </Suspense>
     </div>
   )
 }
 
-async function CollectionCards({ borderClass }: { borderClass: string }) {
+async function CollectionCards() {
   'use cache'
   cacheLife('days')
   cacheTag('collections')
@@ -84,9 +65,7 @@ async function CollectionCards({ borderClass }: { borderClass: string }) {
             href={`/collections/${collection.slug}`}
             key={collection.id}
           >
-            <div
-              className={`relative aspect-[2/3] shadow-[0_0_10px_rgba(0,0,0,0.2)] overflow-hidden bg-neutral-100 dark:bg-neutral-900 ${borderClass}`}
-            >
+            <div className="relative aspect-[2/3] overflow-hidden border-[#D9A322] bg-neutral-100 shadow-[0_0_10px_rgba(0,0,0,0.2)] dark:bg-neutral-900">
               {poster ? (
                 <Media
                   fill
