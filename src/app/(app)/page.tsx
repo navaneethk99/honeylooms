@@ -112,9 +112,15 @@ async function HomePageContent() {
     if (!desktopImage || !mobileImage || !desktopSrc || !mobileSrc) return []
 
     const sources = bannerImagePresets.map(({ dimension, name }) => ({
-      desktopSrc: getMediaUrl(desktopImage.sizes?.[name]?.url) || desktopSrc,
+      desktopSrc: getMediaUrl(
+        desktopImage.sizes?.[name]?.url || desktopImage.url,
+        desktopImage.sizes?.[name]?.filename,
+      ),
       dimension,
-      mobileSrc: getMediaUrl(mobileImage.sizes?.[name]?.url) || mobileSrc,
+      mobileSrc: getMediaUrl(
+        mobileImage.sizes?.[name]?.url || mobileImage.url,
+        mobileImage.sizes?.[name]?.filename,
+      ),
     }))
 
     return [

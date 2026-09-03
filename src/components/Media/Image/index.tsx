@@ -39,6 +39,7 @@ export const Image: React.FC<MediaProps> = (props) => {
     const {
       alt: altFromResource,
       height: fullHeight,
+      sizes: imageSizes,
       url,
       width: fullWidth,
     } = resource
@@ -47,7 +48,8 @@ export const Image: React.FC<MediaProps> = (props) => {
     height = heightFromProps ?? fullHeight
     alt = altFromResource
 
-    src = getMediaUrl(url)
+    const imageSize = imageSizes?.bannerLarge
+    src = getMediaUrl(imageSize?.url || url, imageSize?.filename)
   }
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
