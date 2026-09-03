@@ -5,13 +5,10 @@ import { useEffect, useState } from 'react'
 type Props = {
   banners: Array<{
     alt: string
+    desktopSrc: string
     id: string
+    mobileSrc: string
     rotationDelay: number
-    sources: Array<{
-      desktopSrc: string
-      dimension: number
-      mobileSrc: string
-    }>
   }>
 }
 
@@ -26,16 +23,6 @@ function BannerSlide({
   isActive: boolean
   isFirst: boolean
 }) {
-  const [hasBeenActive, setHasBeenActive] = useState(isActive)
-  const [highestLoadedStage, setHighestLoadedStage] = useState(-1)
-
-  useEffect(() => {
-    if (isActive) setHasBeenActive(true)
-  }, [isActive])
-
-  const lastStageIndex = banner.sources.length - 1
-  const highestRenderedStage = hasBeenActive ? Math.min(highestLoadedStage + 1, lastStageIndex) : 0
-
   return (
     <div
       aria-hidden={!isActive}
@@ -43,29 +30,18 @@ function BannerSlide({
         isActive ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      {banner.sources.slice(0, highestRenderedStage + 1).map((source, stageIndex) => (
-        <picture
-          className={`absolute inset-0 block transition-opacity duration-500 ease-out ${
-            stageIndex === 0 || stageIndex <= highestLoadedStage ? 'opacity-100' : 'opacity-0'
-          }`}
-          key={source.dimension}
-        >
-          <source media="(max-width: 767px)" srcSet={source.mobileSrc} />
-          {/* A native image keeps the picture source authoritative for mobile art direction. */}
-          <img
-            alt={stageIndex === 0 ? banner.alt : ''}
-            aria-hidden={stageIndex === 0 ? undefined : true}
-            className={`${stageIndex === lastStageIndex ? 'home-hero-media ' : ''}size-full object-cover`}
-            decoding="async"
-            fetchPriority={stageIndex === 0 && isFirst ? 'high' : 'auto'}
-            loading={stageIndex === 0 && isFirst ? 'eager' : 'lazy'}
-            onLoad={() => setHighestLoadedStage((current) => Math.max(current, stageIndex))}
-            src={source.desktopSrc}
-            width={source.dimension}
-            height={source.dimension}
-          />
-        </picture>
-      ))}
+      <picture className="absolute inset-0 block">
+        <source media="(max-width: 767px)" srcSet={banner.mobileSrc} />
+        {/* A native image keeps the picture source authoritative for mobile art direction. */}
+        <img
+          alt={banner.alt}
+          className="home-hero-media size-full object-cover"
+          decoding="async"
+          fetchPriority={isFirst ? 'high' : 'auto'}
+          loading={isFirst ? 'eager' : 'lazy'}
+          src={banner.desktopSrc}
+        />
+      </picture>
     </div>
   )
 }

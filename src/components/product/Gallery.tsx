@@ -4,6 +4,7 @@ import type { Product } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
+import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
 import clsx from 'clsx'
@@ -89,16 +90,25 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
         {isZoomPreviewVisible && activeImageURL ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed z-50 hidden aspect-square w-96 rounded-full border border-neutral-200 bg-neutral-50 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 lg:block"
+            className="pointer-events-none fixed z-50 hidden aspect-square w-96 overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 lg:block"
             style={{
-              backgroundImage: `url(${activeImageURL})`,
-              backgroundPosition: zoomOrigin,
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: '400%',
               left: zoomPreviewPosition.left,
               top: zoomPreviewPosition.top,
             }}
-          />
+          >
+            <Image
+              alt=""
+              aria-hidden="true"
+              className="object-cover"
+              fill
+              sizes="384px"
+              src={activeImageURL}
+              style={{
+                transform: 'scale(4)',
+                transformOrigin: zoomOrigin,
+              }}
+            />
+          </div>
         ) : null}
       </div>
 

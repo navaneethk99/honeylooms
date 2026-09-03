@@ -25,7 +25,6 @@ import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
-import { bannerImagePresets } from '@/utilities/bannerImagePresets'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getHomepageData()
@@ -111,24 +110,13 @@ async function HomePageContent() {
 
     if (!desktopImage || !mobileImage || !desktopSrc || !mobileSrc) return []
 
-    const sources = bannerImagePresets.map(({ dimension, name }) => ({
-      desktopSrc: getMediaUrl(
-        desktopImage.sizes?.[name]?.url || desktopImage.url,
-        desktopImage.sizes?.[name]?.filename,
-      ),
-      dimension,
-      mobileSrc: getMediaUrl(
-        mobileImage.sizes?.[name]?.url || mobileImage.url,
-        mobileImage.sizes?.[name]?.filename,
-      ),
-    }))
-
     return [
       {
         alt: desktopImage.alt || mobileImage.alt || '',
+        desktopSrc,
         id: String(banner.id),
+        mobileSrc,
         rotationDelay: banner.rotationDelay ?? 5,
-        sources,
       },
     ]
   })

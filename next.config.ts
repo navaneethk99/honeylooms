@@ -47,6 +47,15 @@ const nextConfig: NextConfig = {
         pathname: '/Honeylooms Full Logo.png',
       },
       {
+        pathname: '/cotton.webp',
+      },
+      {
+        pathname: '/handmade.webp',
+      },
+      {
+        pathname: '/india.webp',
+      },
+      {
         pathname: '/inverted_honeylooms.png',
       },
       {
@@ -54,6 +63,9 @@ const nextConfig: NextConfig = {
       },
       {
         pathname: '/api/media/file/**',
+      },
+      {
+        pathname: '/media/**',
       },
     ],
     qualities: [90, 100],
