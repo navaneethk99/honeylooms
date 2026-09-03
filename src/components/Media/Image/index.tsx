@@ -51,7 +51,8 @@ export const Image: React.FC<MediaProps> = (props) => {
     // Payload stores image-size variants separately. Prefer the largest generated
     // variant so the URL refers to the object that was uploaded to R2, while
     // retaining the original file as a fallback for older media records.
-    src = getMediaUrl(imageSizes?.bannerLarge?.url || url)
+    const imageSize = imageSizes?.bannerLarge
+    src = getMediaUrl(imageSize?.url || url, imageSize?.filename)
   }
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
