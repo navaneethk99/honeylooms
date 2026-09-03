@@ -90,7 +90,7 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
         {isZoomPreviewVisible && activeImageURL ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed z-50 hidden aspect-square w-96 rounded-full border border-neutral-200 bg-neutral-50 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 lg:block"
+            className="pointer-events-none fixed z-50 hidden aspect-square w-96 overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 lg:block"
             style={{
               left: zoomPreviewPosition.left,
               top: zoomPreviewPosition.top,

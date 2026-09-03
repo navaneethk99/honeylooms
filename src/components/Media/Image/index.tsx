@@ -39,6 +39,7 @@ export const Image: React.FC<MediaProps> = (props) => {
     const {
       alt: altFromResource,
       height: fullHeight,
+      sizes: imageSizes,
       url,
       width: fullWidth,
     } = resource
@@ -47,7 +48,10 @@ export const Image: React.FC<MediaProps> = (props) => {
     height = heightFromProps ?? fullHeight
     alt = altFromResource
 
-    src = getMediaUrl(url)
+    // Payload stores image-size variants separately. Prefer the largest generated
+    // variant so the URL refers to the object that was uploaded to R2, while
+    // retaining the original file as a fallback for older media records.
+    src = getMediaUrl(imageSizes?.bannerLarge?.url || url)
   }
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
