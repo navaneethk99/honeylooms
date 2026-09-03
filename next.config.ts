@@ -47,6 +47,15 @@ const nextConfig: NextConfig = {
         pathname: '/Honeylooms Full Logo.png',
       },
       {
+        pathname: '/cotton.webp',
+      },
+      {
+        pathname: '/handmade.webp',
+      },
+      {
+        pathname: '/india.webp',
+      },
+      {
         pathname: '/inverted_honeylooms.png',
       },
       {
