@@ -172,7 +172,7 @@ async function HomePageContent() {
                 {/*<p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-[#6d685f]">
                   Fresh from the studio
                 </p>*/}
-                <h2 className="font-dream-orphanage text-sm leading-none md:text-6xl">
+                <h2 className="font-dream-orphanage text-4xl leading-none md:text-6xl">
                   Latest arrivals
                 </h2>
               </div>
