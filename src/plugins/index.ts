@@ -40,6 +40,9 @@ const r2Endpoint = process.env.R2_ENDPOINT ? new URL(process.env.R2_ENDPOINT).or
 
 export const plugins: Plugin[] = [
   s3Storage({
+    // Browser uploads go directly to R2 using a short-lived signed URL. This keeps
+    // image files out of Vercel Functions, whose request body is limited to 4.5 MB.
+    clientUploads: true,
     enabled: Boolean(
       process.env.R2_BUCKET &&
       process.env.R2_ACCESS_KEY_ID &&
