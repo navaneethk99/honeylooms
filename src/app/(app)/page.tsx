@@ -25,7 +25,6 @@ import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
-import { bannerImagePresets } from '@/utilities/bannerImagePresets'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getHomepageData()
@@ -111,26 +110,13 @@ async function HomePageContent() {
 
     if (!desktopImage || !mobileImage || !desktopSrc || !mobileSrc) return []
 
-    const sources = [
-      ...bannerImagePresets.map(({ dimension, name }) => ({
-        desktopSrc: getMediaUrl(desktopImage.sizes?.[name]?.url) || desktopSrc,
-        dimension,
-        mobileSrc: getMediaUrl(mobileImage.sizes?.[name]?.url) || mobileSrc,
-      })),
-      // Keep the original upload as the final stage; generated Payload sizes cap at 1920px.
-      {
-        desktopSrc,
-        dimension: Math.max(desktopImage.width ?? 0, mobileImage.width ?? 0, 4000),
-        mobileSrc,
-      },
-    ]
-
     return [
       {
         alt: desktopImage.alt || mobileImage.alt || '',
+        desktopSrc,
         id: String(banner.id),
+        mobileSrc,
         rotationDelay: banner.rotationDelay ?? 5,
-        sources,
       },
     ]
   })
