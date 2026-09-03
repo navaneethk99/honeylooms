@@ -2,8 +2,10 @@ import type { Theme } from './types'
 
 export const themeLocalStorageKey = 'payload-theme'
 
-export const defaultTheme = 'light'
+// The storefront is designed dark-first. Keeping this in one shared value also
+// ensures the server-rendered document and client theme provider agree.
+export const defaultTheme = 'dark'
 
 export const getImplicitPreference = (): Theme | null => {
-  return 'light'
+  return 'dark'
 }

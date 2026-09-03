@@ -4,6 +4,12 @@
   color: #24231f;
 }
 
+[data-theme='dark'] .site-header {
+  border-color: rgb(246 241 232 / 16%);
+  background: #171512;
+  color: #f6f1e8;
+}
+
 .header-shell {
   position: relative;
   display: grid;
@@ -68,6 +74,19 @@
   transform: scaleX(1);
 }
 
+[data-theme='dark'] .header-primary-nav .navLink {
+  color: rgb(246 241 232 / 68%);
+}
+
+[data-theme='dark'] .header-primary-nav .navLink::after {
+  background: #d9a322;
+}
+
+[data-theme='dark'] .header-primary-nav .navLink:hover,
+[data-theme='dark'] .header-primary-nav .navLink.active {
+  color: #fffaf0;
+}
+
 .header-actions {
   display: flex;
   height: 2.75rem;
@@ -121,10 +140,35 @@
   transition: background-color 200ms ease;
 }
 
+[data-theme='dark'] .header-actions,
+[data-theme='dark'] .header-menu-trigger {
+  border-color: rgb(246 241 232 / 20%);
+}
+
+[data-theme='dark'] .header-actions .navLink,
+[data-theme='dark'] .header-menu-trigger {
+  color: #f6f1e8;
+}
+
+[data-theme='dark'] .header-actions .navLink + .navLink,
+[data-theme='dark'] .header-actions > * + * .navLink {
+  border-color: rgb(246 241 232 / 20%);
+}
+
+[data-theme='dark'] .header-actions .navLink:hover,
+[data-theme='dark'] .header-menu-trigger:hover {
+  background: rgb(246 241 232 / 9%);
+}
+
 .mobile-menu-panel {
   background: #fff;
   color: #24231f;
   font-family: var(--font-dream-orphanage-face), sans-serif;
+}
+
+[data-theme='dark'] .mobile-menu-panel {
+  background: #171512;
+  color: #f6f1e8;
 }
 
 @media (max-width: 767px) {
