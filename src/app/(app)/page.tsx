@@ -24,6 +24,8 @@ import type {
 import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getMediaUrl } from '@/utilities/getMediaUrl'
+import { bannerImagePresets } from '@/utilities/bannerImagePresets'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getHomepageData()
@@ -100,39 +102,35 @@ async function HomePageContent() {
   const products = productsResult.docs as Product[]
   const latestProducts = products.slice(0, 8)
   const homepageBanners = homepageBannersResult.docs.flatMap((banner) => {
-    const { desktopImage, mobileImage } = banner
+    const desktopImage =
+      banner.desktopImage && typeof banner.desktopImage === 'object' ? banner.desktopImage : null
+    const mobileImage =
+      banner.mobileImage && typeof banner.mobileImage === 'object' ? banner.mobileImage : null
+    const desktopSrc = getMediaUrl(desktopImage?.url)
+    const mobileSrc = getMediaUrl(mobileImage?.url)
 
-    if (
-      typeof desktopImage !== 'object' ||
-      !desktopImage?.url ||
-      typeof mobileImage !== 'object' ||
-      !mobileImage?.url
-    ) {
-      return []
-    }
+    if (!desktopImage || !mobileImage || !desktopSrc || !mobileSrc) return []
+
+    const sources = [
+      ...bannerImagePresets.map(({ dimension, name }) => ({
+        desktopSrc: getMediaUrl(desktopImage.sizes?.[name]?.url) || desktopSrc,
+        dimension,
+        mobileSrc: getMediaUrl(mobileImage.sizes?.[name]?.url) || mobileSrc,
+      })),
+      // Keep the original upload as the final stage; generated Payload sizes cap at 1920px.
+      {
+        desktopSrc,
+        dimension: Math.max(desktopImage.width ?? 0, mobileImage.width ?? 0, 4000),
+        mobileSrc,
+      },
+    ]
 
     return [
       {
-        alt: desktopImage.alt,
+        alt: desktopImage.alt || mobileImage.alt || '',
         id: String(banner.id),
-        rotationDelay: banner.rotationDelay,
-        sources: [
-          {
-            desktopSrc: desktopImage.sizes?.bannerPreview?.url || desktopImage.url,
-            dimension: 320,
-            mobileSrc: mobileImage.sizes?.bannerPreview?.url || mobileImage.url,
-          },
-          {
-            desktopSrc: desktopImage.sizes?.bannerMedium?.url || desktopImage.url,
-            dimension: 960,
-            mobileSrc: mobileImage.sizes?.bannerMedium?.url || mobileImage.url,
-          },
-          {
-            desktopSrc: desktopImage.sizes?.bannerLarge?.url || desktopImage.url,
-            dimension: 1920,
-            mobileSrc: mobileImage.sizes?.bannerLarge?.url || mobileImage.url,
-          },
-        ],
+        rotationDelay: banner.rotationDelay ?? 5,
+        sources,
       },
     ]
   })
