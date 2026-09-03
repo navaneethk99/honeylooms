@@ -18,10 +18,12 @@ function BannerSlide({
   banner,
   isActive,
   isFirst,
+  isMobile,
 }: {
   banner: Banner
   isActive: boolean
   isFirst: boolean
+  isMobile: boolean
 }) {
   return (
     <div
@@ -30,25 +32,31 @@ function BannerSlide({
         isActive ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <picture className="absolute inset-0 block">
-        <source media="(max-width: 767px)" srcSet={banner.mobileSrc} />
-        {/* A native image keeps the picture source authoritative for mobile art direction. */}
-        <img
-          alt={banner.alt}
-          className="home-hero-media size-full object-cover"
-          decoding="async"
-          fetchPriority={isFirst ? 'high' : 'auto'}
-          loading={isFirst ? 'eager' : 'lazy'}
-          src={banner.desktopSrc}
-        />
-      </picture>
+      <img
+        alt={banner.alt}
+        className="home-hero-media size-full object-cover"
+        decoding="async"
+        fetchPriority={isFirst ? 'high' : 'auto'}
+        loading={isFirst ? 'eager' : 'lazy'}
+        src={isMobile ? banner.mobileSrc : banner.desktopSrc}
+      />
     </div>
   )
 }
 
 export function HomepageBannerMedia({ banners }: Props) {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const activeDelay = banners[activeIndex]?.rotationDelay ?? 5
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)')
+    const updateViewport = () => setIsMobile(mediaQuery.matches)
+
+    updateViewport()
+    mediaQuery.addEventListener('change', updateViewport)
+    return () => mediaQuery.removeEventListener('change', updateViewport)
+  }, [])
 
   useEffect(() => {
     if (banners.length <= 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -71,6 +79,7 @@ export function HomepageBannerMedia({ banners }: Props) {
           banner={banner}
           isActive={index === activeIndex}
           isFirst={index === 0}
+          isMobile={isMobile}
           key={banner.id}
         />
       ))}
