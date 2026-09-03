@@ -105,8 +105,10 @@ async function HomePageContent() {
       banner.desktopImage && typeof banner.desktopImage === 'object' ? banner.desktopImage : null
     const mobileImage =
       banner.mobileImage && typeof banner.mobileImage === 'object' ? banner.mobileImage : null
-    const desktopSrc = getMediaUrl(desktopImage?.url)
-    const mobileSrc = getMediaUrl(mobileImage?.url)
+    // Serve the largest generated asset from R2. The original upload is retained
+    // only as a fallback for media uploaded before banner variants existed.
+    const desktopSrc = getMediaUrl(desktopImage?.sizes?.bannerLarge?.url || desktopImage?.url)
+    const mobileSrc = getMediaUrl(mobileImage?.sizes?.bannerLarge?.url || mobileImage?.url)
 
     if (!desktopImage || !mobileImage || !desktopSrc || !mobileSrc) return []
 
