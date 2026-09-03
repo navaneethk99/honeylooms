@@ -8,6 +8,7 @@ import { getPayload } from 'payload'
 
 import { HomepageProductCard } from '@/components/HomepageProductCard'
 import { HomepageProductReveal } from '@/components/HomepageProductReveal'
+import { HomepageBannerMedia } from '@/components/HomepageBannerMedia'
 import { HomepageCategoryReveal } from '@/components/HomepageCategoryReveal'
 import { HomepageSectionReveal } from '@/components/HomepageSectionReveal'
 import { InstagramReels } from '@/components/InstagramReels'
@@ -59,7 +60,7 @@ export default async function HomePage() {
 async function HomePageContent() {
   const payload = await getPayload({ config: configPromise })
 
-  const [productsResult, categoriesResult, collectionsResult, instagramReelsGlobal] =
+  const [productsResult, categoriesResult, collectionsResult, homepageBannersResult, instagramReelsGlobal] =
     await Promise.all([
       payload.find({
         collection: 'products',
@@ -67,7 +68,8 @@ async function HomePageContent() {
         draft: false,
         limit: 48,
         overrideAccess: false,
-        sort: '-createdAt',
+        // Products are manually arranged in the dashboard; preserve that order on the homepage.
+        sort: '_order',
         where: { _status: { equals: 'published' } },
       }),
       payload.find({
@@ -84,11 +86,56 @@ async function HomePageContent() {
         overrideAccess: false,
         sort: '-createdAt',
       }),
+      payload.find({
+        collection: 'homepage-banners',
+        depth: 1,
+        limit: 12,
+        overrideAccess: false,
+        sort: '-updatedAt',
+        where: { active: { equals: true } },
+      }),
       getCachedGlobal('instagram-reels', 0).catch(() => null),
     ])
 
   const products = productsResult.docs as Product[]
   const latestProducts = products.slice(0, 8)
+  const homepageBanners = homepageBannersResult.docs.flatMap((banner) => {
+    const { desktopImage, mobileImage } = banner
+
+    if (
+      typeof desktopImage !== 'object' ||
+      !desktopImage?.url ||
+      typeof mobileImage !== 'object' ||
+      !mobileImage?.url
+    ) {
+      return []
+    }
+
+    return [
+      {
+        alt: desktopImage.alt,
+        id: String(banner.id),
+        rotationDelay: banner.rotationDelay,
+        sources: [
+          {
+            desktopSrc: desktopImage.sizes?.bannerPreview?.url || desktopImage.url,
+            dimension: 320,
+            mobileSrc: mobileImage.sizes?.bannerPreview?.url || mobileImage.url,
+          },
+          {
+            desktopSrc: desktopImage.sizes?.bannerMedium?.url || desktopImage.url,
+            dimension: 960,
+            mobileSrc: mobileImage.sizes?.bannerMedium?.url || mobileImage.url,
+          },
+          {
+            desktopSrc: desktopImage.sizes?.bannerLarge?.url || desktopImage.url,
+            dimension: 1920,
+            mobileSrc: mobileImage.sizes?.bannerLarge?.url || mobileImage.url,
+          },
+        ],
+      },
+    ]
+  })
   const categories = categoriesResult.docs
     .map((category) => ({ category, image: category.image }))
     .filter((item): item is { category: Category; image: MediaType } =>
@@ -111,6 +158,12 @@ async function HomePageContent() {
 
   return (
     <article className="home-page overflow-hidden bg-white text-[#24231f]">
+      {homepageBanners.length > 0 ? (
+        <section className="relative aspect-[10/17] overflow-hidden md:aspect-[17/10]">
+          <HomepageBannerMedia banners={homepageBanners} />
+        </section>
+      ) : null}
+
       {latestProducts.length > 0 ? (
         <section id="latest-arrivals" className="px-5 py-16 md:px-10 md:py-24 lg:px-14">
           <div className="mx-auto max-w-[1500px]">
