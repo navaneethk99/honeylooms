@@ -14,7 +14,7 @@ const initialContext: ThemeContextType = {
 const ThemeContext = createContext(initialContext)
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<Theme | undefined>(defaultTheme)
+  const [theme, setThemeState] = useState<Theme | undefined>('light')
 
   const setTheme = useCallback((themeToSet: Theme | null) => {
     const nextTheme = themeToSet ?? defaultTheme

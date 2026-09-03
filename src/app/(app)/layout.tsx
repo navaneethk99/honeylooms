@@ -153,7 +153,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <React.Suspense fallback={<HeaderFallback />}>
             <Header />
           </React.Suspense>
-          <main className="flex-1 bg-background text-foreground">{children}</main>
+          <main className="flex-1 bg-white text-black">{children}</main>
           <React.Suspense fallback={null}>
             <Footer />
           </React.Suspense>
