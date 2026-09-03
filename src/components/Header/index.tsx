@@ -17,7 +17,7 @@ export function HeaderFallback() {
             className="header-logo"
             height={75}
             priority
-            src="/Honeylooms Full.svg"
+            src="/Honeylooms Full Logo.png"
             width={1000}
           />
         </Link>
