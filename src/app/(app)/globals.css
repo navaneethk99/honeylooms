@@ -3,6 +3,8 @@
 
 @config '../../../tailwind.config.mjs';
 
+/* Retain the variant for legacy utility classes, but the application only emits
+   the light theme so these rules are never activated. */
 @custom-variant dark (&:is([data-theme='dark'] *));
 @custom-variant sm (@media (width >= theme(--breakpoint-sm)));
 @custom-variant md (@media (width >= theme(--breakpoint-md)));
@@ -150,44 +152,6 @@ html.lenis.lenis-stopped {
   --error: oklch(75% 0.15 25deg);
 }
 
-[data-theme='dark'] {
-  --background: oklch(13.8% 0.012 76deg);
-  --foreground: oklch(95.8% 0.018 82deg);
-  --card: oklch(18.1% 0.014 76deg);
-  --card-foreground: oklch(95.8% 0.018 82deg);
-  --popover: oklch(16.2% 0.014 76deg);
-  --popover-foreground: oklch(95.8% 0.018 82deg);
-  --primary: oklch(76.8% 0.142 84deg);
-  --primary-foreground: oklch(16.2% 0.014 76deg);
-  --secondary: oklch(24.4% 0.018 76deg);
-  --secondary-foreground: oklch(95.8% 0.018 82deg);
-  --muted: oklch(22.1% 0.014 76deg);
-  --muted-foreground: oklch(72.8% 0.018 82deg);
-  --accent: oklch(27.2% 0.038 83deg);
-  --accent-foreground: oklch(95.8% 0.018 82deg);
-  --destructive: oklch(39.6% 0.141 25.723deg);
-  --destructive-foreground: oklch(63.7% 0.237 25.331deg);
-  --border: oklch(31.2% 0.018 76deg);
-  --input: oklch(29.1% 0.018 76deg);
-  --ring: oklch(76.8% 0.142 84deg);
-  --chart-1: oklch(48.8% 0.243 264.376deg);
-  --chart-2: oklch(69.6% 0.17 162.48deg);
-  --chart-3: oklch(76.9% 0.188 70.08deg);
-  --chart-4: oklch(62.7% 0.265 303.9deg);
-  --chart-5: oklch(64.5% 0.246 16.439deg);
-  --sidebar: oklch(16.2% 0.014 76deg);
-  --sidebar-foreground: oklch(95.8% 0.018 82deg);
-  --sidebar-primary: oklch(76.8% 0.142 84deg);
-  --sidebar-primary-foreground: oklch(16.2% 0.014 76deg);
-  --sidebar-accent: oklch(24.4% 0.018 76deg);
-  --sidebar-accent-foreground: oklch(95.8% 0.018 82deg);
-  --sidebar-border: oklch(31.2% 0.018 76deg);
-  --sidebar-ring: oklch(76.8% 0.142 84deg);
-  --success: oklch(28% 0.1 200deg);
-  --warning: oklch(35% 0.08 70deg);
-  --error: oklch(45% 0.1 25deg);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -237,44 +201,6 @@ html.lenis.lenis-stopped {
   body {
     @apply font-sans bg-background text-foreground min-h-[100vh] flex flex-col;
   }
-}
-
-/* Storefront legacy components use the original ink-and-paper palette directly.
-   These aliases keep those surfaces readable in the dark-first interface while
-   preserving the warm Honeylooms accent and image treatments. */
-[data-theme='dark'] [class*='text-[#24231f]'] {
-  color: var(--foreground);
-}
-
-[data-theme='dark'] [class*='text-[#5d594f]'],
-[data-theme='dark'] [class*='text-[#6c675d]'],
-[data-theme='dark'] [class*='text-[#6d685f]'],
-[data-theme='dark'] [class*='text-[#8c877d]'] {
-  color: var(--muted-foreground);
-}
-
-[data-theme='dark'] [class*='border-[#24231f]'] {
-  border-color: color-mix(in oklab, var(--foreground) 22%, transparent);
-}
-
-[data-theme='dark'] [class~='bg-white'],
-[data-theme='dark'] [class~='bg-[#fff9ec]'],
-[data-theme='dark'] [class~='bg-[#fff9ec]/95'] {
-  background-color: var(--card);
-}
-
-[data-theme='dark'] [class~='bg-[#ebe5da]'],
-[data-theme='dark'] [class~='bg-[#ded8cc]'],
-[data-theme='dark'] [class~='bg-[#c9c2b6]'] {
-  background-color: var(--muted);
-}
-
-[data-theme='dark'] [class*='bg-[#24231f]'] {
-  background-color: var(--secondary);
-}
-
-[data-theme='dark'] [class*='shadow-[8px_8px_0_#24231f]'] {
-  box-shadow: 8px 8px 0 #d9a322;
 }
 
 html {

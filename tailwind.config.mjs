@@ -7,7 +7,6 @@ export default {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
-  darkMode: ['selector', '[data-theme="dark"]'],
   safelist: [
     'lg:col-span-4',
     'lg:col-span-6',
