@@ -41,7 +41,7 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    unoptimized: true,
+    unoptimized: false,
     localPatterns: [
       {
         pathname: '/inverted_honeylooms.png',
