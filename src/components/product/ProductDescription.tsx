@@ -1,17 +1,24 @@
 'use client'
-import type { Product, Variant } from '@/payload-types'
 
-import { RichText } from '@/components/RichText'
+import type { Product } from '@/payload-types'
+
 import { AddToCart } from '@/components/Cart/AddToCart'
 import { Price } from '@/components/Price'
+import { RichText } from '@/components/RichText'
+import {
+  getEffectiveProductPrice,
+  getOriginalProductPrice,
+  isProductOnSale,
+} from '@/utilities/pricing'
+import { trackStorefrontEvent } from '@/utilities/trackStorefrontEvent'
+import { CreditCard, Mail, Ruler, Star, Truck } from 'lucide-react'
 import Image from 'next/image'
-import React, { Suspense } from 'react'
-
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useEffect } from 'react'
+import { StockIndicator } from './StockIndicator'
 import { VariantSelector } from './VariantSelector'
-import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
-import { StockIndicator } from '@/components/product/StockIndicator'
-import { isProductOnSale } from '@/utilities/pricing'
-import { Star } from 'lucide-react'
+import { getProductVariants, getSelectedVariant } from './purchaseState'
 
 type Props = {
   averageRating?: number
@@ -20,201 +27,195 @@ type Props = {
 }
 
 export function ProductDescription({ averageRating, product, reviewCount }: Props) {
-  const { currency } = useCurrency()
+  const searchParams = useSearchParams()
+  const selectedVariant = getSelectedVariant(product, searchParams.get('variant'))
+  const variants = getProductVariants(product)
+  const hasVariants = Boolean(product.enableVariants && variants.length)
   const productOnSale = isProductOnSale(product)
-  const salePrice = productOnSale ? (product.salePrice ?? 0) : 0
-  let amount = 0,
-    lowestAmount = 0,
-    highestAmount = 0
-  const priceField = `priceIn${currency.code}` as keyof Product
-  const hasVariants = product.enableVariants && Boolean(product.variants?.docs?.length)
-  const fullStars = averageRating === undefined ? 0 : Math.floor(averageRating)
-  const hasPartialStar = averageRating !== undefined && averageRating > fullStars
+  const amount = getEffectiveProductPrice(product, selectedVariant)
+  const originalAmount = getOriginalProductPrice(product, selectedVariant)
+  const variantPrices = variants.map((variant) => getEffectiveProductPrice(product, variant))
+  const showRange = hasVariants && !selectedVariant && !productOnSale
+  const supportURL = `mailto:contact@honeylooms.in?subject=${encodeURIComponent(`Help with ${product.title}`)}`
 
-  if (hasVariants) {
-    const priceField = `priceIn${currency.code}` as keyof Variant
-    const variantsOrderedByPrice = product.variants?.docs
-      ?.filter((variant) => variant && typeof variant === 'object')
-      .sort((a, b) => {
-        if (
-          typeof a === 'object' &&
-          typeof b === 'object' &&
-          priceField in a &&
-          priceField in b &&
-          typeof a[priceField] === 'number' &&
-          typeof b[priceField] === 'number'
-        ) {
-          return a[priceField] - b[priceField]
-        }
-
-        return 0
-      }) as Variant[]
-
-    const lowestVariant = variantsOrderedByPrice[0][priceField]
-    const highestVariant = variantsOrderedByPrice[variantsOrderedByPrice.length - 1][priceField]
-    if (
-      variantsOrderedByPrice &&
-      typeof lowestVariant === 'number' &&
-      typeof highestVariant === 'number'
-    ) {
-      lowestAmount = lowestVariant
-      highestAmount = highestVariant
-    }
-  } else if (product[priceField] && typeof product[priceField] === 'number') {
-    amount = product[priceField]
-  }
+  useEffect(() => {
+    trackStorefrontEvent('product_viewed', { product_id: product.id, product_slug: product.slug })
+  }, [product.id, product.slug])
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Title & Price stacked vertically */}
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        {productOnSale ? (
-          <div className="flex items-center gap-2">
-            {/*<span className="inline-flex w-fit items-center rounded-full bg-red-600 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white">
-              On Sale
-            </span>*/}
-            {/*{product.discountPercentage ? (
-              <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-red-600 dark:text-red-400">
-                Save {product.discountPercentage}%
-              </span>
-            ) : null}*/}
-          </div>
-        ) : null}
         <h1 className="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
           {product.title}
         </h1>
         {averageRating !== undefined ? (
           <div
-            className="flex items-center gap-1.5 text-sm text-neutral-700 dark:text-neutral-300"
-            aria-label={`${averageRating.toFixed(1)} out of 5 stars from ${reviewCount} ${reviewCount === 1 ? 'review' : 'reviews'}`}
+            className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300"
+            aria-label={`${averageRating.toFixed(1)} out of 5 stars from ${reviewCount} customer ${reviewCount === 1 ? 'rating' : 'ratings'}`}
           >
-            <span className="flex gap-0.5" aria-hidden="true">
-              {Array.from({ length: 5 }, (_, index) => {
-                const starNumber = index + 1
-                const fill =
-                  starNumber <= fullStars
-                    ? 100
-                    : starNumber === fullStars + 1 && hasPartialStar
-                      ? 50
-                      : 0
-
-                return (
-                  <span key={starNumber} className="relative inline-flex size-4">
-                    <Star className="size-4 text-[#b8b2a8]" />
-                    {fill ? (
-                      <span
-                        className="absolute inset-y-0 left-0 overflow-hidden"
-                        style={{ width: `${fill}%` }}
-                      >
-                        <Star className="size-4 shrink-0 fill-[#c79b46] text-[#c79b46]" />
-                      </span>
-                    ) : null}
-                  </span>
-                )
-              })}
-            </span>
-            <span className="font-medium">{averageRating.toFixed(1)}</span>
+            <Star aria-hidden="true" className="size-4 fill-[#c79b46] text-[#c79b46]" />
+            <span className="font-medium">{averageRating.toFixed(1)} / 5</span>
             <span className="text-neutral-500">
-              ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+              ({reviewCount} customer {reviewCount === 1 ? 'rating' : 'ratings'})
             </span>
           </div>
         ) : null}
-        <div className="font-mono text-xl font-bold text-neutral-800 dark:text-neutral-200">
-          {hasVariants ? (
-            productOnSale ? (
-              <div className="flex items-center gap-3">
-                <Price amount={salePrice} className="text-black dark:text-red-400 font-bold" />
-                {lowestAmount > 0 ? (
-                  <Price
-                    highestAmount={highestAmount}
-                    lowestAmount={lowestAmount}
-                    className="text-neutral-400 dark:text-neutral-500 line-through text-sm font-normal"
-                  />
-                ) : null}
-                {product.discountPercentage ? (
-                  <span className="bg-red-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded tracking-wider">
-                    -{product.discountPercentage}% OFF
-                  </span>
-                ) : null}
-              </div>
-            ) : (
-              <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
-            )
-          ) : productOnSale ? (
-            <div className="flex items-center gap-3">
-              <Price amount={salePrice} className="text-blackk dark:text-red-400 font-bold" />
-              <Price
-                amount={amount}
-                className="text-neutral-400 dark:text-neutral-500 line-through text-sm font-normal"
-              />
-              {/*{product.discountPercentage ? (
-                <span className="bg-red-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded tracking-wider">
-                  -{product.discountPercentage}% OFF
-                </span>
-              ) : null}*/}
-            </div>
+
+        <div
+          className="flex flex-wrap items-center gap-3 font-mono text-xl font-bold text-neutral-800 dark:text-neutral-200"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {showRange ? (
+            <Price
+              lowestAmount={Math.min(...variantPrices)}
+              highestAmount={Math.max(...variantPrices)}
+            />
           ) : (
             <Price amount={amount} />
           )}
+          {productOnSale && originalAmount > amount ? (
+            <>
+              <Price
+                amount={originalAmount}
+                className="text-sm font-normal text-neutral-500 line-through"
+              />
+              <span className="bg-[#D9A322]/15 px-2 py-1 text-xs text-neutral-800 dark:text-neutral-200">
+                Save {Math.round(((originalAmount - amount) / originalAmount) * 100)}%
+              </span>
+            </>
+          ) : null}
         </div>
       </div>
-
-      <div className="grid max-w-lg grid-cols-3 gap-2" aria-label="Honeylooms product qualities">
-        <Image
-          src="/cotton.webp"
-          alt="Made with cotton"
-          width={1628}
-          height={662}
-          sizes="300px"
-          className="h-auto w-full"
-        />
-        <Image
-          src="/handmade.webp"
-          alt="Handmade"
-          width={1641}
-          height={662}
-          sizes="300px"
-          className="h-auto w-full"
-        />
-        <Image
-          src="/india.webp"
-          alt="Made in India"
-          width={1641}
-          height={662}
-          sizes="300px"
-          className="h-auto w-full"
-        />
+      <div className="grid gap-3 text-xs leading-relaxed text-neutral-600 sm:grid-cols-2 dark:text-neutral-400">
+        <p className="flex items-start gap-2">
+          <Truck aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          <span>
+            <strong className="font-medium text-neutral-900 dark:text-neutral-100">
+              Free prepaid shipping
+            </strong>
+            <br />
+            Across India
+          </span>
+        </p>
+        <p className="flex items-start gap-2">
+          <CreditCard aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          <span>
+            <strong className="font-medium text-neutral-900 dark:text-neutral-100">
+              UPI or cash on delivery
+            </strong>
+          </span>
+        </p>
       </div>
-
-      {/* Description block */}
-      {product.description ? (
-        <div className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-sm">
-          <RichText data={product.description} enableGutter={false} />
+      <div
+        id="product-purchase"
+        className="flex scroll-mt-28 flex-col gap-5 border-y border-neutral-200 py-5 dark:border-neutral-800"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-medium">Find your fit</p>
+          <Link
+            href="/sizing"
+            className="inline-flex min-h-11 items-center gap-2 text-sm underline underline-offset-4"
+          >
+            <Ruler aria-hidden="true" className="size-4" />
+            Size guide
+          </Link>
         </div>
-      ) : null}
-
-      {/* Divider */}
-      <div className="border-t border-neutral-100 dark:border-neutral-900" />
-
-      {/* Variant Selector */}
-      {hasVariants && (
-        <div className="flex flex-col gap-6">
-          <Suspense fallback={null}>
-            <VariantSelector product={product} />
-          </Suspense>
-          <div className="border-t border-neutral-100 dark:border-neutral-900" />
-        </div>
-      )}
-
-      {/* Stock & Purchase section */}
-      <div className="flex flex-col gap-6">
-        <Suspense fallback={null}>
-          <StockIndicator product={product} />
-        </Suspense>
-
-        <Suspense fallback={null}>
+        {hasVariants ? <VariantSelector product={product} /> : null}
+        <StockIndicator product={product} />
+        <div className="flex min-w-full justify-center">
           <AddToCart product={product} />
-        </Suspense>
+        </div>
+
+        <a
+          href={supportURL}
+          className="inline-flex min-h-11 items-center justify-center gap-2 text-sm underline underline-offset-4"
+        >
+          <Mail aria-hidden="true" className="size-4" />
+          Need help choosing? Ask us
+        </a>
+      </div>
+
+      <div className="divide-y divide-neutral-200 border-b border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">
+        {product.description ? (
+          <details open className="pb-5">
+            <summary className="cursor-pointer py-3 text-sm font-semibold">Product details</summary>
+            <div className="pt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+              <RichText data={product.description} enableGutter={false} />
+            </div>
+            <div
+              className="grid max-w-lg grid-cols-3 gap-2 mt-5"
+              aria-label="Honeylooms product qualities"
+            >
+              <Image
+                src="/cotton.webp"
+                alt="Made with cotton"
+                width={1628}
+                height={662}
+                sizes="(max-width: 640px) 30vw, 170px"
+                className="h-auto w-full"
+              />
+              <Image
+                src="/handmade.webp"
+                alt="Handmade"
+                width={1641}
+                height={662}
+                sizes="(max-width: 640px) 30vw, 170px"
+                className="h-auto w-full"
+              />
+              <Image
+                src="/india.webp"
+                alt="Made in India"
+                width={1641}
+                height={662}
+                sizes="(max-width: 640px) 30vw, 170px"
+                className="h-auto w-full"
+              />
+            </div>
+          </details>
+        ) : null}
+        <details className="py-2">
+          <summary className="cursor-pointer py-3 text-sm font-semibold">
+            Delivery & payment
+          </summary>
+          <div className="space-y-3 pb-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+            <p>
+              Orders usually leave us within 1–2 business days. Pre-booked orders or pieces needing
+              finishing may take longer.
+            </p>
+            <p>
+              Prepaid shipping is free across India. Choose UPI at checkout, or cash on delivery
+              with a ₹25 handling charge.
+            </p>
+            <Link
+              href="/deliveries-and-returns"
+              className="inline-block underline underline-offset-4"
+            >
+              Read the delivery policy
+            </Link>
+          </div>
+        </details>
+        <details className="py-2">
+          <summary className="cursor-pointer py-3 text-sm font-semibold">
+            Size exchanges & returns
+          </summary>
+          <div className="space-y-3 pb-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+            <p>
+              Report size issues or manufacturing defects within 48 hours of receiving your order.
+              Items must be unworn, unwashed, undamaged and have their original tags.
+            </p>
+            <p>
+              Size exchanges carry return courier charges. Final sale items, custom orders and gift
+              cards cannot be returned or exchanged.
+            </p>
+            <Link
+              href="/deliveries-and-returns"
+              className="inline-block underline underline-offset-4"
+            >
+              Read the full returns policy
+            </Link>
+          </div>
+        </details>
       </div>
     </div>
   )

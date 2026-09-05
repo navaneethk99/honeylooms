@@ -30,22 +30,17 @@ function BannerSlide({
         isActive ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <img
-        alt={banner.alt}
-        className="home-hero-media block size-full object-cover md:hidden"
-        decoding="async"
-        fetchPriority={isFirst ? 'high' : 'auto'}
-        loading={isFirst ? 'eager' : 'lazy'}
-        src={banner.mobileSrc}
-      />
-      <img
-        alt={banner.alt}
-        className="home-hero-media hidden size-full object-cover md:block"
-        decoding="async"
-        fetchPriority={isFirst ? 'high' : 'auto'}
-        loading={isFirst ? 'eager' : 'lazy'}
-        src={banner.desktopSrc}
-      />
+      <picture className="block size-full">
+        <source media="(max-width: 767px)" srcSet={banner.mobileSrc} />
+        <img
+          alt={banner.alt}
+          className="home-hero-media block size-full object-cover"
+          decoding="async"
+          fetchPriority={isFirst ? 'high' : 'auto'}
+          loading={isFirst ? 'eager' : 'lazy'}
+          src={banner.desktopSrc}
+        />
+      </picture>
     </div>
   )
 }

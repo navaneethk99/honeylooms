@@ -13,7 +13,9 @@ import { notFound } from 'next/navigation'
 import { connection } from 'next/server'
 import React, { cache, Suspense } from 'react'
 import { ChevronLeftIcon } from 'lucide-react'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
+import { createPageMetadata, getDocumentPath } from '@/utilities/seo'
+import { getProductStructuredData, getProductDescription } from '@/utilities/productSEO'
 
 type Args = {
   params: Promise<{
@@ -30,34 +32,16 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const gallery = product.gallery?.filter((item) => typeof item.image === 'object') || []
 
   const metaImage = typeof product.meta?.image === 'object' ? product.meta?.image : undefined
-  const canIndex = product._status === 'published'
-
+  const { isEnabled: draft } = await draftMode()
   const seoImage = metaImage || (gallery.length ? (gallery[0]?.image as Media) : undefined)
 
-  return {
-    description: product.meta?.description || '',
-    openGraph: seoImage?.url
-      ? {
-          images: [
-            {
-              alt: seoImage?.alt,
-              height: seoImage.height!,
-              url: seoImage?.url,
-              width: seoImage.width!,
-            },
-          ],
-        }
-      : null,
-    robots: {
-      follow: canIndex,
-      googleBot: {
-        follow: canIndex,
-        index: canIndex,
-      },
-      index: canIndex,
-    },
+  return createPageMetadata({
+    description: getProductDescription(product),
+    image: seoImage,
+    noIndex: draft || product._status !== 'published',
+    path: getDocumentPath('products', product.slug),
     title: product.meta?.title || product.title,
-  }
+  })
 }
 
 export default function ProductPage({ params }: Args) {
@@ -82,39 +66,6 @@ async function ProductContent({ params }: Args) {
         image: item.image as Media,
       })) || []
 
-  const metaImage = typeof product.meta?.image === 'object' ? product.meta?.image : undefined
-  const hasStock = product.enableVariants
-    ? product?.variants?.docs?.some((variant) => {
-        if (typeof variant !== 'object') return false
-        return variant.inventory && variant?.inventory > 0
-      })
-    : product.inventory! > 0
-
-  let price = product.priceInUSD
-
-  if (product.enableVariants && product?.variants?.docs?.length) {
-    price = product?.variants?.docs?.reduce((acc, variant) => {
-      if (typeof variant === 'object' && variant?.priceInUSD && acc && variant?.priceInUSD > acc) {
-        return variant.priceInUSD
-      }
-      return acc
-    }, price)
-  }
-
-  const productJsonLd = {
-    name: product.title,
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    description: product.description,
-    image: metaImage?.url,
-    offers: {
-      '@type': 'AggregateOffer',
-      availability: hasStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      price: price,
-      priceCurrency: 'usd',
-    },
-  }
-
   const relatedProducts =
     product.relatedProducts?.filter((relatedProduct) => typeof relatedProduct === 'object') ?? []
   const payload = await getPayload({ config: configPromise })
@@ -136,11 +87,13 @@ async function ProductContent({ params }: Args) {
     ? reviews.docs.reduce((total, review) => total + review.rating, 0) / reviewCount
     : undefined
 
+  const productJsonLd = getProductStructuredData(product, { averageRating, reviewCount })
+
   return (
     <React.Fragment>
       <script
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(productJsonLd),
+          __html: JSON.stringify(productJsonLd).replace(/</g, '\\u003c'),
         }}
         type="application/ld+json"
       />

@@ -44,28 +44,7 @@ const nextConfig: NextConfig = {
     unoptimized: false,
     localPatterns: [
       {
-        pathname: '/Honeylooms Full Logo.png',
-      },
-      {
-        pathname: '/cotton.webp',
-      },
-      {
-        pathname: '/handmade.webp',
-      },
-      {
-        pathname: '/india.webp',
-      },
-      {
-        pathname: '/inverted_honeylooms.png',
-      },
-      {
-        pathname: '/aarna*.webp',
-      },
-      {
-        pathname: '/api/media/file/**',
-      },
-      {
-        pathname: '/media/**',
+        pathname: '/**',
       },
     ],
     qualities: [90, 100],

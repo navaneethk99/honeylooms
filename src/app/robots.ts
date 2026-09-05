@@ -1,10 +1,10 @@
 import type { MetadataRoute } from 'next'
 
-import { getServerSideURL } from '@/utilities/getURL'
+import { getCanonicalURL, isSearchIndexable } from '@/utilities/seo'
 
 /* eslint-disable no-restricted-exports */
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = getServerSideURL()
+  const baseUrl = getCanonicalURL().replace(/\/$/, '')
 
   return {
     host: baseUrl,
@@ -33,6 +33,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    // Preview pages remain crawlable so crawlers can see their noindex metadata.
+    ...(isSearchIndexable() ? { sitemap: getCanonicalURL('/sitemap.xml') } : {}),
   }
 }

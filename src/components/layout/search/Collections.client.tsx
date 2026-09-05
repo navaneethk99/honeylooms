@@ -27,6 +27,7 @@ export const CollectionItem: React.FC<Props> = ({ collection }) => {
       params.set('collection', String(collection.id))
     }
 
+    params.delete('page')
     const newParams = params.toString()
 
     router.push(pathname + '?' + newParams)
@@ -91,6 +92,7 @@ export const CollectionSelect: React.FC<{ collections: Collection[] }> = ({ coll
       params.set('collection', collectionId)
     }
 
+    params.delete('page')
     setIsOpen(false)
     router.push(pathname + '?' + params.toString())
   }

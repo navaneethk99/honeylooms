@@ -7,11 +7,10 @@ import { generateMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
-import { homeStaticData } from '@/endpoints/seed/home-static'
 import React, { Suspense } from 'react'
 
 import type { Page } from '@/payload-types'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { getCachedDocument } from '@/utilities/getDocument'
 
 type Args = {
@@ -30,15 +29,11 @@ export default function Page({ params }: Args) {
 
 async function CMSPage({ params }: Args) {
   const { slug = 'home' } = await params
+  if (slug === 'home') permanentRedirect('/')
 
-  let page = await queryPageBySlug({
+  const page = await queryPageBySlug({
     slug,
   })
-
-  // Remove this code once your website is seeded
-  if (!page && slug === 'home') {
-    page = homeStaticData() as Page
-  }
 
   if (!page) {
     return notFound()
@@ -56,12 +51,16 @@ async function CMSPage({ params }: Args) {
 
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug = 'home' } = await params
+  if (slug === 'home') permanentRedirect('/')
 
   const page = await queryPageBySlug({
     slug,
   })
 
-  return generateMeta({ doc: page as Page })
+  if (!page) return notFound()
+
+  const { isEnabled: draft } = await draftMode()
+  return generateMeta({ doc: page, noIndex: draft })
 }
 
 const queryPageBySlug = async ({ slug }: { slug: string }): Promise<Page | null> => {

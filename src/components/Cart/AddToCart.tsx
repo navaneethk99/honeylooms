@@ -1,13 +1,14 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { getPurchaseState } from '@/components/product/purchaseState'
+import { trackStorefrontEvent } from '@/utilities/trackStorefrontEvent'
 import type { Cart, Product, Variant } from '@/payload-types'
 import { useAuth } from '@/providers/Auth'
 
 import { useCart, useEcommerce } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
 import { useSearchParams } from 'next/navigation'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 const waitFor = async (condition: () => boolean, timeout = 2000): Promise<boolean> => {
@@ -56,13 +57,14 @@ export function AddToCart({ product }: Props) {
   const cartRef = useRef<Cart | null | undefined>(cart)
   const onLoginRef = useRef(onLogin)
 
-  addItemRef.current = addItem
-  cartRef.current = cart
-  onLoginRef.current = onLogin
-
-  const variants = product.variants?.docs || []
+  useEffect(() => {
+    addItemRef.current = addItem
+    cartRef.current = cart
+    onLoginRef.current = onLogin
+  }, [addItem, cart, onLogin])
 
   const selectedVariant = useMemo<Variant | undefined>(() => {
+    const variants = product.variants?.docs || []
     if (product.enableVariants && variants.length) {
       const variantId = searchParams.get('variant')
 
@@ -79,7 +81,7 @@ export function AddToCart({ product }: Props) {
     }
 
     return undefined
-  }, [product.enableVariants, searchParams, variants])
+  }, [product.enableVariants, product.variants?.docs, searchParams])
 
   const addToCart = useCallback(
     async (e: React.FormEvent<HTMLButtonElement>) => {
@@ -127,6 +129,11 @@ export function AddToCart({ product }: Props) {
           }
         }
 
+        trackStorefrontEvent('add_to_cart', {
+          product_id: product.id,
+          variant_id: selectedVariant?.id,
+          quantity: 1,
+        })
         toast.success('Item added to cart.')
       } catch {
         toast.error('Unable to add this item to your cart. Please try again.')
@@ -134,102 +141,28 @@ export function AddToCart({ product }: Props) {
         setIsAdding(false)
       }
     },
-    [clearSession, product.id, selectedVariant?.id, user],
+    [clearSession, product.id, selectedVariant, user],
   )
 
-  const disabled = useMemo<boolean>(() => {
-    const existingItem = cart?.items?.find((item) => {
-      const productID = typeof item.product === 'object' ? item.product?.id : item.product
-      const variantID = item.variant
-        ? typeof item.variant === 'object'
-          ? item.variant?.id
-          : item.variant
-        : undefined
-
-      if (productID === product.id) {
-        if (product.enableVariants) {
-          return variantID === selectedVariant?.id
-        }
-        return true
-      }
-    })
-
-    if (existingItem) {
-      const existingQuantity = existingItem.quantity
-
-      if (product.enableVariants) {
-        return existingQuantity >= (selectedVariant?.inventory || 0)
-      }
-      return existingQuantity >= (product.inventory || 0)
-    }
-
-    if (product.enableVariants) {
-      if (!selectedVariant) {
-        return true
-      }
-
-      if (selectedVariant.inventory === 0) {
-        return true
-      }
-    } else {
-      if (product.inventory === 0) {
-        return true
-      }
-    }
-
-    return false
-  }, [selectedVariant, cart?.items, product])
-
-  const isOutOfStock = useMemo<boolean>(() => {
-    if (product.enableVariants) {
-      if (selectedVariant) {
-        const existingItem = cart?.items?.find((item) => {
-          const productID = typeof item.product === 'object' ? item.product?.id : item.product
-          const variantID = item.variant
-            ? typeof item.variant === 'object'
-              ? item.variant?.id
-              : item.variant
-            : undefined
-
-          return productID === product.id && variantID === selectedVariant.id
-        })
-
-        if (existingItem && existingItem.quantity >= (selectedVariant.inventory || 0)) {
-          return true
-        }
-
-        return selectedVariant.inventory === 0 || !selectedVariant.inventory
-      }
-
-      const allVariants = product.variants?.docs || []
-      if (allVariants.length > 0) {
-        return allVariants.every((variant) => {
-          if (typeof variant === 'object' && variant !== null) {
-            return variant.inventory === 0 || !variant.inventory
-          }
-          return true
-        })
-      }
-      return true
-    }
-
-    const existingItem = cart?.items?.find((item) => {
-      const productID = typeof item.product === 'object' ? item.product?.id : item.product
-      return productID === product.id
-    })
-
-    if (existingItem && existingItem.quantity >= (product.inventory || 0)) {
-      return true
-    }
-
-    return product.inventory === 0 || !product.inventory
-  }, [selectedVariant, cart?.items, product])
+  const {
+    disabled,
+    outOfStock: isOutOfStock,
+    atCartLimit,
+  } = getPurchaseState(product, selectedVariant, cart)
 
   return (
     <button
-      aria-label="Add to cart"
+      aria-label={
+        isOutOfStock
+          ? 'Out of stock'
+          : atCartLimit
+            ? 'All available stock is in your bag'
+            : product.enableVariants && !selectedVariant
+              ? 'Select size'
+              : 'Add to cart'
+      }
       className={clsx(
-        'w-full max-w-[320px] mx-auto py-4 text-xs font-semibold uppercase tracking-widest transition-all duration-300 rounded-none flex items-center justify-center border h-12',
+        'w-full max-w-[320px] py-4 text-xs font-semibold uppercase tracking-widest transition-all duration-300 rounded-none flex items-center justify-center border h-12',
         disabled || isLoading || isAdding
           ? 'bg-neutral-100 border-neutral-100 text-neutral-400 cursor-not-allowed dark:bg-neutral-900 dark:border-neutral-900 dark:text-neutral-700'
           : 'bg-neutral-950 border-neutral-950 text-neutral-50 hover:bg-neutral-900 dark:bg-neutral-50 dark:border-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200 cursor-pointer',
@@ -242,9 +175,11 @@ export function AddToCart({ product }: Props) {
         ? 'Adding...'
         : isOutOfStock
           ? 'Out of Stock'
-          : product.enableVariants && !selectedVariant
-            ? 'Select size'
-            : 'Add to bag'}
+          : atCartLimit
+            ? 'All available stock is in your bag'
+            : product.enableVariants && !selectedVariant
+              ? 'Select size'
+              : 'Add to bag'}
     </button>
   )
 }

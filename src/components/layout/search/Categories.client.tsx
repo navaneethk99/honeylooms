@@ -27,6 +27,7 @@ export const CategoryItem: React.FC<Props> = ({ category }) => {
       params.set('category', String(category.id))
     }
 
+    params.delete('page')
     const newParams = params.toString()
 
     router.push(pathname + '?' + newParams)
@@ -91,6 +92,7 @@ export const CategorySelect: React.FC<{ categories: Category[] }> = ({ categorie
       params.set('category', categoryId)
     }
 
+    params.delete('page')
     setIsOpen(false)
     router.push(pathname + '?' + params.toString())
   }

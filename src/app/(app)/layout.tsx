@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { Metadata } from 'next'
 
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/components/Footer'
@@ -15,6 +16,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { LottiePrefetcher } from '@/components/LottiePrefetcher'
 import { SmoothScroll } from '@/components/SmoothScroll'
+import { getCanonicalURL, isSearchIndexable, siteDescription } from '@/utilities/seo'
 import './globals.css'
 
 const editorialFont = Fraunces({
@@ -53,65 +55,33 @@ const rosehotFont = localFont({
   weight: '400',
 })
 
-/* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : 'http://localhost:3000'
-const twitterCreator = TWITTER_CREATOR ? ensureStartsWith(TWITTER_CREATOR, '@') : undefined
-const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : undefined
- */
-/* export const metadata = {
-  metadataBase: new URL(baseUrl),
-  robots: {
-    follow: true,
-    index: true,
-  },
-  title: {
-    default: SITE_NAME,
-    template: `%s | ${SITE_NAME}`,
-  },
-  ...(twitterCreator &&
-    twitterSite && {
-      twitter: {
-        card: 'summary_large_image',
-        creator: twitterCreator,
-        site: twitterSite,
-      },
-    }),
-} */
-
-import type { Metadata } from 'next'
-
 export const metadata: Metadata = {
-  metadataBase: new URL('https://honeylooms.in'),
+  metadataBase: new URL(getCanonicalURL()),
   title: {
     default: 'Honeylooms | Handcrafted Indian Fashion',
     template: '%s | Honeylooms',
   },
-  description:
-    'Discover handcrafted Indian clothing that blends timeless craftsmanship with contemporary style.',
+  description: siteDescription,
   robots: {
-    index: true,
-    follow: true,
-  },
-  alternates: {
-    canonical: '/',
+    index: isSearchIndexable(),
+    follow: isSearchIndexable(),
   },
   openGraph: {
     type: 'website',
-    url: 'https://honeylooms.in',
+    locale: 'en_IN',
     siteName: 'Honeylooms',
     title: 'Honeylooms | Handcrafted Indian Fashion',
-    description:
-      'Discover handcrafted Indian clothing that blends timeless craftsmanship with contemporary style.',
+    description: siteDescription,
     images: [
       {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
+        url: '/logo.png',
         alt: 'Honeylooms',
       },
     ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/logo.png'],
   },
 }
 

@@ -1,17 +1,14 @@
 import type { Metadata } from 'next'
+import { getCanonicalURL, siteDescription } from './seo'
 
 const defaultOpenGraph: Metadata['openGraph'] = {
   type: 'website',
-  url: 'https://honeylooms.in',
   siteName: 'Honeylooms',
   title: 'Honeylooms | Handcrafted Indian Fashion',
-  description:
-    'Discover handcrafted Indian clothing that blends timeless craftsmanship with contemporary style. Made with premium fabrics and designed to last.',
+  description: siteDescription,
   images: [
     {
-      url: 'https://honeylooms.in/logo.png',
-      width: 1200,
-      height: 630,
+      url: getCanonicalURL('/logo.png'),
       alt: 'Honeylooms',
     },
   ],

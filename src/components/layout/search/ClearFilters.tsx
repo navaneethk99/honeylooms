@@ -18,6 +18,7 @@ export function ClearFilters() {
     params.delete('category')
     params.delete('collection')
     params.delete('q')
+    params.delete('page')
     const query = params.toString()
     router.push(query ? `${pathname}?${query}` : pathname)
   }

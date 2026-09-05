@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { connection } from 'next/server'
 import React, { Suspense } from 'react'
-import { ChevronLeftIcon } from 'lucide-react'
+import { ChevronLeftIcon, Ruler } from 'lucide-react'
 import { getPayload } from 'payload'
 import { cacheLife, cacheTag } from 'next/cache'
 
@@ -14,6 +14,8 @@ import { CollectionPageSkeleton, ProductGridSkeleton } from '@/components/Naviga
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { Media } from '@/components/Media'
 import type { Collection, Media as MediaType } from '@/payload-types'
+import { createPageMetadata, getDocumentPath } from '@/utilities/seo'
+import { CreditCard, Truck } from '@animateicons/react/lucide'
 
 type Args = {
   params: Promise<{
@@ -80,10 +82,15 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 
   if (!collection) return notFound()
 
-  return {
+  const { isEnabled: draft } = await draftMode()
+
+  return createPageMetadata({
     title: `${collection.title} Collection`,
-    description: `Shop our curated selection of products in the ${collection.title} collection.`,
-  }
+    description: `Explore the ${collection.title} clothing collection at Honeylooms. Discover the styles, check available sizes, and find your next favourite outfit.`,
+    image: typeof collection.banner === 'object' ? collection.banner : undefined,
+    noIndex: draft,
+    path: getDocumentPath('collections', collection.slug),
+  })
 }
 
 export default function CollectionSlugPage({ params }: Args) {
@@ -118,6 +125,7 @@ async function CollectionContent({ params }: Args) {
             size="100vw"
           />
         )}
+
         <div className="absolute inset-0" />
 
         <div className="absolute inset-0 flex flex-col justify-end container pb-12">
@@ -137,7 +145,31 @@ async function CollectionContent({ params }: Args) {
           </div>
         </div>
       </div>
-
+      <nav
+        aria-label="Shopping information"
+        className="border-b border-[#24231f]/15 px-5 md:px-10 lg:px-14"
+      >
+        <div className="mx-auto flex max-w-[1500px] flex-wrap justify-between gap-x-5 gap-y-1 py-3 text-xs text-[#5d594f]">
+          <Link
+            className="inline-flex min-h-9 items-center gap-2 hover:underline"
+            href="/deliveries-and-returns"
+          >
+            <Truck className="size-4" aria-hidden="true" />
+            Free prepaid shipping in India
+          </Link>
+          <Link
+            className="inline-flex min-h-9 items-center gap-2 hover:underline"
+            href="/deliveries-and-returns"
+          >
+            <CreditCard className="size-4" aria-hidden="true" />
+            Cash on Delivery
+          </Link>
+          <Link className="inline-flex min-h-9 items-center gap-2 hover:underline" href="/sizing">
+            <Ruler className="size-4" aria-hidden="true" />
+            Find your fit with our size guide
+          </Link>
+        </div>
+      </nav>
       {/* Product Grid Section */}
       <div className="container py-16">
         <Link

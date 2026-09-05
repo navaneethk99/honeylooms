@@ -2,36 +2,22 @@ import type { Metadata } from 'next'
 
 import type { Page, Product } from '../payload-types'
 
-import { getMediaUrl } from './getMediaUrl'
-import { mergeOpenGraph } from './mergeOpenGraph'
+import { createPageMetadata, getDocumentPath, siteDescription } from './seo'
 
-export const generateMeta = async (args: { doc: Page | Product }): Promise<Metadata> => {
-  const { doc } = args || {}
-
-  const ogImage =
-    typeof doc?.meta?.image === 'object' &&
-    doc.meta.image !== null &&
-    'url' in doc.meta.image &&
-    getMediaUrl(doc.meta.image.url)
-
-  return {
-    description: doc?.meta?.description,
-    openGraph: mergeOpenGraph({
-      ...(doc?.meta?.description
-        ? {
-            description: doc?.meta?.description,
-          }
-        : {}),
-      images: ogImage
-        ? [
-            {
-              url: ogImage,
-            },
-          ]
-        : undefined,
-      title: doc?.meta?.title || doc?.title || 'Honeylooms',
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
-    }),
+export const generateMeta = async ({
+  collection = 'pages',
+  doc,
+  noIndex = false,
+}: {
+  collection?: 'pages' | 'products'
+  doc: Page | Product | null
+  noIndex?: boolean
+}): Promise<Metadata> => {
+  return createPageMetadata({
+    description: doc?.meta?.description || siteDescription,
+    image: typeof doc?.meta?.image === 'object' ? doc.meta.image : undefined,
+    noIndex: noIndex || !doc || doc._status === 'draft',
+    path: getDocumentPath(collection, doc?.slug),
     title: doc?.meta?.title || doc?.title || 'Honeylooms',
-  }
+  })
 }

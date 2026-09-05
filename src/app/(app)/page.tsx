@@ -1,5 +1,5 @@
 import configPromise from '@payload-config'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, CreditCard, Ruler, Truck } from 'lucide-react'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import Link from 'next/link'
@@ -14,6 +14,8 @@ import { HomepageSectionReveal } from '@/components/HomepageSectionReveal'
 import { InstagramReels } from '@/components/InstagramReels'
 import { Media } from '@/components/Media'
 import { PromoPopup } from '@/components/PromoPopup'
+import { ShoppingQuestions } from '@/components/ShoppingQuestions'
+import { StorefrontLink } from '@/components/StorefrontLink'
 import type {
   Category,
   Collection,
@@ -21,14 +23,23 @@ import type {
   Page as PageType,
   Product,
 } from '@/payload-types'
-import { generateMeta } from '@/utilities/generateMeta'
+import { createPageMetadata } from '@/utilities/seo'
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getHomepageData()
-  return generateMeta({ doc: page as PageType })
+  const { isEnabled: draft } = await draftMode()
+  return createPageMetadata({
+    title: page?.meta?.title || 'Handcrafted Kurtis, Bralettes & Cotton Clothing',
+    description:
+      page?.meta?.description ||
+      'Shop Honeylooms handcrafted kurtis, Indo-traditional bralettes and halter necks. Made in India, with free prepaid shipping across India and guest checkout.',
+    image: typeof page?.meta?.image === 'object' ? page.meta.image : undefined,
+    noIndex: draft,
+    path: '/',
+  })
 }
 
 const getHomepageData = async (): Promise<PageType | null> => {
@@ -61,45 +72,50 @@ export default async function HomePage() {
 async function HomePageContent() {
   const payload = await getPayload({ config: configPromise })
 
-  const [productsResult, categoriesResult, collectionsResult, homepageBannersResult, instagramReelsGlobal] =
-    await Promise.all([
-      payload.find({
-        collection: 'products',
-        depth: 2,
-        draft: false,
-        limit: 48,
-        overrideAccess: false,
-        // Products are manually arranged in the dashboard; preserve that order on the homepage.
-        sort: '_order',
-        where: { _status: { equals: 'published' } },
-      }),
-      payload.find({
-        collection: 'categories',
-        depth: 1,
-        limit: 12,
-        overrideAccess: false,
-        sort: 'title',
-      }),
-      payload.find({
-        collection: 'collections',
-        depth: 1,
-        limit: 12,
-        overrideAccess: false,
-        sort: '-createdAt',
-      }),
-      payload.find({
-        collection: 'homepage-banners',
-        depth: 1,
-        limit: 12,
-        overrideAccess: false,
-        sort: '-updatedAt',
-        where: { active: { equals: true } },
-      }),
-      getCachedGlobal('instagram-reels', 0).catch(() => null),
-    ])
+  const [
+    productsResult,
+    categoriesResult,
+    collectionsResult,
+    homepageBannersResult,
+    instagramReelsGlobal,
+  ] = await Promise.all([
+    payload.find({
+      collection: 'products',
+      depth: 2,
+      draft: false,
+      limit: 8,
+      overrideAccess: false,
+      // Products are manually arranged in the dashboard; preserve that order on the homepage.
+      sort: '_order',
+      where: { _status: { equals: 'published' } },
+    }),
+    payload.find({
+      collection: 'categories',
+      depth: 1,
+      limit: 12,
+      overrideAccess: false,
+      sort: 'title',
+    }),
+    payload.find({
+      collection: 'collections',
+      depth: 1,
+      limit: 12,
+      overrideAccess: false,
+      sort: '-createdAt',
+    }),
+    payload.find({
+      collection: 'homepage-banners',
+      depth: 1,
+      limit: 12,
+      overrideAccess: false,
+      sort: '-updatedAt',
+      where: { active: { equals: true } },
+    }),
+    getCachedGlobal('instagram-reels', 0).catch(() => null),
+  ])
 
   const products = productsResult.docs as Product[]
-  const latestProducts = products.slice(0, 8)
+  const featuredProducts = products.slice(0, 8)
   const homepageBanners = homepageBannersResult.docs.flatMap((banner) => {
     const desktopImage =
       banner.desktopImage && typeof banner.desktopImage === 'object' ? banner.desktopImage : null
@@ -144,14 +160,51 @@ async function HomePageContent() {
 
   return (
     <article className="home-page overflow-hidden bg-white text-[#24231f]">
+      <h1 className="sr-only">Honeylooms handcrafted kurtis, bralettes and cotton clothing</h1>
+      <nav
+        aria-label="Shopping information"
+        className="border-b border-[#24231f]/15 px-5 md:px-10 lg:px-14"
+      >
+        <div className="mx-auto flex max-w-[1500px] flex-wrap justify-between gap-x-5 gap-y-1 py-3 text-xs text-[#5d594f]">
+          <Link
+            className="inline-flex min-h-9 items-center gap-2 hover:underline"
+            href="/deliveries-and-returns"
+          >
+            <Truck className="size-4" aria-hidden="true" />
+            Free prepaid shipping in India
+          </Link>
+          <Link
+            className="inline-flex min-h-9 items-center gap-2 hover:underline"
+            href="/deliveries-and-returns"
+          >
+            <CreditCard className="size-4" aria-hidden="true" />
+            Cash on Delivery
+          </Link>
+          <Link className="inline-flex min-h-9 items-center gap-2 hover:underline" href="/sizing">
+            <Ruler className="size-4" aria-hidden="true" />
+            Find your fit with our size guide
+          </Link>
+        </div>
+      </nav>
+
       {homepageBanners.length > 0 ? (
-        <section className="relative aspect-[10/17] overflow-hidden md:aspect-[17/10]">
-          <HomepageBannerMedia banners={homepageBanners} />
+        <section aria-label="From the Honeylooms studio" className="border-y border-[#24231f]/15">
+          <div className="relative aspect-[10/17] overflow-hidden md:aspect-[17/10]">
+            <HomepageBannerMedia banners={homepageBanners} />
+          </div>
+          <div className="flex justify-center bg-[#f6f3ed] px-5 py-5">
+            <StorefrontLink
+              placement="home_campaign_shop"
+              className="inline-flex min-h-12 items-center gap-4 bg-[#24231f] px-6 text-sm font-medium text-white hover:bg-[#464238]"
+              href="/shop"
+            >
+              Explore the shop <ArrowUpRight aria-hidden="true" className="size-4" />
+            </StorefrontLink>
+          </div>
         </section>
       ) : null}
-
-      {latestProducts.length > 0 ? (
-        <section id="latest-arrivals" className="px-5 py-16 md:px-10 md:py-24 lg:px-14">
+      {featuredProducts.length > 0 ? (
+        <section id="latest-arrivals" className="px-5 py-10 md:px-10 md:py-14 lg:px-14">
           <div className="mx-auto max-w-[1500px]">
             <div className="mb-9 flex items-end justify-between gap-5 md:mb-12">
               <div>
@@ -159,29 +212,29 @@ async function HomePageContent() {
                   Fresh from the studio
                 </p>*/}
                 <h2 className="font-dream-orphanage text-4xl leading-none md:text-6xl">
-                  Latest arrivals
+                  Find your next favourite
                 </h2>
               </div>
               <Link
                 className="group hidden items-center gap-2 border-b border-[#24231f]/40 pb-1 text-[10px] uppercase tracking-[0.18em] transition-colors hover:border-[#24231f] sm:inline-flex"
-                href="/shop?sort=-createdAt"
+                href="/shop"
               >
-                Shop all new in
+                Shop all styles
                 <ArrowUpRight className="size-3.5" />
               </Link>
             </div>
 
             <HomepageProductReveal>
-              {latestProducts.map((product) => (
+              {featuredProducts.map((product) => (
                 <HomepageProductCard key={product.id} product={product} />
               ))}
             </HomepageProductReveal>
 
             <Link
               className="mt-10 inline-flex items-center gap-2 border-b border-[#24231f]/40 pb-1 text-[10px] uppercase tracking-[0.18em] sm:hidden"
-              href="/shop?sort=-createdAt"
+              href="/shop"
             >
-              Shop all new in
+              Shop all styles
               <ArrowUpRight className="size-3.5" />
             </Link>
           </div>
@@ -210,7 +263,10 @@ async function HomePageContent() {
       </section> */}
 
       {categories.length > 0 ? (
-        <section className="bg-white px-5 py-6 text-[#24231f] md:px-10 md:py-8 lg:px-14">
+        <section
+          id="shop-by-category"
+          className="scroll-mt-8 bg-white px-5 py-6 text-[#24231f] md:px-10 md:py-8 lg:px-14"
+        >
           <HomepageCategoryReveal>
             <div className="mb-9 md:mb-12 md:flex md:items-end md:justify-between">
               <div data-category-heading>
@@ -320,6 +376,7 @@ async function HomePageContent() {
                 const poster = collection.poster as MediaType | null
                 return (
                   <Link
+                    aria-label={`Shop the ${collection.title} collection`}
                     className="group relative aspect-[2/3] w-full max-w-[20rem] self-start overflow-hidden bg-[#ded8cc] shadow-[8px_8px_0_#24231f]"
                     data-reveal-card
                     href={`/collections/${collection.slug}`}
@@ -348,6 +405,8 @@ async function HomePageContent() {
       ) : null}
 
       <InstagramReels urls={instagramReelUrls} />
+
+      <ShoppingQuestions />
 
       {/* <section className="grid border-y border-[#24231f]/15 bg-[#ebe5da] sm:grid-cols-3">
         {[

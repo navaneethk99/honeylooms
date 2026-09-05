@@ -1,5 +1,6 @@
 'use client'
 
+import { trackStorefrontEvent } from '@/utilities/trackStorefrontEvent'
 import { Media } from '@/components/Media'
 import { Message } from '@/components/Message'
 import { Price } from '@/components/Price'
@@ -10,7 +11,7 @@ import { useAuth } from '@/providers/Auth'
 import { Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { Suspense, useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 type CashfreeInstance = {
   checkout: (options: {
@@ -93,6 +94,7 @@ const getAddressNameDefaults = (name?: string | null) => {
 
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
+  const checkoutTracked = useRef(false)
   const addressNameDefaults = getAddressNameDefaults(user?.name)
   const router = useRouter()
   const { cart, clearCart } = useCart()
@@ -138,6 +140,17 @@ export const CheckoutPage: React.FC = () => {
     })),
   )
   const checkoutSubtotal = resolvedSubtotal || cart?.subtotal || 0
+  useEffect(() => {
+    if (!cartIsEmpty && !checkoutTracked.current) {
+      checkoutTracked.current = true
+      trackStorefrontEvent('checkout_started', {
+        item_count: cart?.items?.reduce((count, item) => count + (item.quantity || 0), 0),
+        value: checkoutSubtotal / 100,
+        currency: 'INR',
+      })
+    }
+  }, [cartIsEmpty, cart?.items, checkoutSubtotal])
+
   const appliedDiscountAmount = appliedDiscount
     ? calculatePromoDiscount({
         discountPercentage: appliedDiscount.discountPercentage,
@@ -216,7 +229,9 @@ export const CheckoutPage: React.FC = () => {
         })) as Record<string, unknown>
 
         if (paymentData) {
+          trackStorefrontEvent('payment_started', { payment_method: paymentID })
           if (paymentID === 'cod') {
+            trackStorefrontEvent('purchase_completed', { payment_method: 'cod' })
             const accessToken = (paymentData.accessToken as string) || ''
             const queryParams = new URLSearchParams()
             const customerEmail = email || user?.email
@@ -265,6 +280,7 @@ export const CheckoutPage: React.FC = () => {
             })
 
             if (confirmResult && typeof confirmResult === 'object' && 'orderID' in confirmResult) {
+              trackStorefrontEvent('purchase_completed', { payment_method: 'cashfree' })
               const accessToken =
                 'accessToken' in confirmResult ? (confirmResult.accessToken as string) : ''
               const queryParams = new URLSearchParams()
@@ -382,7 +398,7 @@ export const CheckoutPage: React.FC = () => {
     return (
       <div className="prose dark:prose-invert py-12 w-full items-center">
         <p>Your cart is empty.</p>
-        <Link href="/search">Continue shopping?</Link>
+        <Link href="/shop">Continue shopping?</Link>
       </div>
     )
   }
@@ -390,30 +406,21 @@ export const CheckoutPage: React.FC = () => {
   return (
     <div className="my-8 flex grow flex-col items-stretch justify-stretch gap-10 bg-white md:flex-row md:gap-6 lg:gap-8">
       {(isInitiatingPayment || isProcessingPayment) && <LottieLoader size="full" />}
-      <div className="order-2 flex basis-full flex-col justify-stretch gap-8 md:order-1 lg:basis-2/3">
+      <div className="order-1 flex basis-full flex-col justify-stretch gap-8 md:order-1 lg:basis-2/3">
         <h2 className="font-dream-orphanage text-4xl font-normal tracking-[-0.03em] text-[#24231f]">
           Contact
         </h2>
         {!user && (
-          <div className="flex w-full items-center border-y border-[#24231f]/20 py-5">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#6c675d]">
-              <Button
-                asChild
-                className="h-10 rounded-none bg-[#24231f] px-5 text-white shadow-none hover:bg-[#3b3933]"
-              >
-                <Link href="/login">Log in</Link>
-              </Button>
-              <p>
-                <span className="mr-1">or</span>
-                <Link
-                  className="text-[#24231f] underline underline-offset-4"
-                  href="/create-account"
-                >
-                  create an account
-                </Link>
-              </p>
-            </div>
-          </div>
+          <p className="text-sm leading-relaxed text-[#6c675d]">
+            No account needed. Continue as a guest below, or{' '}
+            <Link
+              className="text-[#24231f] underline underline-offset-4"
+              href="/login?redirect=/checkout"
+            >
+              log in
+            </Link>{' '}
+            to use your saved details.
+          </p>
         )}
         {user ? (
           <div className="border-y border-[#24231f] bg-[#24231f] px-4 py-3 text-sm text-white">
@@ -606,44 +613,58 @@ export const CheckoutPage: React.FC = () => {
           <h3 className="text-xl font-medium">Select Payment Method</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* UPI Option */}
-            <div
+            <label
               className={`p-4 border cursor-pointer transition-all flex flex-col gap-1 ${
                 selectedPaymentMethod === 'cashfree'
                   ? 'border-[#D9A321] bg-[#D9A321]/5 ring-1 ring-[#D9A321]'
                   : 'border-border hover:border-foreground/50'
               }`}
-              onClick={() => setSelectedPaymentMethod('cashfree')}
             >
-              <div className="flex items-center justify-between">
+              <input
+                type="radio"
+                name="payment-method"
+                value="cashfree"
+                checked={selectedPaymentMethod === 'cashfree'}
+                onChange={() => setSelectedPaymentMethod('cashfree')}
+                className="size-4 accent-[#24231f]"
+              />
+              <span className="flex items-center justify-between">
                 <span className="font-semibold text-lg">Pay Using UPI</span>
                 <span className="text-xs uppercase font-mono tracking-widest text-emerald-600 bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-400 px-2 py-0.5 rounded">
                   Free
                 </span>
-              </div>
-              <p className="text-sm text-muted-foreground">
+              </span>
+              <span className="text-sm text-muted-foreground">
                 Instant confirmation via UPI apps (GPay, PhonePe, Paytm, etc.)
-              </p>
-            </div>
+              </span>
+            </label>
 
             {/* COD Option */}
-            <div
+            <label
               className={`p-4 border cursor-pointer transition-all flex flex-col gap-1 ${
                 selectedPaymentMethod === 'cod'
                   ? 'border-[#D9A321] bg-[#D9A321]/5 ring-1 ring-[#D9A321]'
                   : 'border-border hover:border-foreground/50'
               }`}
-              onClick={() => setSelectedPaymentMethod('cod')}
             >
-              <div className="flex items-center justify-between">
+              <input
+                type="radio"
+                name="payment-method"
+                value="cod"
+                checked={selectedPaymentMethod === 'cod'}
+                onChange={() => setSelectedPaymentMethod('cod')}
+                className="size-4 accent-[#24231f]"
+              />
+              <span className="flex items-center justify-between">
                 <span className="font-semibold text-lg">Cash on Delivery</span>
                 <span className="text-xs uppercase font-mono tracking-widest text-primary/70 bg-primary/10 px-2 py-0.5 rounded">
                   + Rs. 25
                 </span>
-              </div>
-              <p className="text-sm text-muted-foreground">
+              </span>
+              <span className="text-sm text-muted-foreground">
                 Pay with cash when your package is delivered.
-              </p>
-            </div>
+              </span>
+            </label>
           </div>
 
           <Button
@@ -680,7 +701,7 @@ export const CheckoutPage: React.FC = () => {
       </div>
 
       {!cartIsEmpty && (
-        <div className="order-1 flex h-fit basis-full flex-col gap-8 border border-[#24231f]/15 bg-white p-8 md:order-2 lg:basis-1/3 lg:pl-8">
+        <div className="order-2 flex h-fit basis-full flex-col gap-8 border border-[#24231f]/15 bg-white p-8 md:order-2 lg:basis-1/3 lg:pl-8">
           <h2 className="text-3xl font-medium">Your cart</h2>
           {cart?.items?.map((item, index) => {
             if (typeof item.product === 'object' && item.product) {
@@ -696,7 +717,7 @@ export const CheckoutPage: React.FC = () => {
               let image = gallery?.[0]?.image || meta?.image
               const productOnSale = isProductOnSale(product)
               let price = getEffectiveProductPrice(product)
-              let originalPrice = getOriginalProductPrice(product, variant)
+              const originalPrice = getOriginalProductPrice(product, variant)
 
               const isVariant = Boolean(variant) && typeof variant === 'object'
 

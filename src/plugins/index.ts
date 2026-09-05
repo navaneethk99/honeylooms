@@ -7,7 +7,7 @@ import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/
 import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
 
 import { Page, Product } from '@/payload-types'
-import { getServerSideURL } from '@/utilities/getURL'
+import { getCanonicalURL, getDocumentPath } from '@/utilities/seo'
 import { ProductsCollection } from '@/collections/Products'
 import { adminOrPublishedStatus } from '@/access/adminOrPublishedStatus'
 import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
@@ -29,10 +29,9 @@ const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Honeylooms` : 'Honeylooms'
 }
 
-const generateURL: GenerateURL<Product | Page> = ({ doc }) => {
-  const url = getServerSideURL()
-
-  return doc?.slug ? `${url}/${doc.slug}` : url
+const generateURL: GenerateURL<Product | Page> = ({ collectionConfig, doc }) => {
+  const collection = collectionConfig?.slug === 'products' ? 'products' : 'pages'
+  return getCanonicalURL(getDocumentPath(collection, doc?.slug))
 }
 
 const r2PublicURL = process.env.R2_PUBLIC_URL?.replace(/\/$/, '')

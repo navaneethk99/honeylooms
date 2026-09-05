@@ -6,10 +6,14 @@ import Link from 'next/link'
 import { Media } from '@/components/Media'
 import { CollectionsGridSkeleton } from '@/components/NavigationSkeletons'
 import type { Media as MediaType } from '@/payload-types'
-export const metadata = {
-  description: 'Browse our curated product collections.',
-  title: 'Collections',
-}
+import { createPageMetadata } from '@/utilities/seo'
+
+export const metadata = createPageMetadata({
+  description:
+    'Discover clothing collections from Honeylooms. Explore each collection, compare your favourite styles, and find an outfit for everyday wear or a special occasion.',
+  path: '/collections',
+  title: 'Clothing Collections',
+})
 
 export default async function CollectionsPage() {
   return (

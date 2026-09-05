@@ -13,7 +13,7 @@ import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
@@ -27,15 +27,14 @@ import {
 } from '@/utilities/pricing'
 
 export function CartModal() {
+  const pathname = usePathname()
+  // A route change starts with a closed drawer, without an extra effect render.
+  return <CartModalContent key={pathname} />
+}
+
+function CartModalContent() {
   const { cart } = useCart()
   const [isOpen, setIsOpen] = useState(false)
-
-  const pathname = usePathname()
-
-  useEffect(() => {
-    // Close the cart modal when the pathname changes.
-    setIsOpen(false)
-  }, [pathname])
 
   const totalQuantity = useMemo(() => {
     if (!cart || !cart.items || !cart.items.length) return undefined
@@ -48,22 +47,30 @@ export function CartModal() {
         <OpenCartButton quantity={totalQuantity} />
       </SheetTrigger>
 
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex w-full flex-col sm:max-w-md">
         <SheetHeader>
           <SheetTitle>My Cart</SheetTitle>
 
-          <SheetDescription>Manage your cart here, add items to view the total.</SheetDescription>
+          <SheetDescription>Review your styles and sizes before checkout.</SheetDescription>
         </SheetHeader>
 
         {!cart || cart?.items?.length === 0 ? (
           <div className="text-center flex flex-col items-center gap-2">
             <CartBagModel className="pointer-events-none" height={112} width={96} />
             <p className="text-center text-2xl font-bold">Your cart is empty.</p>
+            <p className="px-6 text-sm text-neutral-600">
+              Find a style you love and make it yours.
+            </p>
+            <Button asChild className="mt-4 rounded-none">
+              <Link href="/shop" onClick={() => setIsOpen(false)}>
+                Explore the shop
+              </Link>
+            </Button>
           </div>
         ) : (
-          <div className="grow flex px-4">
-            <div className="flex flex-col justify-between w-full">
-              <ul className="grow overflow-auto py-4">
+          <div className="flex min-h-0 grow px-4">
+            <div className="flex min-h-0 w-full flex-col justify-between">
+              <ul className="min-h-0 grow overflow-y-auto py-4">
                 {cart?.items?.map((item, i) => {
                   const product = item.product as Product
                   const variant = item.variant as Variant
@@ -84,7 +91,7 @@ export function CartModal() {
                   let image = firstGalleryImage || metaImage
                   const productOnSale = isProductOnSale(product)
                   let price = getEffectiveProductPrice(product)
-                  let originalPrice = getOriginalProductPrice(product, variant)
+                  const originalPrice = getOriginalProductPrice(product, variant)
 
                   const isVariant = Boolean(variant) && typeof variant === 'object'
 
@@ -120,10 +127,10 @@ export function CartModal() {
                           <DeleteItemButton item={item} />
                         </div>
                         <Link
-                          className="z-30 flex flex-row space-x-4"
+                          className="z-30 flex min-w-0 flex-1 flex-row gap-3 pr-3"
                           href={`/products/${(item.product as Product)?.slug}`}
                         >
-                          <div className="relative h-16 w-16 cursor-pointer overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
+                          <div className="relative h-16 w-16 shrink-0 cursor-pointer overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
                             {image?.url && (
                               <Image
                                 alt={image?.alt || product?.title || ''}
@@ -135,8 +142,8 @@ export function CartModal() {
                             )}
                           </div>
 
-                          <div className="flex flex-1 flex-col text-base">
-                            <span className="leading-tight">{product?.title}</span>
+                          <div className="flex min-w-0 flex-1 flex-col text-sm">
+                            <span className="break-words leading-tight">{product?.title}</span>
                             {/*{productOnSale ? (
                               <span className="mt-1 inline-flex w-fit items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                                 Sale
@@ -183,11 +190,11 @@ export function CartModal() {
                 })}
               </ul>
 
-              <div className="px-4">
+              <div className="shrink-0 border-t border-neutral-200 pb-[env(safe-area-inset-bottom)]">
                 <div className="py-4 text-sm text-neutral-500 dark:text-neutral-400">
                   {typeof cart?.subtotal === 'number' && (
                     <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700">
-                      <p>Total</p>
+                      <p>Subtotal</p>
                       <Price
                         amount={cart?.subtotal}
                         className="text-right text-base text-black dark:text-white"
@@ -195,11 +202,29 @@ export function CartModal() {
                     </div>
                   )}
 
-                  <Button asChild>
+                  <div className="mb-4 space-y-1 text-xs leading-relaxed">
+                    <p>Free prepaid shipping across India.</p>
+
+                    {/*<Link
+                      className="inline-block underline text-center underline-offset-4"
+                      href="/deliveries-and-returns"
+                    >
+                      Delivery &amp; returns policy
+                    </Link>*/}
+                  </div>
+                  <Button asChild className="min-h-12 rounded-none">
                     <Link className="w-full" href="/checkout">
                       Proceed to Checkout
                     </Link>
                   </Button>
+                  <p className="mt-2 text-center text-xs">New here? Guest checkout is available.</p>
+                  <button
+                    className="mt-3 min-h-11 w-full text-center text-sm underline underline-offset-4"
+                    onClick={() => setIsOpen(false)}
+                    type="button"
+                  >
+                    Continue shopping
+                  </button>
                 </div>
               </div>
             </div>

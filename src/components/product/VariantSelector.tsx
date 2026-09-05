@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import type { Product } from '@/payload-types'
 
 import { createUrl } from '@/utilities/createUrl'
@@ -33,7 +32,7 @@ export function VariantSelector({ product }: { product: Product }) {
 
     return (
       <dl className="flex flex-col gap-3" key={type.id}>
-        <dt className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-mono font-bold">
+        <dt className="text-sm  text-black dark:text-neutral-500 font-mono font-semibold">
           Select {type.label}
         </dt>
         <dd className="flex flex-wrap gap-2">
@@ -99,13 +98,15 @@ export function VariantSelector({ product }: { product: Product }) {
               return (
                 <button
                   aria-disabled={!isAvailableForSale}
+                  aria-pressed={isActive}
+                  type="button"
                   className={clsx(
-                    'px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200 border rounded-none min-w-[3.5rem] h-10 flex items-center justify-center',
+                    'px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200 border rounded-none min-w-[3.5rem] h-11 flex items-center justify-center',
                     isActive
                       ? 'bg-neutral-950 border-neutral-950 text-neutral-50 dark:bg-neutral-50 dark:border-neutral-50 dark:text-neutral-950'
                       : isAvailableForSale
-                      ? 'bg-transparent border-neutral-200 hover:border-neutral-950 text-neutral-800 dark:border-neutral-800 dark:hover:border-neutral-50 dark:text-neutral-200 cursor-pointer'
-                      : 'bg-transparent border-neutral-100 text-neutral-300 dark:border-neutral-900 dark:text-neutral-700 cursor-not-allowed line-through',
+                        ? 'bg-transparent border-neutral-200 hover:border-neutral-950 text-neutral-800 dark:border-neutral-800 dark:hover:border-neutral-50 dark:text-neutral-200 cursor-pointer'
+                        : 'bg-transparent border-neutral-100 text-neutral-300 dark:border-neutral-900 dark:text-neutral-700 cursor-not-allowed line-through',
                   )}
                   disabled={!isAvailableForSale}
                   key={option.id}
