@@ -41,7 +41,7 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    unoptimized: false,
+    unoptimized: true,
     localPatterns: [
       {
         pathname: '/Honeylooms Full Logo.png',

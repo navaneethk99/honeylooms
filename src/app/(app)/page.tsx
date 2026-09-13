@@ -309,18 +309,12 @@ async function HomePageContent() {
               </Link>
             </div>
 
-            <div
-              className={
-                collections.length === 1
-                  ? 'flex justify-center'
-                  : 'mx-auto grid max-w-5xl justify-items-center gap-4 md:grid-cols-3'
-              }
-            >
+            <div className="mx-auto flex max-w-5xl flex-wrap justify-center gap-x-6 gap-y-12">
               {collections.map((collection, index) => {
                 const poster = collection.poster as MediaType | null
                 return (
                   <Link
-                    className="group relative aspect-[2/3] w-full max-w-[20rem] self-start overflow-hidden bg-[#ded8cc] shadow-[8px_8px_0_#24231f]"
+                    className="group relative aspect-[2/3] w-[calc((100%-1.5rem)/2)] max-w-[20rem] self-start overflow-hidden bg-[#ded8cc] shadow-[8px_8px_0_#24231f] md:w-full"
                     data-reveal-card
                     href={`/collections/${collection.slug}`}
                     key={collection.id}
