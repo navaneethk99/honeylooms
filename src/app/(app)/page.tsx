@@ -61,42 +61,47 @@ export default async function HomePage() {
 async function HomePageContent() {
   const payload = await getPayload({ config: configPromise })
 
-  const [productsResult, categoriesResult, collectionsResult, homepageBannersResult, instagramReelsGlobal] =
-    await Promise.all([
-      payload.find({
-        collection: 'products',
-        depth: 2,
-        draft: false,
-        limit: 48,
-        overrideAccess: false,
-        // Products are manually arranged in the dashboard; preserve that order on the homepage.
-        sort: '_order',
-        where: { _status: { equals: 'published' } },
-      }),
-      payload.find({
-        collection: 'categories',
-        depth: 1,
-        limit: 12,
-        overrideAccess: false,
-        sort: 'title',
-      }),
-      payload.find({
-        collection: 'collections',
-        depth: 1,
-        limit: 12,
-        overrideAccess: false,
-        sort: '-createdAt',
-      }),
-      payload.find({
-        collection: 'homepage-banners',
-        depth: 1,
-        limit: 12,
-        overrideAccess: false,
-        sort: '-updatedAt',
-        where: { active: { equals: true } },
-      }),
-      getCachedGlobal('instagram-reels', 0).catch(() => null),
-    ])
+  const [
+    productsResult,
+    categoriesResult,
+    collectionsResult,
+    homepageBannersResult,
+    instagramReelsGlobal,
+  ] = await Promise.all([
+    payload.find({
+      collection: 'products',
+      depth: 2,
+      draft: false,
+      limit: 48,
+      overrideAccess: false,
+      // Products are manually arranged in the dashboard; preserve that order on the homepage.
+      sort: '_order',
+      where: { _status: { equals: 'published' } },
+    }),
+    payload.find({
+      collection: 'categories',
+      depth: 1,
+      limit: 12,
+      overrideAccess: false,
+      sort: 'title',
+    }),
+    payload.find({
+      collection: 'collections',
+      depth: 1,
+      limit: 12,
+      overrideAccess: false,
+      sort: '-createdAt',
+    }),
+    payload.find({
+      collection: 'homepage-banners',
+      depth: 1,
+      limit: 12,
+      overrideAccess: false,
+      sort: '-updatedAt',
+      where: { active: { equals: true } },
+    }),
+    getCachedGlobal('instagram-reels', 0).catch(() => null),
+  ])
 
   const products = productsResult.docs as Product[]
   const latestProducts = products.slice(0, 8)
@@ -145,8 +150,17 @@ async function HomePageContent() {
   return (
     <article className="home-page overflow-hidden bg-white text-[#24231f]">
       {homepageBanners.length > 0 ? (
-        <section className="relative aspect-[10/17] overflow-hidden md:aspect-[17/10]">
+        <section className="relative h-[calc(100svh-var(--homepage-header-height,113px)-48px)] w-full overflow-hidden md:h-[calc(100svh-var(--homepage-header-height,121px))]">
           <HomepageBannerMedia banners={homepageBanners} />
+          <div className="absolute inset-x-0 bottom-6 z-10 flex justify-center px-5">
+            <Link
+              className="inline-flex min-h-12 items-center justify-center gap-3 border border-[#24231f] bg-[#24231f] px-8 py-3 text-sm uppercase tracking-[0.14em] text-white shadow-md transition-colors hover:bg-white hover:text-[#24231f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              href="/shop"
+            >
+              Shop now
+              <ArrowUpRight aria-hidden="true" className="size-4" />
+            </Link>
+          </div>
         </section>
       ) : null}
 

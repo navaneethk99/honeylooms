@@ -22,7 +22,9 @@ export function HeaderClient({ header }: Props) {
   const pathname = usePathname()
 
   return (
-    <header className="site-header relative z-20">
+    <header
+      className={cn('site-header', pathname === '/' ? 'sticky top-0 z-30' : 'relative z-20')}
+    >
       <nav aria-label="Main navigation" className="header-shell">
         <div className="header-mobile-menu md:hidden">
           <Suspense fallback={null}>
