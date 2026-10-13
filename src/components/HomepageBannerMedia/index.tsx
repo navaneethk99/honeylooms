@@ -50,7 +50,7 @@ export function HomepageBannerMedia({ banners }: Props) {
     breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
   })
   const [activeIndex, setActiveIndex] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const activeDelay = banners[activeIndex]?.rotationDelay ?? 5
 
   useEffect(() => {
@@ -79,19 +79,25 @@ export function HomepageBannerMedia({ banners }: Props) {
     if (!carouselApi) return
 
     const onSelect = () => setActiveIndex(carouselApi.selectedScrollSnap())
+    const onPointerDown = () => setIsDragging(true)
+    const onPointerUp = () => setIsDragging(false)
     carouselApi.on('select', onSelect)
     carouselApi.on('reInit', onSelect)
+    carouselApi.on('pointerDown', onPointerDown)
+    carouselApi.on('pointerUp', onPointerUp)
 
     return () => {
       carouselApi.off('select', onSelect)
       carouselApi.off('reInit', onSelect)
+      carouselApi.off('pointerDown', onPointerDown)
+      carouselApi.off('pointerUp', onPointerUp)
     }
   }, [carouselApi])
 
   useEffect(() => {
     if (
       !carouselApi ||
-      isPaused ||
+      isDragging ||
       banners.length <= 1 ||
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
@@ -103,7 +109,7 @@ export function HomepageBannerMedia({ banners }: Props) {
     }, activeDelay * 1000)
 
     return () => window.clearTimeout(timer)
-  }, [activeDelay, activeIndex, banners.length, carouselApi, isPaused])
+  }, [activeDelay, activeIndex, banners.length, carouselApi, isDragging])
 
   if (banners.length === 0) return null
 
@@ -113,12 +119,6 @@ export function HomepageBannerMedia({ banners }: Props) {
       aria-roledescription="carousel"
       className="absolute inset-0 overflow-hidden bg-[#24231f]"
       ref={bannerRef}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onFocusCapture={() => setIsPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setIsPaused(false)
-      }}
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         {banners.map((banner, index) => (
